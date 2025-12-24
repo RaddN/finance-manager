@@ -1385,6 +1385,18 @@
         <div id="view-dashboard">
             <div class="stats-grid">
                 <div class="stat-card" style="border-color: var(--success);">
+                    <div class="stat-label">This Month Income</div>
+                    <div class="stat-value" id="dash-current-month-income">৳0</div>
+                </div>
+                <div class="stat-card" style="border-color: var(--danger);">
+                    <div class="stat-label">This Month Expenses</div>
+                    <div class="stat-value" id="dash-current-month-expenses">৳0</div>
+                </div>
+                <div class="stat-card" style="border-color: var(--primary);">
+                    <div class="stat-label">This Month Balance</div>
+                    <div class="stat-value" id="dash-current-month-balance">৳0</div>
+                </div>
+                <div class="stat-card" style="border-color: var(--success);">
                     <div class="stat-label">Total Income</div>
                     <div class="stat-value" id="dash-income">৳0</div>
                 </div>
@@ -2560,6 +2572,24 @@
             document.getElementById('dash-receivables-total').textContent = formatCurrency(totalReceivables);
             document.getElementById('dash-payables-total').textContent = formatCurrency(totalPayables);
 
+            // Calculate current month totals
+            const now = new Date();
+            const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`; // YYYY-MM
+            
+            const currentMonthIncome = state.data.income
+                .filter(item => item.date && item.date.substring(0, 7) === currentMonth)
+                .reduce((sum, item) => sum + Number(item.amount || 0), 0);
+            
+            const currentMonthExpenses = state.data.expenses
+                .filter(item => item.date && item.date.substring(0, 7) === currentMonth)
+                .reduce((sum, item) => sum + Number(item.amount || 0), 0);
+            
+            const currentMonthBalance = currentMonthIncome - currentMonthExpenses;
+
+            document.getElementById('dash-current-month-income').textContent = formatCurrency(currentMonthIncome);
+            document.getElementById('dash-current-month-expenses').textContent = formatCurrency(currentMonthExpenses);
+            document.getElementById('dash-current-month-balance').textContent = formatCurrency(currentMonthBalance);
+
             // Render Alerts
             renderDashboardAlerts();
 
@@ -3148,6 +3178,19 @@
             }
         }
 
+        // Helper function to format month from YYYY-MM to "May 2025"
+        function formatMonthLabel(monthStr) {
+            if (!monthStr || monthStr.length < 7) return monthStr;
+            const [year, month] = monthStr.split('-');
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'];
+            const monthIndex = parseInt(month) - 1;
+            if (monthIndex >= 0 && monthIndex < 12) {
+                return `${monthNames[monthIndex]} ${year}`;
+            }
+            return monthStr;
+        }
+
         function getMonthlyData() {
             const incomeByMonth = {};
             const expensesByMonth = {};
@@ -3169,7 +3212,8 @@
             const allMonths = [...new Set([...Object.keys(incomeByMonth), ...Object.keys(expensesByMonth)])].sort();
 
             return {
-                labels: allMonths,
+                labels: allMonths.map(m => formatMonthLabel(m)), // Format labels as "May 2025"
+                labelsRaw: allMonths, // Keep raw format for calculations
                 income: allMonths.map(m => incomeByMonth[m] || 0),
                 expenses: allMonths.map(m => expensesByMonth[m] || 0)
             };
