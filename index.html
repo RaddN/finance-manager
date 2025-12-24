@@ -1,1 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance Manager</title>
+    <!-- SheetJS for Excel processing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        :root {
+            --primary: #3182ce;
+            --primary-dark: #2c5282;
+            --success: #38a169;
+            --danger: #e53e3e;
+            --warning: #d97706;
+            --purple: #805ad5;
+            --bg-grad-start: #f5f7fa;
+            --bg-grad-end: #e4e8ec;
+            --card-bg: #ffffff;
+            --text-main: #2d3748;
+            --text-light: #718096;
+            --border: #e2e8f0;
+        }
 
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, var(--bg-grad-start) 0%, var(--bg-grad-end) 100%);
+            min-height: 100vh;
+            color: var(--text-main);
+            padding-bottom: 100px; /* Space for FAB */
+        }
+
+        /* Header */
+        header {
+            background: var(--card-bg);
+            padding: 1rem 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+        .logo { font-size: 1.25rem; font-weight: bold; color: var(--primary); display: flex; align-items: center; gap: 0.5rem; }
+        
+        /* Status Bar */
+        .status-bar {
+            background: #fff;
+            border-bottom: 1px solid var(--border);
+            padding: 0.5rem;
+            text-align: center;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .status-connected { color: var(--success); background: #f0fff4; }
+        .status-disconnected { color: var(--danger); background: #fff5f5; }
+
+        /* Navigation */
+        .nav-tabs {
+            display: flex;
+            gap: 1rem;
+            overflow-x: auto;
+            background: var(--card-bg);
+            padding: 0.5rem 1rem;
+            border-bottom: 1px solid var(--border);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .nav-tab {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            white-space: nowrap;
+            color: var(--text-light);
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .nav-tab:hover { background: #edf2f7; color: var(--text-main); }
+        .nav-tab.active { background: var(--primary); color: white; }
+
+        /* Main Content */
+        .container { max-width: 1200px; margin: 0 auto; padding: 1.5rem 1rem; }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border-left: 5px solid var(--primary);
+        }
+        .stat-label { font-size: 0.8rem; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+        .stat-value { font-size: 1.8rem; font-weight: bold; margin-top: 0.5rem; }
+
+        /* Tables & Cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .card h2 { margin-bottom: 1rem; font-size: 1.25rem; color: var(--text-main); }
+        
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        th { text-align: left; padding: 1rem; background: #f7fafc; color: var(--text-light); font-size: 0.875rem; font-weight: 600; border-bottom: 2px solid var(--border); }
+        td { padding: 1rem; border-bottom: 1px solid #edf2f7; font-size: 0.95rem; vertical-align: middle; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #f7fafc; }
+
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 64px;
+            height: 64px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(49, 130, 206, 0.4);
+            cursor: pointer;
+            font-size: 2rem;
+            transition: transform 0.2s, background 0.2s;
+            z-index: 100;
+            border: none;
+        }
+        .fab:hover { transform: scale(1.1); background: var(--primary-dark); }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .modal {
+            background: var(--card-bg);
+            width: 90%;
+            max-width: 500px;
+            border-radius: 16px;
+            padding: 2rem;
+            transform: translateY(20px);
+            transition: transform 0.2s;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .modal-overlay.active .modal { transform: translateY(0); }
+        
+        .modal-header { font-size: 1.5rem; font-weight: bold; margin-bottom: 1.5rem; text-align: center; }
+        
+        .form-group { margin-bottom: 1rem; }
+        .form-label { display: block; margin-bottom: 0.5rem; font-size: 0.875rem; color: var(--text-light); font-weight: 500; }
+        .form-input, .form-select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border 0.2s;
+        }
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(49,130,206,0.1);
+        }
+        
+        .btn { padding: 0.75rem 1.5rem; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; width: 100%; margin-top: 0.5rem; transition: background 0.2s; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-secondary { background: #edf2f7; color: var(--text-main); }
+        .btn-secondary:hover { background: #e2e8f0; }
+        .btn-danger { background: #fed7d7; color: var(--danger); padding: 0.5rem 1rem; font-size: 0.875rem; width: auto; }
+        .btn-danger:hover { background: #feb2b2; }
+
+        /* Type Selector Grid */
+        .type-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .type-card {
+            background: #f7fafc;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .type-card:hover { border-color: var(--primary); background: #ebf8ff; transform: translateY(-2px); }
+        .type-icon { font-size: 2.5rem; margin-bottom: 0.5rem; display: block; }
+        .type-label { font-weight: 600; color: var(--text-main); }
+
+        /* Tags */
+        .tag { padding: 0.25rem 0.75rem; border-radius: 99px; font-size: 0.75rem; font-weight: 600; display: inline-block; }
+        .tag-success { background: #f0fff4; color: var(--success); }
+        .tag-danger { background: #fff5f5; color: var(--danger); }
+        .tag-warning { background: #fffaf0; color: var(--warning); }
+        .tag-purple { background: #faf5ff; color: var(--purple); }
+
+        /* Future Plans Progress */
+        .plan-item { margin-bottom: 1.5rem; }
+        .plan-header { display: flex; justify-content: space-between; margin-bottom: 0.5rem; }
+        .progress-track { width: 100%; height: 10px; background: #edf2f7; border-radius: 5px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--purple); transition: width 0.5s ease; }
+        .plan-meta { display: flex; justify-content: space-between; margin-top: 0.5rem; font-size: 0.875rem; color: var(--text-light); }
+
+        .hidden { display: none !important; }
+        .text-right { text-align: right; }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                <span>📊</span> Finance Manager
+            </div>
+            <button class="btn btn-primary" style="width: auto;" id="connect-btn" onclick="connectExcelFile()">Connect Excel</button>
+        </div>
+    </header>
+
+    <!-- Status Bar -->
+    <div id="status-bar" class="status-bar status-disconnected">
+        Disconnected from 'finance_data.xlsx'. Please connect to start.
+    </div>
+
+    <!-- Navigation -->
+    <nav class="nav-tabs">
+        <div class="nav-tab active" onclick="switchTab('dashboard')">Dashboard</div>
+        <div class="nav-tab" onclick="switchTab('income')">Income</div>
+        <div class="nav-tab" onclick="switchTab('expenses')">Expenses</div>
+        <div class="nav-tab" onclick="switchTab('receivables')">Due (Receivables)</div>
+        <div class="nav-tab" onclick="switchTab('payables')">Payables</div>
+        <div class="nav-tab" onclick="switchTab('plans')">Future Plans</div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="container">
+        
+        <!-- Dashboard View -->
+        <div id="view-dashboard">
+            <div class="stats-grid">
+                <div class="stat-card" style="border-color: var(--success);">
+                    <div class="stat-label">Total Income</div>
+                    <div class="stat-value" id="dash-income">৳0</div>
+                </div>
+                <div class="stat-card" style="border-color: var(--danger);">
+                    <div class="stat-label">Total Expenses</div>
+                    <div class="stat-value" id="dash-expenses">৳0</div>
+                </div>
+                <div class="stat-card" style="border-color: var(--primary);">
+                    <div class="stat-label">Net Balance</div>
+                    <div class="stat-value" id="dash-balance">৳0</div>
+                </div>
+                <div class="stat-card" style="border-color: var(--purple);">
+                    <div class="stat-label">Total Savings</div>
+                    <div class="stat-value" id="dash-savings">৳0</div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+                <div class="card">
+                    <h2>📥 Due Receivables</h2>
+                    <div id="dash-receivables-list"></div>
+                </div>
+                <div class="card">
+                    <h2>📤 Due Payables</h2>
+                    <div id="dash-payables-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Generic List View (Used for Income, Expenses, Receivables, Payables) -->
+        <div id="view-list" class="hidden">
+            <div class="card">
+                <h2 id="list-title">Items</h2>
+                <div class="table-container">
+                    <table>
+                        <thead id="list-thead"></thead>
+                        <tbody id="list-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Plans View -->
+        <div id="view-plans" class="hidden">
+            <div class="card">
+                <h2>Future Plans & Goals</h2>
+                <div id="plans-container"></div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Sticky Add Button -->
+    <button class="fab" onclick="openModal('selector')">+</button>
+
+    <!-- Modal Overlay -->
+    <div id="modal-overlay" class="modal-overlay">
+        <div class="modal" id="modal-content">
+            <!-- Content injected via JS -->
+        </div>
+    </div>
+
+    <script>
+        // --- 1. STATE & CONFIG ---
+        const CONFIG = {
+            fileName: 'finance_data.xlsx',
+            currency: '৳'
+        };
+
+        let state = {
+            fileHandle: null,
+            isConnected: false,
+            data: {
+                income: [],
+                expenses: [],
+                receivables: [],
+                payables: [],
+                plans: []
+            }
+        };
+
+        // --- 2. EXCEL FILE SYSTEM LOGIC ---
+        
+        async function connectExcelFile() {
+            if (!window.showOpenFilePicker) {
+                alert("Your browser does not support the File System Access API. Please use Chrome, Edge, or Opera on HTTPS/Localhost.");
+                return;
+            }
+
+            try {
+                [state.fileHandle] = await window.showOpenFilePicker({
+                    types: [{
+                        description: 'Excel Files',
+                        accept: { 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'] }
+                    }],
+                    multiple: false
+                });
+
+                if (state.fileHandle.name !== CONFIG.fileName) {
+                    alert(`Please select the file named exactly: ${CONFIG.fileName}`);
+                    state.fileHandle = null;
+                    return;
+                }
+
+                state.isConnected = true;
+                updateStatus(true);
+                
+                // Load Data
+                await readExcelFile();
+                renderAll();
+
+            } catch (err) {
+                console.error(err);
+                if (err.name !== 'AbortError') {
+                    alert('Error connecting to file: ' + err.message);
+                }
+            }
+        }
+
+        async function readExcelFile() {
+            const file = await state.fileHandle.getFile();
+            const arrayBuffer = await file.arrayBuffer();
+            const workbook = XLSX.read(arrayBuffer, {type: 'array'});
+
+            const parseSheet = (name) => {
+                if (workbook.Sheets[name]) {
+                    return XLSX.utils.sheet_to_json(workbook.Sheets[name]);
+                }
+                return [];
+            };
+
+            // Map sheets to state data
+            state.data.income = parseSheet('Income');
+            state.data.expenses = parseSheet('Expenses');
+            state.data.receivables = parseSheet('Receivables');
+            state.data.payables = parseSheet('Payables');
+            state.data.plans = parseSheet('Plans');
+        }
+
+        async function writeExcelFile() {
+            if (!state.fileHandle || !state.isConnected) return;
+
+            try {
+                // Create workbook
+                const wb = XLSX.utils.book_new();
+
+                // Convert data to sheets
+                const incomeSheet = XLSX.utils.json_to_sheet(state.data.income);
+                const expensesSheet = XLSX.utils.json_to_sheet(state.data.expenses);
+                const receivablesSheet = XLSX.utils.json_to_sheet(state.data.receivables);
+                const payablesSheet = XLSX.utils.json_to_sheet(state.data.payables);
+                const plansSheet = XLSX.utils.json_to_sheet(state.data.plans);
+
+                // Append sheets
+                XLSX.utils.book_append_sheet(wb, incomeSheet, "Income");
+                XLSX.utils.book_append_sheet(wb, expensesSheet, "Expenses");
+                XLSX.utils.book_append_sheet(wb, receivablesSheet, "Receivables");
+                XLSX.utils.book_append_sheet(wb, payablesSheet, "Payables");
+                XLSX.utils.book_append_sheet(wb, plansSheet, "Plans");
+
+                // Write to file
+                const wbout = XLSX.write(wb, {bookType:'xlsx', type:'array'});
+                const writable = await state.fileHandle.createWritable();
+                await writable.write(wbout);
+                await writable.close();
+
+                // Visual feedback (brief toast or status update)
+                const statusEl = document.getElementById('status-bar');
+                const originalText = statusEl.textContent;
+                statusEl.textContent = 'Saved successfully!';
+                setTimeout(() => updateStatus(true), 1500);
+
+            } catch (err) {
+                console.error('Save error:', err);
+                alert('Failed to save to Excel file. Check permissions.');
+            }
+        }
+
+        // --- 3. UI RENDERING ---
+
+        function updateStatus(connected) {
+            const el = document.getElementById('status-bar');
+            const btn = document.getElementById('connect-btn');
+            if (connected) {
+                el.className = 'status-bar status-connected';
+                el.textContent = `Connected to ${CONFIG.fileName}`;
+                btn.textContent = 'Connected';
+                btn.disabled = true;
+            } else {
+                el.className = 'status-bar status-disconnected';
+                el.textContent = 'Disconnected. Please connect Excel file.';
+                btn.textContent = 'Connect Excel';
+                btn.disabled = false;
+            }
+        }
+
+        function formatCurrency(amount) {
+            return CONFIG.currency + Number(amount).toLocaleString('en-BD');
+        }
+
+        function switchTab(tabId) {
+            // Update Tab UI
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            const activeTab = Array.from(document.querySelectorAll('.nav-tab')).find(t => t.innerText.toLowerCase().includes(tabId === 'plans' ? 'future' : tabId));
+            if (activeTab) activeTab.classList.add('active');
+
+            // Hide all views
+            document.getElementById('view-dashboard').classList.add('hidden');
+            document.getElementById('view-list').classList.add('hidden');
+            document.getElementById('view-plans').classList.add('hidden');
+
+            // Show selected view
+            if (tabId === 'dashboard') {
+                document.getElementById('view-dashboard').classList.remove('hidden');
+                renderDashboard();
+            } else if (tabId === 'plans') {
+                document.getElementById('view-plans').classList.remove('hidden');
+                renderPlansList();
+            } else {
+                document.getElementById('view-list').classList.remove('hidden');
+                renderListTable(tabId);
+            }
+        }
+
+        function renderAll() {
+            // Determine current tab and render it specifically
+            const activeTab = document.querySelector('.nav-tab.active');
+            if(activeTab) {
+                if(activeTab.innerText.includes('Dashboard')) switchTab('dashboard');
+                else if(activeTab.innerText.includes('Future')) switchTab('plans');
+                else switchTab(activeTab.getAttribute('onclick').match(/'([^']+)'/)[1]);
+            } else {
+                switchTab('dashboard');
+            }
+        }
+
+        function renderDashboard() {
+            // Calculate Stats
+            const totalIncome = state.data.income.reduce((sum, i) => sum + Number(i.amount || 0), 0);
+            const totalExpenses = state.data.expenses.reduce((sum, i) => sum + Number(i.amount || 0), 0);
+            const netBalance = totalIncome - totalExpenses;
+            const totalReceivables = state.data.receivables.reduce((sum, i) => sum + Number(i.amount || 0), 0);
+
+            document.getElementById('dash-income').textContent = formatCurrency(totalIncome);
+            document.getElementById('dash-expenses').textContent = formatCurrency(totalExpenses);
+            document.getElementById('dash-balance').textContent = formatCurrency(netBalance);
+            document.getElementById('dash-savings').textContent = formatCurrency(totalReceivables + (netBalance > 0 ? netBalance : 0)); // Approximate logic
+
+            // Render Dashboard Lists (Top 5)
+            const renderSmallList = (items, containerId, type) => {
+                const container = document.getElementById(containerId);
+                container.innerHTML = '';
+                const list = items.slice(0, 5); // Show top 5
+                
+                if (list.length === 0) {
+                    container.innerHTML = '<div style="color:#cbd5e0; font-style:italic;">No items</div>';
+                    return;
+                }
+
+                list.forEach((item, idx) => {
+                    const row = document.createElement('div');
+                    row.style.cssText = "display:flex; justify-content:space-between; padding:0.5rem 0; border-bottom:1px solid #f7fafc;";
+                    const title = type === 'receivable' ? (item.from || 'Unknown') : (item.to || 'Unknown');
+                    row.innerHTML = `
+                        <span>${title} <small style="color:#a0aec0">(${item.dueDate || '-'})</small></span>
+                        <strong style="color: ${type === 'receivable' ? 'var(--success)' : 'var(--danger)'}">${formatCurrency(item.amount)}</strong>
+                    `;
+                    container.appendChild(row);
+                });
+            };
+
+            renderSmallList(state.data.receivables, 'dash-receivables-list', 'receivable');
+            renderSmallList(state.data.payables, 'dash-payables-list', 'payable');
+        }
+
+        function renderListTable(type) {
+            const titleEl = document.getElementById('list-title');
+            const thead = document.getElementById('list-thead');
+            const tbody = document.getElementById('list-tbody');
+            const data = state.data[type] || [];
+
+            thead.innerHTML = '';
+            tbody.innerHTML = '';
+
+            let headers = [];
+
+            if (type === 'income') {
+                titleEl.textContent = 'Income Sources';
+                headers = ['Date', 'Source', 'Category', 'Amount', 'Action'];
+            } else if (type === 'expenses') {
+                titleEl.textContent = 'Expenses';
+                headers = ['Date', 'Description', 'Category', 'Amount', 'Action'];
+            } else if (type === 'receivables') {
+                titleEl.textContent = 'Receivables (Due)';
+                headers = ['Due Date', 'From', 'Description', 'Amount', 'Action'];
+            } else if (type === 'payables') {
+                titleEl.textContent = 'Payables';
+                headers = ['Due Date', 'To', 'Description', 'Amount', 'Action'];
+            }
+
+            // Render Headers
+            const trHead = document.createElement('tr');
+            headers.forEach(h => {
+                const th = document.createElement('th');
+                th.textContent = h;
+                trHead.appendChild(th);
+            });
+            thead.appendChild(trHead);
+
+            // Render Rows
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="${headers.length}" class="text-center" style="padding: 2rem; color: var(--text-light);">No data found.</td></tr>`;
+                return;
+            }
+
+            data.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                let cols = '';
+
+                if (type === 'income') {
+                    cols = `
+                        <td>${item.date || '-'}</td>
+                        <td>${item.source || '-'}</td>
+                        <td><span class="tag tag-success">${item.category || '-'}</span></td>
+                        <td>${formatCurrency(item.amount)}</td>
+                    `;
+                } else if (type === 'expenses') {
+                    cols = `
+                        <td>${item.date || '-'}</td>
+                        <td>${item.description || '-'}</td>
+                        <td><span class="tag tag-danger">${item.category || '-'}</span></td>
+                        <td>${formatCurrency(item.amount)}</td>
+                    `;
+                } else if (type === 'receivables') {
+                    cols = `
+                        <td>${item.dueDate || '-'}</td>
+                        <td>${item.from || '-'}</td>
+                        <td>${item.description || '-'}</td>
+                        <td style="color:var(--success); font-weight:bold;">${formatCurrency(item.amount)}</td>
+                    `;
+                } else if (type === 'payables') {
+                    cols = `
+                        <td>${item.dueDate || '-'}</td>
+                        <td>${item.to || '-'}</td>
+                        <td>${item.description || '-'}</td>
+                        <td style="color:var(--danger); font-weight:bold;">${formatCurrency(item.amount)}</td>
+                    `;
+                }
+
+                tr.innerHTML = cols + `<td><button class="btn btn-danger" onclick="deleteItem('${type}', ${index})">Delete</button></td>`;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderPlansList() {
+            const container = document.getElementById('plans-container');
+            container.innerHTML = '';
+            const data = state.data.plans || [];
+
+            if (data.length === 0) {
+                container.innerHTML = '<div class="text-center" style="padding: 2rem; color: var(--text-light);">No future plans found.</div>';
+                return;
+            }
+
+            data.forEach((plan, index) => {
+                const current = Number(plan.currentAmount || 0);
+                const target = Number(plan.targetAmount || 1);
+                const percent = Math.min(100, Math.round((current / target) * 100));
+
+                const div = document.createElement('div');
+                div.className = 'plan-item';
+                div.innerHTML = `
+                    <div class="plan-header">
+                        <h3 style="font-size: 1.1rem;">${plan.title || 'Untitled'}</h3>
+                        <button class="btn btn-danger" style="width: auto; padding: 0.25rem 0.75rem;" onclick="deleteItem('plans', ${index})">✕</button>
+                    </div>
+                    <div style="font-size: 0.875rem; color: var(--text-light); margin-bottom: 0.5rem;">
+                        Target: ${formatCurrency(target)} by ${plan.deadline || 'No Date'}
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill" style="width: ${percent}%"></div>
+                    </div>
+                    <div class="plan-meta">
+                        <span>Saved: ${formatCurrency(current)}</span>
+                        <span style="font-weight: bold; color: var(--purple);">${percent}%</span>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // --- 4. MODAL & FORM LOGIC ---
+
+        function openModal(mode, type = null) {
+            const overlay = document.getElementById('modal-overlay');
+            const content = document.getElementById('modal-content');
+            
+            overlay.classList.add('active');
+
+            if (mode === 'selector') {
+                content.innerHTML = `
+                    <div class="modal-header">Add New Item</div>
+                    <div class="type-grid">
+                        <div class="type-card" onclick="openModal('form', 'income')">
+                            <span class="type-icon">💰</span>
+                            <div class="type-label">Income</div>
+                        </div>
+                        <div class="type-card" onclick="openModal('form', 'expense')">
+                            <span class="type-icon">💸</span>
+                            <div class="type-label">Expense</div>
+                        </div>
+                        <div class="type-card" onclick="openModal('form', 'receivable')">
+                            <span class="type-icon">📥</span>
+                            <div class="type-label">Due (Receivable)</div>
+                        </div>
+                        <div class="type-card" onclick="openModal('form', 'payable')">
+                            <span class="type-icon">📤</span>
+                            <div class="type-label">Payable</div>
+                        </div>
+                        <div class="type-card" style="grid-column: span 2;" onclick="openModal('form', 'plan')">
+                            <span class="type-icon">🎯</span>
+                            <div class="type-label">Future Plan</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                `;
+            } else if (mode === 'form') {
+                let formHTML = `<div class="modal-header">Add ${type.charAt(0).toUpperCase() + type.slice(1)}</div>`;
+
+                if (type === 'income') {
+                    formHTML += `
+                        <div class="form-group">
+                            <label class="form-label">Source</label>
+                            <input type="text" class="form-input" id="inp-source" placeholder="e.g. Salary, Freelance">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Category</label>
+                            <select class="form-select" id="inp-category">
+                                <option>Salary</option>
+                                <option>Freelance</option>
+                                <option>Business</option>
+                                <option>Investment</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Amount</label>
+                            <input type="number" class="form-input" id="inp-amount" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Date</label>
+                            <input type="date" class="form-input" id="inp-date">
+                        </div>
+                    `;
+                } else if (type === 'expense') {
+                    formHTML += `
+                        <div class="form-group">
+                            <label class="form-label">Description</label>
+                            <input type="text" class="form-input" id="inp-desc" placeholder="e.g. Groceries">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Category</label>
+                            <select class="form-select" id="inp-category">
+                                <option>Food</option>
+                                <option>Housing</option>
+                                <option>Transport</option>
+                                <option>Utilities</option>
+                                <option>Health</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Amount</label>
+                            <input type="number" class="form-input" id="inp-amount" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Date</label>
+                            <input type="date" class="form-input" id="inp-date">
+                        </div>
+                    `;
+                } else if (type === 'receivable') {
+                    formHTML += `
+                        <div class="form-group">
+                            <label class="form-label">From (Client/Person)</label>
+                            <input type="text" class="form-input" id="inp-from" placeholder="Name">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Description</label>
+                            <input type="text" class="form-input" id="inp-desc" placeholder="Reason">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Amount</label>
+                            <input type="number" class="form-input" id="inp-amount" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Due Date</label>
+                            <input type="date" class="form-input" id="inp-duedate">
+                        </div>
+                    `;
+                } else if (type === 'payable') {
+                    formHTML += `
+                        <div class="form-group">
+                            <label class="form-label">To (Vendor/Person)</label>
+                            <input type="text" class="form-input" id="inp-to" placeholder="Name">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Description</label>
+                            <input type="text" class="form-input" id="inp-desc" placeholder="Reason">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Amount</label>
+                            <input type="number" class="form-input" id="inp-amount" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Due Date</label>
+                            <input type="date" class="form-input" id="inp-duedate">
+                        </div>
+                    `;
+                } else if (type === 'plan') {
+                    formHTML += `
+                        <div class="form-group">
+                            <label class="form-label">Plan Title</label>
+                            <input type="text" class="form-input" id="inp-title" placeholder="e.g. New Laptop">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Target Amount</label>
+                            <input type="number" class="form-input" id="inp-target" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Current Saved Amount</label>
+                            <input type="number" class="form-input" id="inp-current" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Target Deadline</label>
+                            <input type="date" class="form-input" id="inp-deadline">
+                        </div>
+                    `;
+                }
+
+                formHTML += `
+                    <button class="btn btn-primary" onclick="submitForm('${type}')">Save Item</button>
+                    <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                `;
+                
+                content.innerHTML = formHTML;
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('modal-overlay').classList.remove('active');
+        }
+
+        function submitForm(type) {
+            let newItem = {};
+            
+            // Helper to get value
+            const val = (id) => document.getElementById(id).value;
+            const num = (id) => Number(document.getElementById(id).value) || 0;
+
+            if (type === 'income') {
+                newItem = {
+                    source: val('inp-source'),
+                    category: val('inp-category'),
+                    amount: num('inp-amount'),
+                    date: val('inp-date')
+                };
+                state.data.income.push(newItem);
+            } else if (type === 'expense') {
+                newItem = {
+                    description: val('inp-desc'),
+                    category: val('inp-category'),
+                    amount: num('inp-amount'),
+                    date: val('inp-date')
+                };
+                state.data.expenses.push(newItem);
+            } else if (type === 'receivable') {
+                newItem = {
+                    from: val('inp-from'),
+                    description: val('inp-desc'),
+                    amount: num('inp-amount'),
+                    dueDate: val('inp-duedate')
+                };
+                state.data.receivables.push(newItem);
+            } else if (type === 'payable') {
+                newItem = {
+                    to: val('inp-to'),
+                    description: val('inp-desc'),
+                    amount: num('inp-amount'),
+                    dueDate: val('inp-duedate')
+                };
+                state.data.payables.push(newItem);
+            } else if (type === 'plan') {
+                newItem = {
+                    title: val('inp-title'),
+                    targetAmount: num('inp-target'),
+                    currentAmount: num('inp-current'),
+                    deadline: val('inp-deadline')
+                };
+                state.data.plans.push(newItem);
+            }
+
+            // Save to Excel and UI
+            writeExcelFile().then(() => {
+                renderAll();
+                closeModal();
+            });
+        }
+
+        function deleteItem(type, index) {
+            if (confirm('Are you sure you want to delete this item?')) {
+                state.data[type].splice(index, 1);
+                writeExcelFile().then(() => {
+                    renderAll();
+                });
+            }
+        }
+
+        // --- 5. INITIALIZATION ---
+        // Check if previously connected (optional advanced feature, skipped for simplicity to stick to manual connect for security)
+        // Just wait for user to click connect.
+    </script>
+</body>
+</html>
