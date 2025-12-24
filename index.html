@@ -587,23 +587,60 @@
                 </div>
             </div>
 
+            <!-- Financial Health Score -->
+            <div class="card" style="margin-bottom: 2rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                    <div>
+                        <div style="font-size: 0.875rem; opacity: 0.9; margin-bottom: 0.5rem;">Financial Health Score</div>
+                        <div style="font-size: 3rem; font-weight: bold;" id="health-score">-</div>
+                        <div style="font-size: 0.875rem; opacity: 0.9; margin-top: 0.5rem;" id="health-status"></div>
+                    </div>
+                    <div style="flex: 1; min-width: 200px;">
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+                            <div>
+                                <div style="font-size: 0.75rem; opacity: 0.8;">Savings Rate</div>
+                                <div style="font-size: 1.5rem; font-weight: bold;" id="savings-rate">0%</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 0.75rem; opacity: 0.8;">Expense Ratio</div>
+                                <div style="font-size: 1.5rem; font-weight: bold;" id="expense-ratio">0%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Quick Insights -->
             <div class="analytics-grid" style="margin-bottom: 2rem;">
                 <div class="insight-card">
                     <div class="insight-title">Average Monthly Expense</div>
                     <div class="insight-value" id="avg-monthly-expense">৳0</div>
+                    <div class="insight-trend" id="expense-trend"></div>
                 </div>
                 <div class="insight-card">
                     <div class="insight-title">Average Monthly Income</div>
                     <div class="insight-value" id="avg-monthly-income">৳0</div>
+                    <div class="insight-trend" id="income-trend"></div>
                 </div>
                 <div class="insight-card">
                     <div class="insight-title">Top Spending Category</div>
                     <div class="insight-value" id="top-category" style="font-size: 1.2rem;">-</div>
+                    <div class="insight-trend" id="top-category-amount"></div>
                 </div>
                 <div class="insight-card">
                     <div class="insight-title">Average Transaction Size</div>
                     <div class="insight-value" id="avg-transaction">৳0</div>
+                    <div class="insight-trend">All transactions</div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-title">Monthly Savings</div>
+                    <div class="insight-value" id="avg-monthly-savings">৳0</div>
+                    <div class="insight-trend" id="savings-trend"></div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-title">Transaction Count</div>
+                    <div class="insight-value" id="transaction-count">0</div>
+                    <div class="insight-trend" id="transaction-breakdown"></div>
                 </div>
             </div>
 
@@ -657,6 +694,11 @@
                         </select>
                         <input type="date" class="filter-input" id="date-from-filter" onchange="applyFilters()" placeholder="From Date">
                         <input type="date" class="filter-input" id="date-to-filter" onchange="applyFilters()" placeholder="To Date">
+                        <select class="filter-input" id="recurring-filter" onchange="applyFilters()" style="min-width: 120px;">
+                            <option value="">All Types</option>
+                            <option value="recurring">Recurring Only</option>
+                            <option value="non-recurring">Non-Recurring</option>
+                        </select>
                         <select class="filter-input" id="sort-by" onchange="applyFilters()" style="min-width: 150px;">
                             <option value="">Sort by...</option>
                             <option value="date-asc">Date (Oldest)</option>
@@ -1012,6 +1054,179 @@
 
             renderSmallList(state.data.receivables, 'dash-receivables-list', 'receivable');
             renderSmallList(state.data.payables, 'dash-payables-list', 'payable');
+        }
+
+        function renderQuickInsights(totalIncome, totalExpenses) {
+            // Calculate average monthly expense
+            const monthlyData = getMonthlyData();
+            const avgMonthlyExpense = monthlyData.expenses.length > 0 
+                ? monthlyData.expenses.reduce((a, b) => a + b, 0) / monthlyData.expenses.length 
+                : 0;
+            const expenseEl = document.getElementById('avg-monthly-expense');
+            if (expenseEl) expenseEl.textContent = formatCurrency(avgMonthlyExpense);
+
+            // Calculate average monthly income
+            const avgMonthlyIncome = monthlyData.income.length > 0 
+                ? monthlyData.income.reduce((a, b) => a + b, 0) / monthlyData.income.length 
+                : 0;
+            const incomeEl = document.getElementById('avg-monthly-income');
+            if (incomeEl) incomeEl.textContent = formatCurrency(avgMonthlyIncome);
+
+            // Top spending category
+            const expenseCategories = getCategoryData('expenses');
+            const topCategory = expenseCategories.labels.length > 0 ? expenseCategories.labels[0] : '-';
+            const topCategoryAmount = expenseCategories.values.length > 0 ? expenseCategories.values[0] : 0;
+            const topCatEl = document.getElementById('top-category');
+            if (topCatEl) topCatEl.textContent = topCategory;
+            const topCatAmountEl = document.getElementById('top-category-amount');
+            if (topCatAmountEl) topCatAmountEl.textContent = topCategoryAmount > 0 ? formatCurrency(topCategoryAmount) : '-';
+
+            // Average transaction size
+            const totalTransactions = state.data.expenses.length + state.data.income.length;
+            const avgTransaction = totalTransactions > 0 
+                ? (totalIncome + totalExpenses) / totalTransactions 
+                : 0;
+            const avgTransEl = document.getElementById('avg-transaction');
+            if (avgTransEl) avgTransEl.textContent = formatCurrency(avgTransaction);
+
+            // Average monthly savings
+            const avgMonthlySavings = avgMonthlyIncome - avgMonthlyExpense;
+            const savingsEl = document.getElementById('avg-monthly-savings');
+            if (savingsEl) savingsEl.textContent = formatCurrency(avgMonthlySavings);
+            const savingsTrendEl = document.getElementById('savings-trend');
+            if (savingsTrendEl) {
+                savingsTrendEl.className = 'insight-trend ' + (avgMonthlySavings >= 0 ? 'trend-up' : 'trend-down');
+                savingsTrendEl.textContent = avgMonthlySavings >= 0 ? 'Positive monthly savings' : 'Negative monthly savings';
+            }
+
+            // Transaction count breakdown
+            const transCountEl = document.getElementById('transaction-count');
+            if (transCountEl) transCountEl.textContent = totalTransactions;
+            const transBreakdownEl = document.getElementById('transaction-breakdown');
+            if (transBreakdownEl) {
+                transBreakdownEl.textContent = `${state.data.income.length} income, ${state.data.expenses.length} expenses`;
+            }
+
+            // Calculate trends (compare last 2 months if available)
+            if (monthlyData.expenses.length >= 2) {
+                const recent = monthlyData.expenses.slice(-2);
+                const expenseChange = recent[1] - recent[0];
+                const expenseTrendEl = document.getElementById('expense-trend');
+                if (expenseTrendEl) {
+                    expenseTrendEl.className = 'insight-trend ' + (expenseChange < 0 ? 'trend-up' : 'trend-down');
+                    expenseTrendEl.textContent = expenseChange < 0 
+                        ? `↓ ${formatCurrency(Math.abs(expenseChange))} vs last month`
+                        : `↑ ${formatCurrency(expenseChange)} vs last month`;
+                }
+            }
+
+            if (monthlyData.income.length >= 2) {
+                const recent = monthlyData.income.slice(-2);
+                const incomeChange = recent[1] - recent[0];
+                const incomeTrendEl = document.getElementById('income-trend');
+                if (incomeTrendEl) {
+                    incomeTrendEl.className = 'insight-trend ' + (incomeChange > 0 ? 'trend-up' : 'trend-down');
+                    incomeTrendEl.textContent = incomeChange > 0 
+                        ? `↑ ${formatCurrency(incomeChange)} vs last month`
+                        : `↓ ${formatCurrency(Math.abs(incomeChange))} vs last month`;
+                }
+            }
+
+            // Calculate Financial Health Score
+            calculateFinancialHealth(totalIncome, totalExpenses, avgMonthlyIncome, avgMonthlyExpense);
+        }
+
+        function calculateFinancialHealth(totalIncome, totalExpenses, avgMonthlyIncome, avgMonthlyExpense) {
+            let score = 0;
+            const maxScore = 100;
+
+            // Savings rate (0-30 points)
+            if (totalIncome > 0) {
+                const savingsRate = ((totalIncome - totalExpenses) / totalIncome) * 100;
+                const savingsRateEl = document.getElementById('savings-rate');
+                if (savingsRateEl) savingsRateEl.textContent = savingsRate.toFixed(1) + '%';
+                if (savingsRate >= 20) score += 30;
+                else if (savingsRate >= 10) score += 20;
+                else if (savingsRate >= 5) score += 15;
+                else if (savingsRate >= 0) score += 10;
+                else score += 0;
+            } else {
+                const savingsRateEl = document.getElementById('savings-rate');
+                if (savingsRateEl) savingsRateEl.textContent = '0%';
+            }
+
+            // Expense ratio (0-25 points)
+            if (totalIncome > 0) {
+                const expenseRatio = (totalExpenses / totalIncome) * 100;
+                const expenseRatioEl = document.getElementById('expense-ratio');
+                if (expenseRatioEl) expenseRatioEl.textContent = expenseRatio.toFixed(1) + '%';
+                if (expenseRatio <= 70) score += 25;
+                else if (expenseRatio <= 80) score += 20;
+                else if (expenseRatio <= 90) score += 15;
+                else if (expenseRatio <= 100) score += 10;
+                else score += 5;
+            } else {
+                const expenseRatioEl = document.getElementById('expense-ratio');
+                if (expenseRatioEl) expenseRatioEl.textContent = '0%';
+            }
+
+            // Monthly consistency (0-20 points)
+            const monthlyData = getMonthlyData();
+            if (monthlyData.income.length >= 3) {
+                const incomeVariance = calculateVariance(monthlyData.income.slice(-3));
+                if (incomeVariance < 0.1) score += 20;
+                else if (incomeVariance < 0.2) score += 15;
+                else if (incomeVariance < 0.3) score += 10;
+                else score += 5;
+            } else {
+                score += 10; // Default for insufficient data
+            }
+
+            // Growth trend (0-15 points)
+            if (monthlyData.income.length >= 2 && monthlyData.expenses.length >= 2) {
+                const incomeTrend = monthlyData.income.slice(-2)[1] - monthlyData.income.slice(-2)[0];
+                const expenseTrend = monthlyData.expenses.slice(-2)[1] - monthlyData.expenses.slice(-2)[0];
+                if (incomeTrend > 0 && expenseTrend <= 0) score += 15;
+                else if (incomeTrend > expenseTrend) score += 10;
+                else if (incomeTrend === expenseTrend) score += 5;
+                else score += 0;
+            } else {
+                score += 5;
+            }
+
+            // Transaction activity (0-10 points)
+            const totalTransactions = state.data.expenses.length + state.data.income.length;
+            if (totalTransactions >= 20) score += 10;
+            else if (totalTransactions >= 10) score += 7;
+            else if (totalTransactions >= 5) score += 5;
+            else score += 2;
+
+            // Update UI
+            const healthScoreEl = document.getElementById('health-score');
+            if (healthScoreEl) healthScoreEl.textContent = Math.min(score, maxScore);
+            const statusEl = document.getElementById('health-status');
+            if (statusEl) {
+                if (score >= 80) {
+                    statusEl.textContent = 'Excellent - Great financial health!';
+                    statusEl.style.color = '#48bb78';
+                } else if (score >= 65) {
+                    statusEl.textContent = 'Good - On the right track';
+                    statusEl.style.color = '#38a169';
+                } else if (score >= 50) {
+                    statusEl.textContent = 'Fair - Room for improvement';
+                    statusEl.style.color = '#d69e2e';
+                } else {
+                    statusEl.textContent = 'Needs Attention - Review spending habits';
+                    statusEl.style.color = '#e53e3e';
+                }
+            }
+        }
+
+        function calculateVariance(values) {
+            if (values.length === 0) return 0;
+            const mean = values.reduce((a, b) => a + b, 0) / values.length;
+            const variance = values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length;
+            return variance / (mean * mean); // Coefficient of variation
         }
 
         // Chart rendering functions
@@ -1387,6 +1602,7 @@
             const categoryFilter = document.getElementById('category-filter')?.value || '';
             const dateFrom = document.getElementById('date-from-filter')?.value || '';
             const dateTo = document.getElementById('date-to-filter')?.value || '';
+            const recurringFilter = document.getElementById('recurring-filter')?.value || '';
             const sortBy = document.getElementById('sort-by')?.value || '';
 
             const data = state.data[currentListType] || [];
@@ -1406,6 +1622,13 @@
                 
                 if (dateFrom && itemDate < dateFrom) return false;
                 if (dateTo && itemDate > dateTo) return false;
+
+                // Recurring filter
+                if (recurringFilter) {
+                    const isRecurring = item.recurring === true || item.recurring === 'true';
+                    if (recurringFilter === 'recurring' && !isRecurring) return false;
+                    if (recurringFilter === 'non-recurring' && isRecurring) return false;
+                }
 
                 return true;
             });
@@ -1450,6 +1673,7 @@
             document.getElementById('category-filter').value = '';
             document.getElementById('date-from-filter').value = '';
             document.getElementById('date-to-filter').value = '';
+            document.getElementById('recurring-filter').value = '';
             document.getElementById('sort-by').value = '';
             applyFilters();
         }
@@ -1566,6 +1790,14 @@
             if (!container) return;
 
             const period = document.getElementById('report-period')?.value || 'month';
+            const customRange = document.getElementById('custom-date-range');
+            
+            if (period === 'custom') {
+                if (customRange) customRange.style.display = 'flex';
+            } else {
+                if (customRange) customRange.style.display = 'none';
+            }
+
             const now = new Date();
             let startDate = '', endDate = '';
 
@@ -1575,12 +1807,19 @@
             } else if (period === 'lastmonth') {
                 startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString().split('T')[0];
                 endDate = new Date(now.getFullYear(), now.getMonth(), 0).toISOString().split('T')[0];
+            } else if (period === 'quarter') {
+                const quarter = Math.floor(now.getMonth() / 3);
+                startDate = new Date(now.getFullYear(), quarter * 3, 1).toISOString().split('T')[0];
+                endDate = now.toISOString().split('T')[0];
             } else if (period === 'year') {
                 startDate = new Date(now.getFullYear(), 0, 1).toISOString().split('T')[0];
                 endDate = now.toISOString().split('T')[0];
             } else if (period === 'lastyear') {
                 startDate = new Date(now.getFullYear() - 1, 0, 1).toISOString().split('T')[0];
                 endDate = new Date(now.getFullYear() - 1, 11, 31).toISOString().split('T')[0];
+            } else if (period === 'custom') {
+                startDate = document.getElementById('custom-from')?.value || '';
+                endDate = document.getElementById('custom-to')?.value || '';
             }
 
             const filterByDate = (items, dateField) => {
@@ -1705,6 +1944,13 @@
         }
 
         function printReport() {
+            window.print();
+        }
+
+        function exportReportToPDF() {
+            // Simple PDF export using window.print with PDF option
+            // For better PDF generation, you could use libraries like jsPDF
+            alert('To export as PDF, use the Print button and select "Save as PDF" from your printer options.');
             window.print();
         }
 
@@ -1954,6 +2200,10 @@
                             <span class="type-icon">💰</span>
                             <div class="type-label">Budget</div>
                         </div>
+                        <div class="type-card" style="grid-column: span 2;" onclick="openCategorySelector()">
+                            <span class="type-icon">📁</span>
+                            <div class="type-label">Category</div>
+                        </div>
                     </div>
                     <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
                 `;
@@ -2183,6 +2433,77 @@
                     renderAll();
                 });
             }
+        }
+
+        function openCategorySelector() {
+            closeModal();
+            const overlay = document.getElementById('modal-overlay');
+            const content = document.getElementById('modal-content');
+            
+            overlay.classList.add('active');
+            content.innerHTML = `
+                <div class="modal-header">Add Category</div>
+                <div class="form-group">
+                    <label class="form-label">Category Type</label>
+                    <select class="form-select" id="cat-type-selector" onchange="updateCategoryForm()">
+                        <option value="income">Income</option>
+                        <option value="expense">Expense</option>
+                    </select>
+                </div>
+                <div id="category-form-content"></div>
+                <button class="btn btn-primary" onclick="submitCategoryFromSelector()">Add Category</button>
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+            `;
+            updateCategoryForm();
+        }
+
+        function updateCategoryForm() {
+            const type = document.getElementById('cat-type-selector')?.value || 'expense';
+            const formContent = document.getElementById('category-form-content');
+            if (formContent) {
+                formContent.innerHTML = `
+                    <div class="form-group">
+                        <label class="form-label">Category Name</label>
+                        <input type="text" class="form-input" id="cat-name-input" placeholder="e.g. Groceries, Salary" required>
+                    </div>
+                    <div style="padding: 1rem; background: #f7fafc; border-radius: 8px; font-size: 0.875rem; color: var(--text-light);">
+                        This category will be available for ${type} transactions.
+                    </div>
+                `;
+            }
+        }
+
+        function submitCategoryFromSelector() {
+            const type = document.getElementById('cat-type-selector')?.value || 'expense';
+            const name = document.getElementById('cat-name-input')?.value.trim();
+            
+            if (!name) {
+                alert('Category name is required!');
+                return;
+            }
+
+            const newCategory = { name, type };
+            
+            // Check if category already exists
+            if (!state.data.categories) state.data.categories = [];
+            const exists = state.data.categories.find(c => 
+                c.name.toLowerCase() === name.toLowerCase() && c.type === type
+            );
+            
+            if (exists) {
+                alert('This category already exists!');
+                return;
+            }
+
+            state.data.categories.push(newCategory);
+            writeExcelFile().then(() => {
+                closeModal();
+                if (window.location.hash === '#categories' || document.querySelector('.nav-tab.active')?.textContent.includes('Categor')) {
+                    switchTab('categories');
+                } else {
+                    renderAll();
+                }
+            });
         }
 
         function submitForm(type) {
