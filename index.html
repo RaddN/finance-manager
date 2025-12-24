@@ -1168,7 +1168,11 @@
 
         // --- 2. EXCEL FILE SYSTEM LOGIC ---
         
-        // IndexedDB for storing file handle
+        // Store file handle and metadata
+        const STORAGE_KEY = 'finance_manager_file_handle';
+        const STORAGE_METADATA_KEY = 'finance_manager_file_metadata';
+        
+        // IndexedDB for storing file handle (file handles can be stored but become stale)
         let db = null;
         
         async function initDB() {
@@ -1190,10 +1194,25 @@
         
         async function saveFileHandle(fileHandle) {
             try {
+                // Store file handle in IndexedDB (for current session)
                 if (!db) await initDB();
                 const transaction = db.transaction(['fileHandle'], 'readwrite');
                 const store = transaction.objectStore('fileHandle');
                 await store.put(fileHandle, 'handle');
+                
+                // Also store metadata in localStorage for persistence
+                try {
+                    const file = await fileHandle.getFile();
+                    const metadata = {
+                        name: file.name,
+                        lastModified: file.lastModified,
+                        size: file.size,
+                        timestamp: Date.now()
+                    };
+                    localStorage.setItem(STORAGE_METADATA_KEY, JSON.stringify(metadata));
+                } catch (err) {
+                    console.error('Error saving file metadata:', err);
+                }
             } catch (err) {
                 console.error('Error saving file handle:', err);
             }
@@ -1215,12 +1234,23 @@
             }
         }
         
+        function getStoredFileMetadata() {
+            try {
+                const metadata = localStorage.getItem(STORAGE_METADATA_KEY);
+                return metadata ? JSON.parse(metadata) : null;
+            } catch (err) {
+                console.error('Error loading file metadata:', err);
+                return null;
+            }
+        }
+        
         async function removeFileHandle() {
             try {
                 if (!db) await initDB();
                 const transaction = db.transaction(['fileHandle'], 'readwrite');
                 const store = transaction.objectStore('fileHandle');
                 await store.delete('handle');
+                localStorage.removeItem(STORAGE_METADATA_KEY);
             } catch (err) {
                 console.error('Error removing file handle:', err);
             }
@@ -1230,15 +1260,73 @@
             try {
                 if (!fileHandle) return false;
                 // Try to get the file to verify handle is still valid
-                await fileHandle.getFile();
+                const file = await fileHandle.getFile();
                 // Verify file name matches
-                if (fileHandle.name !== CONFIG.fileName) {
+                if (file.name !== CONFIG.fileName) {
                     return false;
                 }
                 return true;
             } catch (err) {
                 console.error('File handle verification failed:', err);
                 return false;
+            }
+        }
+        
+        async function tryRestoreFileHandle(silent = false) {
+            try {
+                // First, try to restore from IndexedDB (might work if same session)
+                const savedHandle = await loadFileHandle();
+                if (savedHandle && await verifyFileHandle(savedHandle)) {
+                    return savedHandle;
+                }
+                
+                // If IndexedDB handle is invalid, check if we have metadata
+                const metadata = getStoredFileMetadata();
+                if (!metadata || metadata.name !== CONFIG.fileName) {
+                    return null;
+                }
+                
+                // Try to request the file again using permission persistence
+                // The browser should remember the permission and make it easier
+                if (window.showOpenFilePicker) {
+                    try {
+                        // Request the file - browser should remember permission
+                        // If silent is true, we'll skip this (for auto-restore on page load)
+                        if (silent) {
+                            return null; // Don't show file picker automatically on page load
+                        }
+                        
+                        const [fileHandle] = await window.showOpenFilePicker({
+                            types: [{
+                                description: 'Excel Files',
+                                accept: { 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'] }
+                            }],
+                            multiple: false,
+                            excludeAcceptAllOption: false
+                        });
+                        
+                        // Verify it's the correct file
+                        if (fileHandle.name === CONFIG.fileName) {
+                            // Verify file metadata matches (optional check for extra security)
+                            const file = await fileHandle.getFile();
+                            // Allow reconnection even if metadata changed slightly (file might have been updated)
+                            // Save the new handle
+                            await saveFileHandle(fileHandle);
+                            return fileHandle;
+                        }
+                    } catch (err) {
+                        if (err.name === 'AbortError') {
+                            // User cancelled, that's fine
+                            return null;
+                        }
+                        console.error('Error restoring file handle:', err);
+                    }
+                }
+                
+                return null;
+            } catch (err) {
+                console.error('Error in tryRestoreFileHandle:', err);
+                return null;
             }
         }
         
@@ -1249,13 +1337,44 @@
             }
 
             try {
-                [state.fileHandle] = await window.showOpenFilePicker({
+                // Check if we have stored metadata - try to reconnect automatically
+                const metadata = getStoredFileMetadata();
+                
+                // If we have metadata, try to restore automatically first (non-silent mode)
+                if (metadata && metadata.name === CONFIG.fileName) {
+                    try {
+                        const restoredHandle = await tryRestoreFileHandle(false); // false = show file picker if needed
+                        if (restoredHandle && await verifyFileHandle(restoredHandle)) {
+                            state.fileHandle = restoredHandle;
+                            state.isConnected = true;
+                            updateStatus(true);
+                            
+                            await readExcelFile();
+                            renderAll();
+                            
+                            showToast('Reconnected to Excel file.', 'success');
+                            return;
+                        }
+                    } catch (err) {
+                        if (err.name === 'AbortError') {
+                            // User cancelled file picker
+                            return;
+                        }
+                        console.log('Auto-restore failed, showing file picker:', err);
+                    }
+                }
+                
+                // Show file picker (either no metadata or restore failed)
+                const pickerOptions = {
                     types: [{
                         description: 'Excel Files',
                         accept: { 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'] }
                     }],
-                    multiple: false
-                });
+                    multiple: false,
+                    excludeAcceptAllOption: false
+                };
+                
+                [state.fileHandle] = await window.showOpenFilePicker(pickerOptions);
 
                 if (state.fileHandle.name !== CONFIG.fileName) {
                     alert(`Please select the file named exactly: ${CONFIG.fileName}`);
@@ -1263,7 +1382,7 @@
                     return;
                 }
 
-                // Save file handle for next session
+                // Save file handle and metadata for next session
                 await saveFileHandle(state.fileHandle);
                 
                 state.isConnected = true;
@@ -1293,11 +1412,13 @@
             }
         }
         
-        async function restoreFileHandle() {
+        async function restoreFileHandle(silent = true) {
             try {
-                const savedHandle = await loadFileHandle();
-                if (savedHandle && await verifyFileHandle(savedHandle)) {
-                    state.fileHandle = savedHandle;
+                // Try to restore file handle (silent = true means don't show file picker automatically)
+                const restoredHandle = await tryRestoreFileHandle(silent);
+                
+                if (restoredHandle && await verifyFileHandle(restoredHandle)) {
+                    state.fileHandle = restoredHandle;
                     state.isConnected = true;
                     updateStatus(true);
                     
@@ -1305,16 +1426,16 @@
                     await readExcelFile();
                     renderAll();
                     
-                    showToast('Restored connection to Excel file.', 'success');
+                    if (!silent) {
+                        showToast('Restored connection to Excel file.', 'success');
+                    }
                     return true;
                 } else {
-                    // Invalid handle, remove it
-                    await removeFileHandle();
+                    // No valid handle found, but keep metadata for manual reconnect
                     return false;
                 }
             } catch (err) {
                 console.error('Error restoring file handle:', err);
-                await removeFileHandle();
                 return false;
             }
         }
@@ -3968,10 +4089,25 @@
                 console.error('Failed to initialize database:', err);
             }
             
-            // Try to restore file handle
-            const restored = await restoreFileHandle();
-            if (!restored) {
-                // No valid connection, show disconnected state
+            // Check if we have stored file metadata
+            const metadata = getStoredFileMetadata();
+            
+            if (metadata && metadata.name === CONFIG.fileName) {
+                // We have a stored file, try to restore connection
+                const restored = await restoreFileHandle();
+                
+                if (!restored) {
+                    // Couldn't auto-restore, but we have metadata
+                    // Show a message that we can reconnect
+                    const statusEl = document.getElementById('status-bar');
+                    if (statusEl) {
+                        statusEl.className = 'status-bar status-disconnected';
+                        statusEl.textContent = `Previously connected to ${CONFIG.fileName}. Click "Connect Excel" to reconnect.`;
+                    }
+                    updateStatus(false);
+                }
+            } else {
+                // No stored file, show disconnected state
                 updateStatus(false);
             }
         })();
