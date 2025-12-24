@@ -519,6 +519,145 @@
             font-weight: 600;
             margin-left: 0.5rem;
         }
+
+        /* Overdue Badge */
+        .overdue-badge {
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            background: #fff5f5;
+            color: #c53030;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+        .due-soon-badge {
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            background: #fffaf0;
+            color: #d69e2e;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        /* Alert Banner */
+        .alert-banner {
+            background: #fff5f5;
+            border-left: 4px solid var(--danger);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+        .alert-banner.warning {
+            background: #fffaf0;
+            border-left-color: var(--warning);
+        }
+        .alert-banner.info {
+            background: #ebf8ff;
+            border-left-color: var(--primary);
+        }
+
+        /* Comparison Card */
+        .comparison-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--primary);
+        }
+        .comparison-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .comparison-row:last-child {
+            border-bottom: none;
+        }
+        .comparison-label {
+            font-weight: 500;
+            color: var(--text-main);
+        }
+        .comparison-values {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+        .comparison-value {
+            text-align: right;
+            min-width: 100px;
+        }
+        .comparison-diff {
+            font-size: 0.875rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        .comparison-diff.positive {
+            background: #f0fff4;
+            color: var(--success);
+        }
+        .comparison-diff.negative {
+            background: #fff5f5;
+            color: var(--danger);
+        }
+
+        /* Template Badge */
+        .template-badge {
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            background: #faf5ff;
+            color: var(--purple);
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            right: 2rem;
+            background: var(--card-bg);
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            min-width: 300px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .toast.success {
+            border-left: 4px solid var(--success);
+        }
+        .toast.error {
+            border-left: 4px solid var(--danger);
+        }
+        .toast.warning {
+            border-left: 4px solid var(--warning);
+        }
+
+        /* Select All Checkbox */
+        .select-all-cell {
+            text-align: center;
+            width: 60px;
+        }
     </style>
 </head>
 <body>
@@ -585,6 +724,15 @@
                     <div class="stat-label">Due Payables</div>
                     <div class="stat-value" id="dash-payables-total">৳0</div>
                 </div>
+            </div>
+
+            <!-- Alerts Banner -->
+            <div id="dashboard-alerts"></div>
+
+            <!-- Monthly Comparison -->
+            <div class="card" id="monthly-comparison-card" style="margin-bottom: 2rem;">
+                <h2>📊 Monthly Comparison</h2>
+                <div id="monthly-comparison-content"></div>
             </div>
 
             <!-- Financial Health Score -->
@@ -1023,6 +1171,12 @@
             document.getElementById('dash-receivables-total').textContent = formatCurrency(totalReceivables);
             document.getElementById('dash-payables-total').textContent = formatCurrency(totalPayables);
 
+            // Render Alerts
+            renderDashboardAlerts();
+
+            // Render Monthly Comparison
+            renderMonthlyComparison();
+
             // Render Quick Insights
             renderQuickInsights(totalIncome, totalExpenses);
 
@@ -1054,6 +1208,217 @@
 
             renderSmallList(state.data.receivables, 'dash-receivables-list', 'receivable');
             renderSmallList(state.data.payables, 'dash-payables-list', 'payable');
+        }
+
+        function renderDashboardAlerts() {
+            const alertsContainer = document.getElementById('dashboard-alerts');
+            if (!alertsContainer) return;
+
+            alertsContainer.innerHTML = '';
+            const alerts = [];
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            // Check overdue receivables
+            const overdueReceivables = state.data.receivables.filter(item => {
+                if (!item.dueDate) return false;
+                const due = new Date(item.dueDate);
+                due.setHours(0, 0, 0, 0);
+                return due < today;
+            });
+
+            // Check overdue payables
+            const overduePayables = state.data.payables.filter(item => {
+                if (!item.dueDate) return false;
+                const due = new Date(item.dueDate);
+                due.setHours(0, 0, 0, 0);
+                return due < today;
+            });
+
+            // Check due soon (within 3 days)
+            const dueSoonReceivables = state.data.receivables.filter(item => {
+                if (!item.dueDate) return false;
+                const due = new Date(item.dueDate);
+                due.setHours(0, 0, 0, 0);
+                const diffDays = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
+                return diffDays >= 0 && diffDays <= 3 && !overdueReceivables.includes(item);
+            });
+
+            const dueSoonPayables = state.data.payables.filter(item => {
+                if (!item.dueDate) return false;
+                const due = new Date(item.dueDate);
+                due.setHours(0, 0, 0, 0);
+                const diffDays = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
+                return diffDays >= 0 && diffDays <= 3 && !overduePayables.includes(item);
+            });
+
+            // Check over-budget categories
+            const overBudgetCategories = (state.data.budgets || []).filter(budget => {
+                const category = budget.category;
+                const budgetAmount = Number(budget.amount || 0);
+                const actualSpending = state.data.expenses
+                    .filter(exp => exp.category === category)
+                    .reduce((sum, exp) => sum + Number(exp.amount || 0), 0);
+                return actualSpending > budgetAmount;
+            });
+
+            // Add alerts
+            if (overdueReceivables.length > 0) {
+                const total = overdueReceivables.reduce((sum, item) => sum + Number(item.amount || 0), 0);
+                alerts.push({
+                    type: 'danger',
+                    message: `⚠️ You have ${overdueReceivables.length} overdue receivable${overdueReceivables.length > 1 ? 's' : ''} totaling ${formatCurrency(total)}`,
+                    action: () => switchTab('receivables')
+                });
+            }
+
+            if (overduePayables.length > 0) {
+                const total = overduePayables.reduce((sum, item) => sum + Number(item.amount || 0), 0);
+                alerts.push({
+                    type: 'danger',
+                    message: `⚠️ You have ${overduePayables.length} overdue payable${overduePayables.length > 1 ? 's' : ''} totaling ${formatCurrency(total)}`,
+                    action: () => switchTab('payables')
+                });
+            }
+
+            if (dueSoonReceivables.length > 0) {
+                const total = dueSoonReceivables.reduce((sum, item) => sum + Number(item.amount || 0), 0);
+                alerts.push({
+                    type: 'warning',
+                    message: `📅 ${dueSoonReceivables.length} receivable${dueSoonReceivables.length > 1 ? 's' : ''} due soon (within 3 days) - ${formatCurrency(total)}`,
+                    action: () => switchTab('receivables')
+                });
+            }
+
+            if (dueSoonPayables.length > 0) {
+                const total = dueSoonPayables.reduce((sum, item) => sum + Number(item.amount || 0), 0);
+                alerts.push({
+                    type: 'warning',
+                    message: `📅 ${dueSoonPayables.length} payable${dueSoonPayables.length > 1 ? 's' : ''} due soon (within 3 days) - ${formatCurrency(total)}`,
+                    action: () => switchTab('payables')
+                });
+            }
+
+            if (overBudgetCategories.length > 0) {
+                alerts.push({
+                    type: 'warning',
+                    message: `💰 ${overBudgetCategories.length} budget${overBudgetCategories.length > 1 ? 's' : ''} exceeded`,
+                    action: () => switchTab('budgets')
+                });
+            }
+
+            // Render alerts
+            alerts.forEach(alert => {
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `alert-banner ${alert.type === 'danger' ? '' : alert.type === 'warning' ? 'warning' : 'info'}`;
+                alertDiv.innerHTML = `
+                    <div style="flex: 1;">${alert.message}</div>
+                    <button class="btn btn-secondary" onclick="alert.action(); closeAlert(this)" style="width: auto; padding: 0.5rem 1rem;">View</button>
+                `;
+                alertsContainer.appendChild(alertDiv);
+            });
+        }
+
+        function closeAlert(button) {
+            button.closest('.alert-banner').remove();
+        }
+
+        function renderMonthlyComparison() {
+            const container = document.getElementById('monthly-comparison-content');
+            if (!container) return;
+
+            const monthlyData = getMonthlyData();
+            if (monthlyData.labels.length < 2) {
+                container.innerHTML = '<div style="color: var(--text-light); padding: 1rem; text-align: center;">Not enough data for comparison. Need at least 2 months of data.</div>';
+                return;
+            }
+
+            const currentMonthIdx = monthlyData.labels.length - 1;
+            const previousMonthIdx = monthlyData.labels.length - 2;
+
+            const currentMonth = monthlyData.labels[currentMonthIdx];
+            const previousMonth = monthlyData.labels[previousMonthIdx];
+
+            const currentIncome = monthlyData.income[currentMonthIdx] || 0;
+            const previousIncome = monthlyData.income[previousMonthIdx] || 0;
+            const incomeDiff = currentIncome - previousIncome;
+
+            const currentExpenses = monthlyData.expenses[currentMonthIdx] || 0;
+            const previousExpenses = monthlyData.expenses[previousMonthIdx] || 0;
+            const expenseDiff = currentExpenses - previousExpenses;
+
+            const currentSavings = currentIncome - currentExpenses;
+            const previousSavings = previousIncome - previousExpenses;
+            const savingsDiff = currentSavings - previousSavings;
+
+            container.innerHTML = `
+                <div class="comparison-row">
+                    <div class="comparison-label">Month</div>
+                    <div class="comparison-values">
+                        <div class="comparison-value"><strong>${previousMonth}</strong></div>
+                        <div class="comparison-value"><strong>${currentMonth}</strong></div>
+                        <div class="comparison-value" style="min-width: 120px;"><strong>Difference</strong></div>
+                    </div>
+                </div>
+                <div class="comparison-row">
+                    <div class="comparison-label">Income</div>
+                    <div class="comparison-values">
+                        <div class="comparison-value">${formatCurrency(previousIncome)}</div>
+                        <div class="comparison-value">${formatCurrency(currentIncome)}</div>
+                        <div class="comparison-value">
+                            <span class="comparison-diff ${incomeDiff >= 0 ? 'positive' : 'negative'}">
+                                ${incomeDiff >= 0 ? '+' : ''}${formatCurrency(incomeDiff)}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="comparison-row">
+                    <div class="comparison-label">Expenses</div>
+                    <div class="comparison-values">
+                        <div class="comparison-value">${formatCurrency(previousExpenses)}</div>
+                        <div class="comparison-value">${formatCurrency(currentExpenses)}</div>
+                        <div class="comparison-value">
+                            <span class="comparison-diff ${expenseDiff <= 0 ? 'positive' : 'negative'}">
+                                ${expenseDiff >= 0 ? '+' : ''}${formatCurrency(expenseDiff)}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="comparison-row">
+                    <div class="comparison-label">Savings</div>
+                    <div class="comparison-values">
+                        <div class="comparison-value">${formatCurrency(previousSavings)}</div>
+                        <div class="comparison-value">${formatCurrency(currentSavings)}</div>
+                        <div class="comparison-value">
+                            <span class="comparison-diff ${savingsDiff >= 0 ? 'positive' : 'negative'}">
+                                ${savingsDiff >= 0 ? '+' : ''}${formatCurrency(savingsDiff)}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showToast(message, type = 'success') {
+            // Remove existing toast
+            const existingToast = document.querySelector('.toast');
+            if (existingToast) existingToast.remove();
+
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : '⚠️';
+            toast.innerHTML = `<span>${icon}</span><span>${message}</span>`;
+            document.body.appendChild(toast);
+
+            // Show toast
+            setTimeout(() => toast.classList.add('show'), 10);
+
+            // Hide and remove toast after 3 seconds
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
         }
 
         function renderQuickInsights(totalIncome, totalExpenses) {
@@ -1462,9 +1827,11 @@
         // Filter state
         let currentListType = null;
         let filteredData = null;
+        let selectedItems = new Set();
 
         function renderListTable(type) {
             currentListType = type;
+            selectedItems.clear(); // Reset selections
             const titleEl = document.getElementById('list-title');
             const thead = document.getElementById('list-thead');
             const tbody = document.getElementById('list-tbody');
@@ -1478,16 +1845,16 @@
 
             if (type === 'income') {
                 titleEl.textContent = 'Income Sources';
-                headers = ['Date', 'Source', 'Category', 'Amount', 'Actions'];
+                headers = ['', 'Date', 'Source', 'Category', 'Amount', 'Actions'];
             } else if (type === 'expenses') {
                 titleEl.textContent = 'Expenses';
-                headers = ['Date', 'Description', 'Category', 'Amount', 'Actions'];
+                headers = ['', 'Date', 'Description', 'Category', 'Amount', 'Actions'];
             } else if (type === 'receivables') {
                 titleEl.textContent = 'Receivables (Due)';
-                headers = ['Due Date', 'From', 'Description', 'Amount', 'Actions'];
+                headers = ['', 'Due Date', 'From', 'Description', 'Amount', 'Actions'];
             } else if (type === 'payables') {
                 titleEl.textContent = 'Payables';
-                headers = ['Due Date', 'To', 'Description', 'Amount', 'Actions'];
+                headers = ['', 'Due Date', 'To', 'Description', 'Amount', 'Actions'];
             }
 
             // Populate category filter
@@ -1495,12 +1862,20 @@
 
             // Render Headers
             const trHead = document.createElement('tr');
-            headers.forEach(h => {
+            headers.forEach((h, idx) => {
                 const th = document.createElement('th');
-                th.textContent = h;
+                if (idx === 0) {
+                    th.className = 'select-all-cell';
+                    th.innerHTML = `<input type="checkbox" onchange="toggleSelectAll(this.checked)">`;
+                } else {
+                    th.textContent = h;
+                }
                 trHead.appendChild(th);
             });
             thead.appendChild(trHead);
+
+            // Render Bulk Actions Bar
+            renderBulkActionsBar();
 
             // Render rows
             renderTableRows(type, filteredData, tbody, headers.length);
@@ -1539,9 +1914,30 @@
                 const originalIndex = state.data[type].indexOf(item);
                 const tr = document.createElement('tr');
                 let cols = '';
+                const itemKey = `${type}-${originalIndex}`;
+
+                // Checkbox column
+                cols += `<td class="checkbox-cell"><input type="checkbox" onchange="toggleItemSelection('${itemKey}', this.checked)" ${selectedItems.has(itemKey) ? 'checked' : ''}></td>`;
+
+                // Date badge helper
+                const getDueDateBadge = (dueDate) => {
+                    if (!dueDate) return '';
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    const due = new Date(dueDate);
+                    due.setHours(0, 0, 0, 0);
+                    const diffDays = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
+                    
+                    if (diffDays < 0) {
+                        return `<span class="overdue-badge">⚠️ Overdue (${Math.abs(diffDays)} days)</span>`;
+                    } else if (diffDays <= 3) {
+                        return `<span class="due-soon-badge">Due in ${diffDays} day${diffDays !== 1 ? 's' : ''}</span>`;
+                    }
+                    return '';
+                };
 
                 if (type === 'income') {
-                    cols = `
+                    cols += `
                         <td>${item.date || '-'}</td>
                         <td>
                             ${item.source || '-'}
@@ -1552,7 +1948,7 @@
                         <td>${formatCurrency(item.amount)}</td>
                     `;
                 } else if (type === 'expenses') {
-                    cols = `
+                    cols += `
                         <td>${item.date || '-'}</td>
                         <td>
                             ${item.description || '-'}
@@ -1563,15 +1959,21 @@
                         <td>${formatCurrency(item.amount)}</td>
                     `;
                 } else if (type === 'receivables') {
-                    cols = `
-                        <td>${item.dueDate || '-'}</td>
+                    cols += `
+                        <td>
+                            ${item.dueDate || '-'}
+                            ${getDueDateBadge(item.dueDate)}
+                        </td>
                         <td>${item.from || '-'}</td>
                         <td>${item.description || '-'}</td>
                         <td style="color:var(--success); font-weight:bold;">${formatCurrency(item.amount)}</td>
                     `;
                 } else if (type === 'payables') {
-                    cols = `
-                        <td>${item.dueDate || '-'}</td>
+                    cols += `
+                        <td>
+                            ${item.dueDate || '-'}
+                            ${getDueDateBadge(item.dueDate)}
+                        </td>
                         <td>${item.to || '-'}</td>
                         <td>${item.description || '-'}</td>
                         <td style="color:var(--danger); font-weight:bold;">${formatCurrency(item.amount)}</td>
@@ -1592,6 +1994,100 @@
                     </td>
                 `;
                 tbody.appendChild(tr);
+            });
+        }
+
+        function renderBulkActionsBar() {
+            const card = document.getElementById('view-list')?.querySelector('.card');
+            if (!card) return;
+
+            let bulkBar = card.querySelector('.bulk-actions');
+            if (!bulkBar) {
+                bulkBar = document.createElement('div');
+                bulkBar.className = 'bulk-actions';
+                bulkBar.innerHTML = `
+                    <span id="bulk-count">0 selected</span>
+                    <button class="btn btn-danger" onclick="bulkDelete()" style="width: auto;">🗑️ Delete Selected</button>
+                    <button class="btn btn-secondary" onclick="clearSelection()" style="width: auto;">Cancel</button>
+                `;
+                const tableContainer = card.querySelector('.table-container');
+                if (tableContainer) {
+                    card.insertBefore(bulkBar, tableContainer);
+                } else {
+                    card.appendChild(bulkBar);
+                }
+            }
+            updateBulkActionsBar();
+        }
+
+        function toggleItemSelection(itemKey, checked) {
+            if (checked) {
+                selectedItems.add(itemKey);
+            } else {
+                selectedItems.delete(itemKey);
+            }
+            updateBulkActionsBar();
+        }
+
+        function toggleSelectAll(checked) {
+            if (!filteredData) return;
+            filteredData.forEach((item, index) => {
+                const originalIndex = state.data[currentListType].indexOf(item);
+                const itemKey = `${currentListType}-${originalIndex}`;
+                if (checked) {
+                    selectedItems.add(itemKey);
+                } else {
+                    selectedItems.delete(itemKey);
+                }
+            });
+            // Update all checkboxes
+            document.querySelectorAll('#list-tbody input[type="checkbox"]').forEach(cb => cb.checked = checked);
+            updateBulkActionsBar();
+        }
+
+        function updateBulkActionsBar() {
+            const bulkBar = document.querySelector('.bulk-actions');
+            const bulkCount = document.getElementById('bulk-count');
+            if (bulkBar && bulkCount) {
+                const count = selectedItems.size;
+                bulkCount.textContent = `${count} selected`;
+                if (count > 0) {
+                    bulkBar.classList.add('active');
+                } else {
+                    bulkBar.classList.remove('active');
+                }
+            }
+        }
+
+        function clearSelection() {
+            selectedItems.clear();
+            document.querySelectorAll('#list-tbody input[type="checkbox"]').forEach(cb => cb.checked = false);
+            document.querySelector('#list-thead input[type="checkbox"]').checked = false;
+            updateBulkActionsBar();
+        }
+
+        function bulkDelete() {
+            if (selectedItems.size === 0) return;
+            if (!confirm(`Are you sure you want to delete ${selectedItems.size} item(s)?`)) return;
+
+            // Sort indices in descending order to avoid index shifting issues
+            const indicesToDelete = Array.from(selectedItems)
+                .map(key => {
+                    const [type, index] = key.split('-');
+                    return { type, index: parseInt(index) };
+                })
+                .filter(item => item.type === currentListType)
+                .map(item => item.index)
+                .sort((a, b) => b - a);
+
+            indicesToDelete.forEach(index => {
+                state.data[currentListType].splice(index, 1);
+            });
+
+            selectedItems.clear();
+            writeExcelFile().then(() => {
+                renderAll();
+                showToast(`Successfully deleted ${indicesToDelete.length} item(s)`, 'success');
             });
         }
 
@@ -2430,6 +2926,7 @@
                 delete duplicate.id; // Remove any ID if present
                 data.push(duplicate);
                 writeExcelFile().then(() => {
+                    showToast('Transaction duplicated successfully!', 'success');
                     renderAll();
                 });
             }
@@ -2478,7 +2975,7 @@
             const name = document.getElementById('cat-name-input')?.value.trim();
             
             if (!name) {
-                alert('Category name is required!');
+                showToast('Category name is required!', 'error');
                 return;
             }
 
@@ -2491,12 +2988,13 @@
             );
             
             if (exists) {
-                alert('This category already exists!');
+                showToast('This category already exists!', 'error');
                 return;
             }
 
             state.data.categories.push(newCategory);
             writeExcelFile().then(() => {
+                showToast('Category added successfully!', 'success');
                 closeModal();
                 if (window.location.hash === '#categories' || document.querySelector('.nav-tab.active')?.textContent.includes('Categor')) {
                     switchTab('categories');
@@ -2515,7 +3013,27 @@
 
             const isEditing = editingIndex !== null;
 
+            // Validation helper
+            const validateRequired = (value, fieldName) => {
+                if (!value || value.trim() === '') {
+                    showToast(`${fieldName} is required!`, 'error');
+                    return false;
+                }
+                return true;
+            };
+
+            const validateAmount = (amount, fieldName = 'Amount') => {
+                if (!amount || amount <= 0) {
+                    showToast(`${fieldName} must be greater than 0!`, 'error');
+                    return false;
+                }
+                return true;
+            };
+
             if (type === 'income') {
+                if (!validateRequired(val('inp-source'), 'Source')) return;
+                if (!validateAmount(num('inp-amount'), 'Amount')) return;
+                if (!validateRequired(val('inp-date'), 'Date')) return;
                 newItem = {
                     source: val('inp-source'),
                     category: val('inp-category') || 'Other',
@@ -2530,6 +3048,9 @@
                     state.data.income.push(newItem);
                 }
             } else if (type === 'expense') {
+                if (!validateRequired(val('inp-desc'), 'Description')) return;
+                if (!validateAmount(num('inp-amount'), 'Amount')) return;
+                if (!validateRequired(val('inp-date'), 'Date')) return;
                 newItem = {
                     description: val('inp-desc'),
                     category: val('inp-category') || 'Other',
@@ -2544,6 +3065,9 @@
                     state.data.expenses.push(newItem);
                 }
             } else if (type === 'receivable') {
+                if (!validateRequired(val('inp-from'), 'From')) return;
+                if (!validateAmount(num('inp-amount'), 'Amount')) return;
+                if (!validateRequired(val('inp-duedate'), 'Due Date')) return;
                 newItem = {
                     from: val('inp-from'),
                     description: val('inp-desc'),
@@ -2556,6 +3080,9 @@
                     state.data.receivables.push(newItem);
                 }
             } else if (type === 'payable') {
+                if (!validateRequired(val('inp-to'), 'To')) return;
+                if (!validateAmount(num('inp-amount'), 'Amount')) return;
+                if (!validateRequired(val('inp-duedate'), 'Due Date')) return;
                 newItem = {
                     to: val('inp-to'),
                     description: val('inp-desc'),
@@ -2568,6 +3095,9 @@
                     state.data.payables.push(newItem);
                 }
             } else if (type === 'plan') {
+                if (!validateRequired(val('inp-title'), 'Plan Title')) return;
+                if (!validateAmount(num('inp-target'), 'Target Amount')) return;
+                if (!validateRequired(val('inp-deadline'), 'Deadline')) return;
                 newItem = {
                     title: val('inp-title'),
                     targetAmount: num('inp-target'),
@@ -2579,6 +3109,8 @@
                     state.data.plans.push(newItem);
                 }
             } else if (type === 'budget') {
+                if (!validateRequired(val('inp-category'), 'Category')) return;
+                if (!validateAmount(num('inp-amount'), 'Budget Amount')) return;
                 newItem = {
                     category: val('inp-category'),
                     amount: num('inp-amount')
@@ -2589,6 +3121,7 @@
                     state.data.budgets.push(newItem);
                 }
             } else if (type === 'category') {
+                if (!validateRequired(val('inp-name'), 'Category Name')) return;
                 newItem = {
                     name: val('inp-name'),
                     type: val('inp-type')
@@ -2609,8 +3142,12 @@
 
             // Save to Excel and UI
             writeExcelFile().then(() => {
+                showToast(`${isEditing ? 'Updated' : 'Added'} ${type} successfully!`, 'success');
                 renderAll();
                 closeModal();
+            }).catch(err => {
+                showToast('Error saving data. Please try again.', 'error');
+                console.error(err);
             });
         }
 
