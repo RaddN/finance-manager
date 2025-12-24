@@ -546,7 +546,6 @@
             border-radius: 12px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
             padding: 1.5rem;
-            margin-bottom: 1.5rem;
             position: relative;
             height: 300px;
             max-width: 100vw;
@@ -599,7 +598,6 @@
             background: var(--card-bg);
             border-radius: 12px;
             padding: 1.5rem;
-            margin-bottom: 1rem;
             border-left: 4px solid var(--primary);
         }
 
@@ -865,11 +863,17 @@
             border: none;
             cursor: pointer;
             padding: 0.5rem;
-            display: flex;
+            display: none;
             align-items: center;
             justify-content: center;
             border-radius: 4px;
             transition: background 0.2s;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-menu-button {
+                display: flex;
+            }
         }
 
         .mobile-menu-button:hover {
@@ -926,21 +930,11 @@
 
         /* Responsive Design */
         @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                gap: 1rem;
-                align-items: stretch;
-            }
 
             .header-content>div {
                 display: flex;
                 gap: 0.5rem;
                 flex-wrap: wrap;
-            }
-
-            .header-content .btn {
-                flex: 1;
-                min-width: 120px;
             }
 
             .nav-tabs {
@@ -1149,7 +1143,7 @@
             }
 
             .btn {
-                padding: 0.625rem 1rem;
+                padding: 0.625rem 0.5rem;
                 font-size: 0.875rem;
             }
 
@@ -1343,13 +1337,7 @@
             <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
                 <button class="btn btn-secondary" style="width: auto; display: none;" onclick="refreshData()"
                     title="Refresh Data" id="refresh-btn">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="23 4 23 10 17 10"></polyline>
-                        <polyline points="1 20 1 14 7 14"></polyline>
-                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
-                    </svg>
-                    Refresh
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" xml:space="preserve" width="16" height="16"><path fill="none" stroke="#000" stroke-miterlimit="10" d="M12.85 5.45A5.47 5.47 0 0 0 8 2.5C5.65 2.5 3.7 3.95 2.9 6m.2 4.5c.9 1.75 2.75 3 4.9 3 2.35 0 4.3-1.45 5.1-3.5"/><path fill="none" stroke="#000" stroke-miterlimit="10" d="M13 2.5v3h-3m-7 8v-3h3"/></svg>
                 </button>
                 <button class="btn btn-secondary" style="width: auto; display: none;" onclick="exportData()"
                     title="Export Data" id="export-btn">
@@ -1359,28 +1347,13 @@
                         <polyline points="7 10 12 15 17 10"></polyline>
                         <line x1="12" y1="15" x2="12" y2="3"></line>
                     </svg>
-                    Export
                 </button>
                 <button class="btn btn-secondary" style="width: auto; display: none;" onclick="disconnectExcelFile()"
                     title="Disconnect Excel File" id="disconnect-btn">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                        <polyline points="16 17 21 12 16 7"></polyline>
-                        <line x1="21" y1="12" x2="9" y2="12"></line>
-                    </svg>
-                    Change Connection
+                    <svg width="16" height="16" viewBox="-0.08 0 1.28 1.28" xmlns="http://www.w3.org/2000/svg"><path d="M.103 0a.1.1 0 0 0-.101.102v1.077a.1.1 0 0 0 .101.101h.915a.1.1 0 0 0 .101-.101V.406L.742 0z" fill-rule="evenodd" clip-rule="evenodd" fill="#0c8fe8"/><g fill-rule="evenodd" clip-rule="evenodd"><path d="M1.12.407v.02H.864S.738.402.741.293c0 0 .004.114.12.114z" fill="#0973e2"/><path d="M.741 0v.291c0 .033.022.116.122.116h.256z" opacity=".5" fill="#fff"/></g><path d="M.565.712a.106.106 0 0 0-.151 0L.353.773a.11.11 0 0 0 0 .151.025.025 0 0 0 .035 0 .024.024 0 0 0 0-.035.06.06 0 0 1 0-.082L.45.746a.057.057 0 0 1 .081 0 .06.06 0 0 1 0 .081l-.029.03q.01.03.008.061L.566.862a.106.106 0 0 0 0-.151M.412.83a.025.025 0 0 0 0 .035.057.057 0 0 1 0 .081l-.061.061a.057.057 0 0 1-.081 0 .06.06 0 0 1 0-.081L.299.897A.14.14 0 0 1 .291.835L.235.891a.106.106 0 0 0 0 .151.11.11 0 0 0 .151 0L.448.98a.106.106 0 0 0 0-.151.025.025 0 0 0-.035 0" fill="#fff"/></svg>
                 </button>
-                <button class="btn btn-primary" style="width: auto;" id="connect-btn" onclick="connectExcelFile()">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                        <polyline points="14 2 14 8 20 8"></polyline>
-                        <line x1="16" y1="13" x2="8" y2="13"></line>
-                        <line x1="16" y1="17" x2="8" y2="17"></line>
-                        <polyline points="10 9 9 9 8 9"></polyline>
-                    </svg>
-                    Connect Excel
+                <button class="btn btn-secondary" style="width: auto;" id="connect-btn" onclick="connectExcelFile()">
+                    <svg width="16" height="16" viewBox="-0.08 0 1.28 1.28" xmlns="http://www.w3.org/2000/svg"><path d="M.103 0a.1.1 0 0 0-.101.102v1.077a.1.1 0 0 0 .101.101h.915a.1.1 0 0 0 .101-.101V.406L.742 0z" fill-rule="evenodd" clip-rule="evenodd" fill="#0c8fe8"/><g fill-rule="evenodd" clip-rule="evenodd"><path d="M1.12.407v.02H.864S.738.402.741.293c0 0 .004.114.12.114z" fill="#0973e2"/><path d="M.741 0v.291c0 .033.022.116.122.116h.256z" opacity=".5" fill="#fff"/></g><path d="M.565.712a.106.106 0 0 0-.151 0L.353.773a.11.11 0 0 0 0 .151.025.025 0 0 0 .035 0 .024.024 0 0 0 0-.035.06.06 0 0 1 0-.082L.45.746a.057.057 0 0 1 .081 0 .06.06 0 0 1 0 .081l-.029.03q.01.03.008.061L.566.862a.106.106 0 0 0 0-.151M.412.83a.025.025 0 0 0 0 .035.057.057 0 0 1 0 .081l-.061.061a.057.057 0 0 1-.081 0 .06.06 0 0 1 0-.081L.299.897A.14.14 0 0 1 .291.835L.235.891a.106.106 0 0 0 0 .151.11.11 0 0 0 .151 0L.448.98a.106.106 0 0 0 0-.151.025.025 0 0 0-.035 0" fill="#fff"/></svg>
                 </button>
             </div>
         </div>
@@ -2444,14 +2417,7 @@
                 el.className = 'status-bar status-disconnected';
                 el.textContent = 'Disconnected. Please connect Excel file.';
                 btn.innerHTML = `
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                        <polyline points="14 2 14 8 20 8"></polyline>
-                        <line x1="16" y1="13" x2="8" y2="13"></line>
-                        <line x1="16" y1="17" x2="8" y2="17"></line>
-                        <polyline points="10 9 9 9 8 9"></polyline>
-                    </svg>
-                    Connect Excel
+                    <svg width="16" height="16" viewBox="-0.08 0 1.28 1.28" xmlns="http://www.w3.org/2000/svg"><path d="M.103 0a.1.1 0 0 0-.101.102v1.077a.1.1 0 0 0 .101.101h.915a.1.1 0 0 0 .101-.101V.406L.742 0z" fill-rule="evenodd" clip-rule="evenodd" fill="#0c8fe8"/><g fill-rule="evenodd" clip-rule="evenodd"><path d="M1.12.407v.02H.864S.738.402.741.293c0 0 .004.114.12.114z" fill="#0973e2"/><path d="M.741 0v.291c0 .033.022.116.122.116h.256z" opacity=".5" fill="#fff"/></g><path d="M.565.712a.106.106 0 0 0-.151 0L.353.773a.11.11 0 0 0 0 .151.025.025 0 0 0 .035 0 .024.024 0 0 0 0-.035.06.06 0 0 1 0-.082L.45.746a.057.057 0 0 1 .081 0 .06.06 0 0 1 0 .081l-.029.03q.01.03.008.061L.566.862a.106.106 0 0 0 0-.151M.412.83a.025.025 0 0 0 0 .035.057.057 0 0 1 0 .081l-.061.061a.057.057 0 0 1-.081 0 .06.06 0 0 1 0-.081L.299.897A.14.14 0 0 1 .291.835L.235.891a.106.106 0 0 0 0 .151.11.11 0 0 0 .151 0L.448.98a.106.106 0 0 0 0-.151.025.025 0 0 0-.035 0" fill="#fff"/></svg>
                 `;
                 btn.disabled = false;
                 btn.style.display = 'inline-flex'; // Show connect button when disconnected
@@ -2506,12 +2472,7 @@
                 if (refreshBtn && state.isConnected) {
                     refreshBtn.disabled = false;
                     refreshBtn.innerHTML = `
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="23 4 23 10 17 10"></polyline>
-                            <polyline points="1 20 1 14 7 14"></polyline>
-                            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
-                        </svg>
-                        Refresh
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" xml:space="preserve" width="16" height="16"><path fill="none" stroke="#000" stroke-miterlimit="10" d="M12.85 5.45A5.47 5.47 0 0 0 8 2.5C5.65 2.5 3.7 3.95 2.9 6m.2 4.5c.9 1.75 2.75 3 4.9 3 2.35 0 4.3-1.45 5.1-3.5"/><path fill="none" stroke="#000" stroke-miterlimit="10" d="M13 2.5v3h-3m-7 8v-3h3"/></svg>
                     `;
                 }
             }
@@ -3560,7 +3521,7 @@
                 const colsBeforeAmount = 5; // Mobile details + checkbox + Date/DueDate, Source/From/To, Description/Category, Category/Description
                 tfoot.innerHTML = `
                     <tr>
-                        <td colspan="1" class="table-total-label mobile-total"><strong>Total:</strong></td>
+                        <td colspan="1" class="table-total-label mobile-total" style="display: none;"><strong>Total:</strong></td>
                         <td colspan="${colsBeforeAmount - 1}" class="table-total-label desktop-total"><strong>Total:</strong></td>
                         <td class="table-total-value">${formatCurrency(totalAmount)}</td>
                         <td></td>
