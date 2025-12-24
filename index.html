@@ -179,7 +179,7 @@
         
         .form-group { margin-bottom: 1rem; }
         .form-label { display: block; margin-bottom: 0.5rem; font-size: 0.875rem; color: var(--text-light); font-weight: 500; }
-        .form-input, .form-select {
+        .form-input, .form-select, textarea.form-input {
             width: 100%;
             padding: 0.75rem;
             border: 1px solid var(--border);
@@ -187,6 +187,9 @@
             font-size: 1rem;
             font-family: inherit;
             transition: border 0.2s;
+        }
+        textarea.form-input {
+            resize: vertical;
         }
         .form-input:focus, .form-select:focus {
             outline: none;
@@ -437,6 +440,85 @@
             gap: 1.5rem;
             margin-bottom: 2rem;
         }
+
+        /* Category Management */
+        .category-item {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+        }
+        .category-item:hover {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-color: var(--primary);
+        }
+        .category-name {
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--text-main);
+        }
+        .category-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .category-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+        .badge-income { background: #f0fff4; color: var(--success); }
+        .badge-expense { background: #fff5f5; color: var(--danger); }
+
+        /* Bulk Actions */
+        .bulk-actions {
+            background: #f7fafc;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+            align-items: center;
+            gap: 1rem;
+        }
+        .bulk-actions.active {
+            display: flex;
+        }
+        .checkbox-cell {
+            text-align: center;
+            width: 40px;
+        }
+        input[type="checkbox"] {
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Transaction Notes */
+        .transaction-note {
+            font-size: 0.75rem;
+            color: var(--text-light);
+            font-style: italic;
+            margin-top: 0.25rem;
+        }
+
+        /* Recurring Badge */
+        .recurring-badge {
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            background: #e6fffa;
+            color: #047857;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
     </style>
 </head>
 <body>
@@ -468,6 +550,7 @@
         <div class="nav-tab" onclick="switchTab('payables')">Payables</div>
         <div class="nav-tab" onclick="switchTab('plans')">Future Plans</div>
         <div class="nav-tab" onclick="switchTab('budgets')">Budgets</div>
+        <div class="nav-tab" onclick="switchTab('categories')">Categories</div>
         <div class="nav-tab" onclick="switchTab('reports')">Reports</div>
         <div class="nav-tab" onclick="switchTab('analytics')">Analytics</div>
     </nav>
@@ -640,6 +723,28 @@
             </div>
         </div>
 
+        <!-- Categories View -->
+        <div id="view-categories" class="hidden">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h2>Category Management</h2>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <button class="btn btn-primary" style="width: auto;" onclick="openModal('form', 'category')">+ Add Category</button>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
+                    <div>
+                        <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--text-main);">Income Categories</h3>
+                        <div id="income-categories-list"></div>
+                    </div>
+                    <div>
+                        <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--text-main);">Expense Categories</h3>
+                        <div id="expense-categories-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </main>
 
     <!-- Sticky Add Button -->
@@ -668,7 +773,8 @@
                 receivables: [],
                 payables: [],
                 plans: [],
-                budgets: []
+                budgets: [],
+                categories: []
             }
         };
 
@@ -729,6 +835,7 @@
             state.data.payables = parseSheet('Payables');
             state.data.plans = parseSheet('Plans');
             state.data.budgets = parseSheet('Budgets') || [];
+            state.data.categories = parseSheet('Categories') || [];
         }
 
         async function writeExcelFile() {
@@ -745,6 +852,7 @@
                 const payablesSheet = XLSX.utils.json_to_sheet(state.data.payables);
                 const plansSheet = XLSX.utils.json_to_sheet(state.data.plans);
                 const budgetsSheet = XLSX.utils.json_to_sheet(state.data.budgets || []);
+                const categoriesSheet = XLSX.utils.json_to_sheet(state.data.categories || []);
 
                 // Append sheets
                 XLSX.utils.book_append_sheet(wb, incomeSheet, "Income");
@@ -753,6 +861,7 @@
                 XLSX.utils.book_append_sheet(wb, payablesSheet, "Payables");
                 XLSX.utils.book_append_sheet(wb, plansSheet, "Plans");
                 XLSX.utils.book_append_sheet(wb, budgetsSheet, "Budgets");
+                XLSX.utils.book_append_sheet(wb, categoriesSheet, "Categories");
 
                 // Write to file
                 const wbout = XLSX.write(wb, {bookType:'xlsx', type:'array'});
@@ -807,6 +916,7 @@
             document.getElementById('view-budgets')?.classList.add('hidden');
             document.getElementById('view-reports')?.classList.add('hidden');
             document.getElementById('view-analytics')?.classList.add('hidden');
+            document.getElementById('view-categories')?.classList.add('hidden');
 
             // Show selected view
             if (tabId === 'dashboard') {
@@ -824,6 +934,9 @@
             } else if (tabId === 'analytics') {
                 document.getElementById('view-analytics').classList.remove('hidden');
                 renderAnalytics();
+            } else if (tabId === 'categories') {
+                document.getElementById('view-categories').classList.remove('hidden');
+                renderCategoriesList();
             } else {
                 document.getElementById('view-list').classList.remove('hidden');
                 renderListTable(tabId);
@@ -1215,15 +1328,23 @@
                 if (type === 'income') {
                     cols = `
                         <td>${item.date || '-'}</td>
-                        <td>${item.source || '-'}</td>
-                        <td><span class="tag tag-success">${item.category || '-'}</span></td>
+                        <td>
+                            ${item.source || '-'}
+                            ${item.recurring ? '<span class="recurring-badge">🔄 Recurring</span>' : ''}
+                            ${item.notes ? `<div class="transaction-note">${item.notes}</div>` : ''}
+                        </td>
+                        <td><span class="tag tag-success">${item.category || 'Other'}</span></td>
                         <td>${formatCurrency(item.amount)}</td>
                     `;
                 } else if (type === 'expenses') {
                     cols = `
                         <td>${item.date || '-'}</td>
-                        <td>${item.description || '-'}</td>
-                        <td><span class="tag tag-danger">${item.category || '-'}</span></td>
+                        <td>
+                            ${item.description || '-'}
+                            ${item.recurring ? '<span class="recurring-badge">🔄 Recurring</span>' : ''}
+                            ${item.notes ? `<div class="transaction-note">${item.notes}</div>` : ''}
+                        </td>
+                        <td><span class="tag tag-danger">${item.category || 'Other'}</span></td>
                         <td>${formatCurrency(item.amount)}</td>
                     `;
                 } else if (type === 'receivables') {
@@ -1242,9 +1363,14 @@
                     `;
                 }
 
+                const actionButtons = type === 'income' || type === 'expenses' 
+                    ? `<button class="btn-icon" onclick="duplicateTransaction('${type}', ${originalIndex})" title="Duplicate">📋</button>`
+                    : '';
+                
                 tr.innerHTML = cols + `
                     <td>
                         <div class="action-buttons">
+                            ${actionButtons}
                             <button class="btn-edit" onclick="editItem('${type}', ${originalIndex})">✏️ Edit</button>
                             <button class="btn-delete" onclick="deleteItem('${type}', ${originalIndex})">🗑️ Delete</button>
                         </div>
@@ -1583,6 +1709,100 @@
         }
 
         // Analytics rendering
+        // Category Management
+        function getCategoriesByType(type) {
+            // Get all unique categories from data if categories sheet is empty
+            if (!state.data.categories || state.data.categories.length === 0) {
+                const dataArray = type === 'income' ? state.data.income : state.data.expenses;
+                const uniqueCategories = [...new Set(dataArray.map(item => item.category).filter(Boolean))];
+                return uniqueCategories.map(cat => ({ name: cat, type: type }));
+            }
+            return state.data.categories.filter(cat => cat.type === type);
+        }
+
+        function renderCategoriesList() {
+            const incomeContainer = document.getElementById('income-categories-list');
+            const expenseContainer = document.getElementById('expense-categories-list');
+            
+            if (!incomeContainer || !expenseContainer) return;
+
+            const incomeCategories = getCategoriesByType('income');
+            const expenseCategories = getCategoriesByType('expense');
+
+            // Render Income Categories
+            if (incomeCategories.length === 0) {
+                incomeContainer.innerHTML = '<div style="color: var(--text-light); font-style: italic; padding: 1rem;">No income categories. Add one to get started.</div>';
+            } else {
+                incomeContainer.innerHTML = incomeCategories.map((cat, index) => {
+                    const catIndex = state.data.categories.findIndex(c => c.name === cat.name && c.type === 'income');
+                    const usageCount = state.data.income.filter(i => i.category === cat.name).length;
+                    return `
+                        <div class="category-item">
+                            <div>
+                                <span class="category-name">${cat.name || 'Unnamed'}</span>
+                                <span class="category-badge badge-income">Income</span>
+                                <small style="color: var(--text-light); margin-left: 0.5rem;">(${usageCount} transactions)</small>
+                            </div>
+                            <div class="category-actions">
+                                <button class="btn-edit" onclick="editItem('categories', ${catIndex >= 0 ? catIndex : index})">✏️ Edit</button>
+                                <button class="btn-delete" onclick="deleteCategory('income', '${cat.name}', ${usageCount})">🗑️ Delete</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            // Render Expense Categories
+            if (expenseCategories.length === 0) {
+                expenseContainer.innerHTML = '<div style="color: var(--text-light); font-style: italic; padding: 1rem;">No expense categories. Add one to get started.</div>';
+            } else {
+                expenseContainer.innerHTML = expenseCategories.map((cat, index) => {
+                    const catIndex = state.data.categories.findIndex(c => c.name === cat.name && c.type === 'expense');
+                    const usageCount = state.data.expenses.filter(e => e.category === cat.name).length;
+                    return `
+                        <div class="category-item">
+                            <div>
+                                <span class="category-name">${cat.name || 'Unnamed'}</span>
+                                <span class="category-badge badge-expense">Expense</span>
+                                <small style="color: var(--text-light); margin-left: 0.5rem;">(${usageCount} transactions)</small>
+                            </div>
+                            <div class="category-actions">
+                                <button class="btn-edit" onclick="editItem('categories', ${catIndex >= 0 ? catIndex : index})">✏️ Edit</button>
+                                <button class="btn-delete" onclick="deleteCategory('expense', '${cat.name}', ${usageCount})">🗑️ Delete</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        function deleteCategory(type, name, usageCount) {
+            if (usageCount > 0) {
+                if (!confirm(`This category is used in ${usageCount} transaction(s). Deleting it will set those transactions to "Other". Continue?`)) {
+                    return;
+                }
+                // Update transactions to use "Other" category
+                if (type === 'income') {
+                    state.data.income.forEach(item => {
+                        if (item.category === name) item.category = 'Other';
+                    });
+                } else {
+                    state.data.expenses.forEach(item => {
+                        if (item.category === name) item.category = 'Other';
+                    });
+                }
+            }
+            
+            const index = state.data.categories.findIndex(c => c.name === name && c.type === type);
+            if (index >= 0) {
+                state.data.categories.splice(index, 1);
+            }
+            
+            writeExcelFile().then(() => {
+                renderAll();
+            });
+        }
+
         function renderAnalytics() {
             const container = document.getElementById('analytics-container');
             if (!container) return;
@@ -1696,12 +1916,13 @@
         let editingIndex = null;
         let editingType = null;
 
-        function openModal(mode, type = null, editIndex = null) {
+        function openModal(mode, type = null, editIndex = null, categoryType = null) {
             const overlay = document.getElementById('modal-overlay');
             const content = document.getElementById('modal-content');
             
             editingIndex = editIndex;
             editingType = type;
+            if (categoryType) window.lastCategoryType = categoryType;
             
             overlay.classList.add('active');
 
@@ -1745,7 +1966,8 @@
                     'receivable': 'receivables',
                     'payable': 'payables',
                     'plan': 'plans',
-                    'budget': 'budgets'
+                    'budget': 'budgets',
+                    'category': 'categories'
                 };
                 const dataType = dataTypeMap[type] || type;
                 const item = isEditing && editIndex !== null ? (state.data[dataType] && state.data[dataType][editIndex]) : null;
@@ -1754,6 +1976,9 @@
                 let formHTML = `<div class="modal-header">${isEditing ? 'Edit' : 'Add'} ${type.charAt(0).toUpperCase() + type.slice(1)}</div>`;
 
                 if (type === 'income') {
+                    const incomeCategories = getCategoriesByType('income').map(c => c.name);
+                    const uniqueCategories = [...new Set([...incomeCategories, ...state.data.income.map(i => i.category).filter(Boolean)])].sort();
+                    const categoryOptions = uniqueCategories.map(cat => `<option${item?.category === cat ? ' selected' : ''}>${cat || 'Other'}</option>`).join('');
                     formHTML += `
                         <div class="form-group">
                             <label class="form-label">Source</label>
@@ -1761,24 +1986,37 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">Category</label>
-                            <select class="form-select" id="inp-category">
-                                <option${item?.category === 'Salary' ? ' selected' : ''}>Salary</option>
-                                <option${item?.category === 'Freelance' ? ' selected' : ''}>Freelance</option>
-                                <option${item?.category === 'Business' ? ' selected' : ''}>Business</option>
-                                <option${item?.category === 'Investment' ? ' selected' : ''}>Investment</option>
-                                <option${item?.category === 'Other' ? ' selected' : ''}>Other</option>
-                            </select>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <select class="form-select" id="inp-category" style="flex: 1;">
+                                    <option value="">Select Category</option>
+                                    ${categoryOptions}
+                                </select>
+                                <button type="button" class="btn-icon" onclick="closeModal(); setTimeout(() => openModal('form', 'category', null, 'income'), 100);" title="Manage Categories">⚙️</button>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Amount</label>
-                            <input type="number" class="form-input" id="inp-amount" placeholder="0" value="${item?.amount || ''}">
+                            <input type="number" class="form-input" id="inp-amount" placeholder="0" step="0.01" value="${item?.amount || ''}">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Date</label>
                             <input type="date" class="form-input" id="inp-date" value="${item?.date || today}">
                         </div>
+                        <div class="form-group">
+                            <label class="form-label">Notes (Optional)</label>
+                            <textarea class="form-input" id="inp-notes" placeholder="Additional notes..." rows="2">${item?.notes || ''}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                <input type="checkbox" id="inp-recurring" ${item?.recurring ? 'checked' : ''}>
+                                <span>Recurring Transaction</span>
+                            </label>
+                        </div>
                     `;
                 } else if (type === 'expense') {
+                    const expenseCategories = getCategoriesByType('expense').map(c => c.name);
+                    const uniqueCategories = [...new Set([...expenseCategories, ...state.data.expenses.map(e => e.category).filter(Boolean)])].sort();
+                    const categoryOptions = uniqueCategories.map(cat => `<option${item?.category === cat ? ' selected' : ''}>${cat || 'Other'}</option>`).join('');
                     formHTML += `
                         <div class="form-group">
                             <label class="form-label">Description</label>
@@ -1786,22 +2024,31 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">Category</label>
-                            <select class="form-select" id="inp-category">
-                                <option${item?.category === 'Food' ? ' selected' : ''}>Food</option>
-                                <option${item?.category === 'Housing' ? ' selected' : ''}>Housing</option>
-                                <option${item?.category === 'Transport' ? ' selected' : ''}>Transport</option>
-                                <option${item?.category === 'Utilities' ? ' selected' : ''}>Utilities</option>
-                                <option${item?.category === 'Health' ? ' selected' : ''}>Health</option>
-                                <option${item?.category === 'Other' ? ' selected' : ''}>Other</option>
-                            </select>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <select class="form-select" id="inp-category" style="flex: 1;">
+                                    <option value="">Select Category</option>
+                                    ${categoryOptions}
+                                </select>
+                                <button type="button" class="btn-icon" onclick="closeModal(); setTimeout(() => openModal('form', 'category', null, 'expense'), 100);" title="Manage Categories">⚙️</button>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Amount</label>
-                            <input type="number" class="form-input" id="inp-amount" placeholder="0" value="${item?.amount || ''}">
+                            <input type="number" class="form-input" id="inp-amount" placeholder="0" step="0.01" value="${item?.amount || ''}">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Date</label>
                             <input type="date" class="form-input" id="inp-date" value="${item?.date || today}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Notes (Optional)</label>
+                            <textarea class="form-input" id="inp-notes" placeholder="Additional notes..." rows="2">${item?.notes || ''}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                <input type="checkbox" id="inp-recurring" ${item?.recurring ? 'checked' : ''}>
+                                <span>Recurring Transaction</span>
+                            </label>
                         </div>
                     `;
                 } else if (type === 'receivable') {
@@ -1860,6 +2107,22 @@
                             Note: Progress will be calculated based on Total Savings (Income - Expenses + Receivables).
                         </div>
                     `;
+                } else if (type === 'category') {
+                    const categoryType = editIndex === null && typeof editIndex !== 'number' ? (window.lastCategoryType || 'expense') : (item?.type || 'expense');
+                    formHTML += `
+                        <div class="form-group">
+                            <label class="form-label">Category Name</label>
+                            <input type="text" class="form-input" id="inp-name" placeholder="e.g. Groceries, Salary" value="${item?.name || ''}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Type</label>
+                            <select class="form-select" id="inp-type" ${item ? 'disabled' : ''}>
+                                <option value="income" ${categoryType === 'income' ? 'selected' : ''}>Income</option>
+                                <option value="expense" ${categoryType === 'expense' ? 'selected' : ''}>Expense</option>
+                            </select>
+                            ${item ? '<small style="color: var(--text-light);">Type cannot be changed after creation</small>' : ''}
+                        </div>
+                    `;
                 } else if (type === 'budget') {
                     const categories = [...new Set(state.data.expenses.map(e => e.category).filter(Boolean))].sort();
                     const categoryOptions = categories.map(cat => `<option${item?.category === cat ? ' selected' : ''}>${cat}</option>`).join('');
@@ -1905,6 +2168,21 @@
             else if (type === 'payables') openModal('form', 'payable', index);
             else if (type === 'plans') openModal('form', 'plan', index);
             else if (type === 'budgets') openModal('form', 'budget', index);
+            else if (type === 'categories') openModal('form', 'category', index);
+        }
+
+        function duplicateTransaction(type, index) {
+            const data = state.data[type];
+            if (data && data[index]) {
+                const original = data[index];
+                const duplicate = {...original};
+                duplicate.date = new Date().toISOString().split('T')[0]; // Set to today
+                delete duplicate.id; // Remove any ID if present
+                data.push(duplicate);
+                writeExcelFile().then(() => {
+                    renderAll();
+                });
+            }
         }
 
         function submitForm(type) {
@@ -1919,9 +2197,11 @@
             if (type === 'income') {
                 newItem = {
                     source: val('inp-source'),
-                    category: val('inp-category'),
+                    category: val('inp-category') || 'Other',
                     amount: num('inp-amount'),
-                    date: val('inp-date')
+                    date: val('inp-date'),
+                    notes: val('inp-notes'),
+                    recurring: document.getElementById('inp-recurring')?.checked || false
                 };
                 if (isEditing) {
                     state.data.income[editingIndex] = newItem;
@@ -1931,9 +2211,11 @@
             } else if (type === 'expense') {
                 newItem = {
                     description: val('inp-desc'),
-                    category: val('inp-category'),
+                    category: val('inp-category') || 'Other',
                     amount: num('inp-amount'),
-                    date: val('inp-date')
+                    date: val('inp-date'),
+                    notes: val('inp-notes'),
+                    recurring: document.getElementById('inp-recurring')?.checked || false
                 };
                 if (isEditing && editingIndex !== null) {
                     state.data.expenses[editingIndex] = newItem;
@@ -1985,6 +2267,23 @@
                 } else {
                     state.data.budgets.push(newItem);
                 }
+            } else if (type === 'category') {
+                newItem = {
+                    name: val('inp-name'),
+                    type: val('inp-type')
+                };
+                if (isEditing && editingIndex !== null) {
+                    state.data.categories[editingIndex] = newItem;
+                } else {
+                    // Check if category already exists
+                    const exists = state.data.categories.find(c => c.name === newItem.name && c.type === newItem.type);
+                    if (!exists) {
+                        state.data.categories.push(newItem);
+                    } else {
+                        alert('This category already exists!');
+                        return;
+                    }
+                }
             }
 
             // Save to Excel and UI
@@ -2017,6 +2316,7 @@
             const payablesSheet = XLSX.utils.json_to_sheet(state.data.payables);
             const plansSheet = XLSX.utils.json_to_sheet(state.data.plans);
             const budgetsSheet = XLSX.utils.json_to_sheet(state.data.budgets || []);
+            const categoriesSheet = XLSX.utils.json_to_sheet(state.data.categories || []);
 
             XLSX.utils.book_append_sheet(wb, incomeSheet, "Income");
             XLSX.utils.book_append_sheet(wb, expensesSheet, "Expenses");
@@ -2024,6 +2324,7 @@
             XLSX.utils.book_append_sheet(wb, payablesSheet, "Payables");
             XLSX.utils.book_append_sheet(wb, plansSheet, "Plans");
             XLSX.utils.book_append_sheet(wb, budgetsSheet, "Budgets");
+            XLSX.utils.book_append_sheet(wb, categoriesSheet, "Categories");
 
             const dateStr = new Date().toISOString().split('T')[0];
             XLSX.writeFile(wb, `finance_data_export_${dateStr}.xlsx`);
