@@ -6,6 +6,8 @@
     <title>Finance Manager</title>
     <!-- SheetJS for Excel processing -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- Chart.js for visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         :root {
             --primary: #3182ce;
@@ -235,6 +237,206 @@
 
         .hidden { display: none !important; }
         .text-right { text-align: right; }
+        .text-center { text-align: center; }
+
+        /* Filter Bar */
+        .filter-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .filter-group {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex: 1;
+            min-width: 200px;
+        }
+        .filter-input {
+            padding: 0.5rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.875rem;
+            flex: 1;
+        }
+        .btn-icon {
+            background: transparent;
+            border: 1px solid var(--border);
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+            font-size: 0.875rem;
+        }
+        .btn-icon:hover {
+            background: #f7fafc;
+            border-color: var(--primary);
+        }
+        .btn-edit {
+            background: #e6f3ff;
+            color: var(--primary);
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            margin-right: 0.5rem;
+            transition: background 0.2s;
+        }
+        .btn-edit:hover {
+            background: #bee3f8;
+        }
+        .btn-delete {
+            background: #fed7d7;
+            color: var(--danger);
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: background 0.2s;
+        }
+        .btn-delete:hover {
+            background: #feb2b2;
+        }
+
+        /* Charts */
+        .chart-container {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            height: 300px;
+        }
+        .chart-container canvas {
+            max-height: 280px;
+        }
+        .chart-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-main);
+        }
+
+        /* Search Box */
+        .search-box {
+            position: relative;
+            flex: 1;
+            min-width: 250px;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 0.5rem 2.5rem 0.5rem 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.875rem;
+        }
+        .search-icon {
+            position: absolute;
+            right: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        /* Analytics & Insights */
+        .insight-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--primary);
+        }
+        .insight-title {
+            font-size: 0.875rem;
+            color: var(--text-light);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .insight-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--text-main);
+        }
+        .insight-trend {
+            font-size: 0.75rem;
+            margin-top: 0.5rem;
+            color: var(--text-light);
+        }
+        .trend-up { color: var(--success); }
+        .trend-down { color: var(--danger); }
+
+        /* Budget Progress */
+        .budget-item {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--primary);
+        }
+        .budget-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .budget-category {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        .budget-amount {
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+        .budget-spent {
+            color: var(--danger);
+        }
+        .budget-remaining {
+            color: var(--success);
+        }
+
+        /* Report Sections */
+        .report-section {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .report-section:last-child {
+            border-bottom: none;
+        }
+        .report-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-main);
+        }
+        .report-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        /* Analytics Grid */
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
     </style>
 </head>
 <body>
@@ -245,7 +447,10 @@
             <div class="logo">
                 <span>📊</span> Finance Manager
             </div>
-            <button class="btn btn-primary" style="width: auto;" id="connect-btn" onclick="connectExcelFile()">Connect Excel</button>
+            <div style="display: flex; gap: 0.5rem;">
+                <button class="btn btn-secondary" style="width: auto;" onclick="exportData()" title="Export Data">📥 Export</button>
+                <button class="btn btn-primary" style="width: auto;" id="connect-btn" onclick="connectExcelFile()">Connect Excel</button>
+            </div>
         </div>
     </header>
 
@@ -262,6 +467,9 @@
         <div class="nav-tab" onclick="switchTab('receivables')">Due (Receivables)</div>
         <div class="nav-tab" onclick="switchTab('payables')">Payables</div>
         <div class="nav-tab" onclick="switchTab('plans')">Future Plans</div>
+        <div class="nav-tab" onclick="switchTab('budgets')">Budgets</div>
+        <div class="nav-tab" onclick="switchTab('reports')">Reports</div>
+        <div class="nav-tab" onclick="switchTab('analytics')">Analytics</div>
     </nav>
 
     <!-- Main Content Area -->
@@ -286,6 +494,54 @@
                     <div class="stat-label">Total Savings</div>
                     <div class="stat-value" id="dash-savings">৳0</div>
                 </div>
+                <div class="stat-card" style="border-color: var(--warning);">
+                    <div class="stat-label">Due Receivables</div>
+                    <div class="stat-value" id="dash-receivables-total">৳0</div>
+                </div>
+                <div class="stat-card" style="border-color: #c53030;">
+                    <div class="stat-label">Due Payables</div>
+                    <div class="stat-value" id="dash-payables-total">৳0</div>
+                </div>
+            </div>
+
+            <!-- Quick Insights -->
+            <div class="analytics-grid" style="margin-bottom: 2rem;">
+                <div class="insight-card">
+                    <div class="insight-title">Average Monthly Expense</div>
+                    <div class="insight-value" id="avg-monthly-expense">৳0</div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-title">Average Monthly Income</div>
+                    <div class="insight-value" id="avg-monthly-income">৳0</div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-title">Top Spending Category</div>
+                    <div class="insight-value" id="top-category" style="font-size: 1.2rem;">-</div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-title">Average Transaction Size</div>
+                    <div class="insight-value" id="avg-transaction">৳0</div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                <div class="chart-container">
+                    <div class="chart-title">Income vs Expenses Trend</div>
+                    <canvas id="trend-chart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">Cash Flow</div>
+                    <canvas id="cashflow-chart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">Expense Categories</div>
+                    <canvas id="expense-categories-chart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">Income Categories</div>
+                    <canvas id="income-categories-chart"></canvas>
+                </div>
             </div>
 
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
@@ -303,7 +559,31 @@
         <!-- Generic List View (Used for Income, Expenses, Receivables, Payables) -->
         <div id="view-list" class="hidden">
             <div class="card">
-                <h2 id="list-title">Items</h2>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
+                    <div>
+                        <h2 id="list-title" style="margin: 0;">Items</h2>
+                        <small id="list-count" style="color: var(--text-light); font-size: 0.875rem;"></small>
+                    </div>
+                    <div class="filter-bar" style="margin: 0;">
+                        <div class="search-box">
+                            <input type="text" id="search-input" placeholder="Search..." onkeyup="applyFilters()">
+                            <span class="search-icon">🔍</span>
+                        </div>
+                        <select class="filter-input" id="category-filter" onchange="applyFilters()">
+                            <option value="">All Categories</option>
+                        </select>
+                        <input type="date" class="filter-input" id="date-from-filter" onchange="applyFilters()" placeholder="From Date">
+                        <input type="date" class="filter-input" id="date-to-filter" onchange="applyFilters()" placeholder="To Date">
+                        <select class="filter-input" id="sort-by" onchange="applyFilters()" style="min-width: 150px;">
+                            <option value="">Sort by...</option>
+                            <option value="date-asc">Date (Oldest)</option>
+                            <option value="date-desc">Date (Newest)</option>
+                            <option value="amount-asc">Amount (Low to High)</option>
+                            <option value="amount-desc">Amount (High to Low)</option>
+                        </select>
+                        <button class="btn-icon" onclick="clearFilters()">Clear Filters</button>
+                    </div>
+                </div>
                 <div class="table-container">
                     <table>
                         <thead id="list-thead"></thead>
@@ -318,6 +598,45 @@
             <div class="card">
                 <h2>Future Plans & Goals</h2>
                 <div id="plans-container"></div>
+            </div>
+        </div>
+
+        <!-- Budgets View -->
+        <div id="view-budgets" class="hidden">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h2>Budget Tracking</h2>
+                    <button class="btn btn-primary" style="width: auto;" onclick="openModal('form', 'budget')">+ Add Budget</button>
+                </div>
+                <div id="budgets-container"></div>
+            </div>
+        </div>
+
+        <!-- Reports View -->
+        <div id="view-reports" class="hidden">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
+                    <h2>Financial Reports</h2>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <select class="filter-input" id="report-period" onchange="renderReports()" style="min-width: 150px;">
+                            <option value="month">This Month</option>
+                            <option value="lastmonth">Last Month</option>
+                            <option value="year">This Year</option>
+                            <option value="lastyear">Last Year</option>
+                            <option value="all">All Time</option>
+                        </select>
+                        <button class="btn-icon" onclick="printReport()">🖨️ Print</button>
+                    </div>
+                </div>
+                <div id="reports-container"></div>
+            </div>
+        </div>
+
+        <!-- Analytics View -->
+        <div id="view-analytics" class="hidden">
+            <div class="card">
+                <h2>Advanced Analytics</h2>
+                <div id="analytics-container"></div>
             </div>
         </div>
 
@@ -348,7 +667,8 @@
                 expenses: [],
                 receivables: [],
                 payables: [],
-                plans: []
+                plans: [],
+                budgets: []
             }
         };
 
@@ -408,6 +728,7 @@
             state.data.receivables = parseSheet('Receivables');
             state.data.payables = parseSheet('Payables');
             state.data.plans = parseSheet('Plans');
+            state.data.budgets = parseSheet('Budgets') || [];
         }
 
         async function writeExcelFile() {
@@ -423,6 +744,7 @@
                 const receivablesSheet = XLSX.utils.json_to_sheet(state.data.receivables);
                 const payablesSheet = XLSX.utils.json_to_sheet(state.data.payables);
                 const plansSheet = XLSX.utils.json_to_sheet(state.data.plans);
+                const budgetsSheet = XLSX.utils.json_to_sheet(state.data.budgets || []);
 
                 // Append sheets
                 XLSX.utils.book_append_sheet(wb, incomeSheet, "Income");
@@ -430,6 +752,7 @@
                 XLSX.utils.book_append_sheet(wb, receivablesSheet, "Receivables");
                 XLSX.utils.book_append_sheet(wb, payablesSheet, "Payables");
                 XLSX.utils.book_append_sheet(wb, plansSheet, "Plans");
+                XLSX.utils.book_append_sheet(wb, budgetsSheet, "Budgets");
 
                 // Write to file
                 const wbout = XLSX.write(wb, {bookType:'xlsx', type:'array'});
@@ -481,6 +804,9 @@
             document.getElementById('view-dashboard').classList.add('hidden');
             document.getElementById('view-list').classList.add('hidden');
             document.getElementById('view-plans').classList.add('hidden');
+            document.getElementById('view-budgets')?.classList.add('hidden');
+            document.getElementById('view-reports')?.classList.add('hidden');
+            document.getElementById('view-analytics')?.classList.add('hidden');
 
             // Show selected view
             if (tabId === 'dashboard') {
@@ -489,6 +815,15 @@
             } else if (tabId === 'plans') {
                 document.getElementById('view-plans').classList.remove('hidden');
                 renderPlansList();
+            } else if (tabId === 'budgets') {
+                document.getElementById('view-budgets').classList.remove('hidden');
+                renderBudgetsList();
+            } else if (tabId === 'reports') {
+                document.getElementById('view-reports').classList.remove('hidden');
+                renderReports();
+            } else if (tabId === 'analytics') {
+                document.getElementById('view-analytics').classList.remove('hidden');
+                renderAnalytics();
             } else {
                 document.getElementById('view-list').classList.remove('hidden');
                 renderListTable(tabId);
@@ -507,17 +842,37 @@
             }
         }
 
+        // Calculate total savings (reusable function)
+        function calculateTotalSavings() {
+            const totalIncome = state.data.income.reduce((sum, i) => sum + Number(i.amount || 0), 0);
+            const totalExpenses = state.data.expenses.reduce((sum, i) => sum + Number(i.amount || 0), 0);
+            const netBalance = totalIncome - totalExpenses;
+            const totalReceivables = state.data.receivables.reduce((sum, i) => sum + Number(i.amount || 0), 0);
+            return totalReceivables + (netBalance > 0 ? netBalance : 0);
+        }
+
         function renderDashboard() {
             // Calculate Stats
             const totalIncome = state.data.income.reduce((sum, i) => sum + Number(i.amount || 0), 0);
             const totalExpenses = state.data.expenses.reduce((sum, i) => sum + Number(i.amount || 0), 0);
             const netBalance = totalIncome - totalExpenses;
+            const totalSavings = calculateTotalSavings();
+
             const totalReceivables = state.data.receivables.reduce((sum, i) => sum + Number(i.amount || 0), 0);
+            const totalPayables = state.data.payables.reduce((sum, i) => sum + Number(i.amount || 0), 0);
 
             document.getElementById('dash-income').textContent = formatCurrency(totalIncome);
             document.getElementById('dash-expenses').textContent = formatCurrency(totalExpenses);
             document.getElementById('dash-balance').textContent = formatCurrency(netBalance);
-            document.getElementById('dash-savings').textContent = formatCurrency(totalReceivables + (netBalance > 0 ? netBalance : 0)); // Approximate logic
+            document.getElementById('dash-savings').textContent = formatCurrency(totalSavings);
+            document.getElementById('dash-receivables-total').textContent = formatCurrency(totalReceivables);
+            document.getElementById('dash-payables-total').textContent = formatCurrency(totalPayables);
+
+            // Render Quick Insights
+            renderQuickInsights(totalIncome, totalExpenses);
+
+            // Render Charts
+            renderCharts();
 
             // Render Dashboard Lists (Top 5)
             const renderSmallList = (items, containerId, type) => {
@@ -546,11 +901,247 @@
             renderSmallList(state.data.payables, 'dash-payables-list', 'payable');
         }
 
+        // Chart rendering functions
+        let trendChart = null;
+        let expenseCategoriesChart = null;
+        let incomeCategoriesChart = null;
+        let cashFlowChart = null;
+
+        function renderCharts() {
+            // Destroy existing charts if they exist
+            if (trendChart) trendChart.destroy();
+            if (expenseCategoriesChart) expenseCategoriesChart.destroy();
+            if (incomeCategoriesChart) incomeCategoriesChart.destroy();
+            if (cashFlowChart) cashFlowChart.destroy();
+
+            // Trend Chart (Income vs Expenses by Month)
+            const monthlyData = getMonthlyData();
+            const trendCtx = document.getElementById('trend-chart');
+            if (trendCtx) {
+                trendChart = new Chart(trendCtx, {
+                    type: 'line',
+                    data: {
+                        labels: monthlyData.labels,
+                        datasets: [
+                            {
+                                label: 'Income',
+                                data: monthlyData.income,
+                                borderColor: '#38a169',
+                                backgroundColor: 'rgba(56, 161, 105, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            },
+                            {
+                                label: 'Expenses',
+                                data: monthlyData.expenses,
+                                borderColor: '#e53e3e',
+                                backgroundColor: 'rgba(229, 62, 62, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'top' },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.dataset.label + ': ' + formatCurrency(context.parsed.y);
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return '৳' + value.toLocaleString('en-BD');
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Expense Categories Chart
+            const expenseCategories = getCategoryData('expenses');
+            const expenseCtx = document.getElementById('expense-categories-chart');
+            if (expenseCtx) {
+                expenseCategoriesChart = new Chart(expenseCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: expenseCategories.labels,
+                        datasets: [{
+                            data: expenseCategories.values,
+                            backgroundColor: [
+                                '#e53e3e', '#d97706', '#d69e2e', '#38a169',
+                                '#3182ce', '#805ad5', '#e53e3e', '#c53030'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom' },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const label = context.label || '';
+                                        const value = context.parsed || 0;
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = ((value / total) * 100).toFixed(1);
+                                        return label + ': ' + formatCurrency(value) + ' (' + percentage + '%)';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Cash Flow Chart
+            const cashFlowData = getMonthlyData();
+            const cashFlowValues = cashFlowData.income.map((income, idx) => income - cashFlowData.expenses[idx]);
+            const cashFlowCtx = document.getElementById('cashflow-chart');
+            if (cashFlowCtx) {
+                cashFlowChart = new Chart(cashFlowCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: cashFlowData.labels,
+                        datasets: [{
+                            label: 'Net Cash Flow',
+                            data: cashFlowValues,
+                            backgroundColor: cashFlowValues.map(val => val >= 0 ? 'rgba(56, 161, 105, 0.6)' : 'rgba(229, 62, 62, 0.6)'),
+                            borderColor: cashFlowValues.map(val => val >= 0 ? '#38a169' : '#e53e3e'),
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return 'Cash Flow: ' + formatCurrency(context.parsed.y);
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                ticks: {
+                                    callback: function(value) {
+                                        return '৳' + value.toLocaleString('en-BD');
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Income Categories Chart
+            const incomeCategories = getCategoryData('income');
+            const incomeCtx = document.getElementById('income-categories-chart');
+            if (incomeCtx) {
+                incomeCategoriesChart = new Chart(incomeCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: incomeCategories.labels,
+                        datasets: [{
+                            data: incomeCategories.values,
+                            backgroundColor: [
+                                '#38a169', '#3182ce', '#805ad5', '#d69e2e',
+                                '#e53e3e', '#48bb78', '#4299e1', '#9f7aea'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom' },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const label = context.label || '';
+                                        const value = context.parsed || 0;
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = ((value / total) * 100).toFixed(1);
+                                        return label + ': ' + formatCurrency(value) + ' (' + percentage + '%)';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        function getMonthlyData() {
+            const incomeByMonth = {};
+            const expensesByMonth = {};
+
+            state.data.income.forEach(item => {
+                if (item.date) {
+                    const month = item.date.substring(0, 7); // YYYY-MM
+                    incomeByMonth[month] = (incomeByMonth[month] || 0) + Number(item.amount || 0);
+                }
+            });
+
+            state.data.expenses.forEach(item => {
+                if (item.date) {
+                    const month = item.date.substring(0, 7); // YYYY-MM
+                    expensesByMonth[month] = (expensesByMonth[month] || 0) + Number(item.amount || 0);
+                }
+            });
+
+            const allMonths = [...new Set([...Object.keys(incomeByMonth), ...Object.keys(expensesByMonth)])].sort();
+            
+            return {
+                labels: allMonths,
+                income: allMonths.map(m => incomeByMonth[m] || 0),
+                expenses: allMonths.map(m => expensesByMonth[m] || 0)
+            };
+        }
+
+        function getCategoryData(type) {
+            const data = type === 'expenses' ? state.data.expenses : state.data.income;
+            const categoryMap = {};
+
+            data.forEach(item => {
+                const category = item.category || 'Other';
+                categoryMap[category] = (categoryMap[category] || 0) + Number(item.amount || 0);
+            });
+
+            const sorted = Object.entries(categoryMap).sort((a, b) => b[1] - a[1]);
+            
+            return {
+                labels: sorted.map(([cat]) => cat),
+                values: sorted.map(([, val]) => val)
+            };
+        }
+
+        // Filter state
+        let currentListType = null;
+        let filteredData = null;
+
         function renderListTable(type) {
+            currentListType = type;
             const titleEl = document.getElementById('list-title');
             const thead = document.getElementById('list-thead');
             const tbody = document.getElementById('list-tbody');
             const data = state.data[type] || [];
+            filteredData = [...data]; // Copy for filtering
 
             thead.innerHTML = '';
             tbody.innerHTML = '';
@@ -559,17 +1150,20 @@
 
             if (type === 'income') {
                 titleEl.textContent = 'Income Sources';
-                headers = ['Date', 'Source', 'Category', 'Amount', 'Action'];
+                headers = ['Date', 'Source', 'Category', 'Amount', 'Actions'];
             } else if (type === 'expenses') {
                 titleEl.textContent = 'Expenses';
-                headers = ['Date', 'Description', 'Category', 'Amount', 'Action'];
+                headers = ['Date', 'Description', 'Category', 'Amount', 'Actions'];
             } else if (type === 'receivables') {
                 titleEl.textContent = 'Receivables (Due)';
-                headers = ['Due Date', 'From', 'Description', 'Amount', 'Action'];
+                headers = ['Due Date', 'From', 'Description', 'Amount', 'Actions'];
             } else if (type === 'payables') {
                 titleEl.textContent = 'Payables';
-                headers = ['Due Date', 'To', 'Description', 'Amount', 'Action'];
+                headers = ['Due Date', 'To', 'Description', 'Amount', 'Actions'];
             }
+
+            // Populate category filter
+            populateCategoryFilter(type, data);
 
             // Render Headers
             const trHead = document.createElement('tr');
@@ -580,13 +1174,41 @@
             });
             thead.appendChild(trHead);
 
-            // Render Rows
+            // Render rows
+            renderTableRows(type, filteredData, tbody, headers.length);
+            
+            // Update item count
+            const countEl = document.getElementById('list-count');
+            if (countEl) {
+                const totalCount = data.length;
+                const filteredCount = filteredData.length;
+                if (filteredCount === totalCount) {
+                    countEl.textContent = `${totalCount} item${totalCount !== 1 ? 's' : ''}`;
+                } else {
+                    countEl.textContent = `Showing ${filteredCount} of ${totalCount} item${totalCount !== 1 ? 's' : ''}`;
+                }
+            }
+        }
+
+        function populateCategoryFilter(type, data) {
+            const categoryFilter = document.getElementById('category-filter');
+            if (!categoryFilter) return;
+
+            const categories = [...new Set(data.map(item => item.category || 'Other').filter(Boolean))].sort();
+            categoryFilter.innerHTML = '<option value="">All Categories</option>' + 
+                categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+        }
+
+        function renderTableRows(type, data, tbody, colspan) {
+            tbody.innerHTML = '';
+
             if (data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="${headers.length}" class="text-center" style="padding: 2rem; color: var(--text-light);">No data found.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="${colspan}" class="text-center" style="padding: 2rem; color: var(--text-light);">No data found.</td></tr>`;
                 return;
             }
 
             data.forEach((item, index) => {
+                const originalIndex = state.data[type].indexOf(item);
                 const tr = document.createElement('tr');
                 let cols = '';
 
@@ -620,9 +1242,90 @@
                     `;
                 }
 
-                tr.innerHTML = cols + `<td><button class="btn btn-danger" onclick="deleteItem('${type}', ${index})">Delete</button></td>`;
+                tr.innerHTML = cols + `
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn-edit" onclick="editItem('${type}', ${originalIndex})">✏️ Edit</button>
+                            <button class="btn-delete" onclick="deleteItem('${type}', ${originalIndex})">🗑️ Delete</button>
+                        </div>
+                    </td>
+                `;
                 tbody.appendChild(tr);
             });
+        }
+
+        function applyFilters() {
+            if (!currentListType) return;
+
+            const searchTerm = (document.getElementById('search-input')?.value || '').toLowerCase();
+            const categoryFilter = document.getElementById('category-filter')?.value || '';
+            const dateFrom = document.getElementById('date-from-filter')?.value || '';
+            const dateTo = document.getElementById('date-to-filter')?.value || '';
+            const sortBy = document.getElementById('sort-by')?.value || '';
+
+            const data = state.data[currentListType] || [];
+            filteredData = data.filter(item => {
+                // Search filter
+                if (searchTerm) {
+                    const searchableText = Object.values(item).join(' ').toLowerCase();
+                    if (!searchableText.includes(searchTerm)) return false;
+                }
+
+                // Category filter
+                if (categoryFilter && item.category !== categoryFilter) return false;
+
+                // Date filter
+                const dateField = currentListType === 'receivables' || currentListType === 'payables' ? 'dueDate' : 'date';
+                const itemDate = item[dateField] || '';
+                
+                if (dateFrom && itemDate < dateFrom) return false;
+                if (dateTo && itemDate > dateTo) return false;
+
+                return true;
+            });
+
+            // Apply sorting
+            if (sortBy) {
+                const dateField = currentListType === 'receivables' || currentListType === 'payables' ? 'dueDate' : 'date';
+                
+                filteredData.sort((a, b) => {
+                    if (sortBy === 'date-asc' || sortBy === 'date-desc') {
+                        const dateA = a[dateField] || '';
+                        const dateB = b[dateField] || '';
+                        return sortBy === 'date-asc' ? dateA.localeCompare(dateB) : dateB.localeCompare(dateA);
+                    } else if (sortBy === 'amount-asc' || sortBy === 'amount-desc') {
+                        const amountA = Number(a.amount || 0);
+                        const amountB = Number(b.amount || 0);
+                        return sortBy === 'amount-asc' ? amountA - amountB : amountB - amountA;
+                    }
+                    return 0;
+                });
+            }
+
+            const tbody = document.getElementById('list-tbody');
+            const headers = document.querySelectorAll('#list-thead th').length;
+            renderTableRows(currentListType, filteredData, tbody, headers);
+            
+            // Update item count
+            const countEl = document.getElementById('list-count');
+            if (countEl) {
+                const totalCount = state.data[currentListType]?.length || 0;
+                const filteredCount = filteredData.length;
+                if (filteredCount === totalCount) {
+                    countEl.textContent = `${totalCount} item${totalCount !== 1 ? 's' : ''}`;
+                } else {
+                    countEl.textContent = `Showing ${filteredCount} of ${totalCount} item${totalCount !== 1 ? 's' : ''}`;
+                }
+            }
+        }
+
+        function clearFilters() {
+            document.getElementById('search-input').value = '';
+            document.getElementById('category-filter').value = '';
+            document.getElementById('date-from-filter').value = '';
+            document.getElementById('date-to-filter').value = '';
+            document.getElementById('sort-by').value = '';
+            applyFilters();
         }
 
         function renderPlansList() {
@@ -635,17 +1338,21 @@
                 return;
             }
 
+            const totalSavings = calculateTotalSavings();
+
             data.forEach((plan, index) => {
-                const current = Number(plan.currentAmount || 0);
                 const target = Number(plan.targetAmount || 1);
-                const percent = Math.min(100, Math.round((current / target) * 100));
+                const percent = Math.min(100, Math.round((totalSavings / target) * 100));
 
                 const div = document.createElement('div');
                 div.className = 'plan-item';
                 div.innerHTML = `
                     <div class="plan-header">
                         <h3 style="font-size: 1.1rem;">${plan.title || 'Untitled'}</h3>
-                        <button class="btn btn-danger" style="width: auto; padding: 0.25rem 0.75rem;" onclick="deleteItem('plans', ${index})">✕</button>
+                        <div class="action-buttons">
+                            <button class="btn-edit" onclick="editItem('plans', ${index})">✏️ Edit</button>
+                            <button class="btn-delete" onclick="deleteItem('plans', ${index})">🗑️ Delete</button>
+                        </div>
                     </div>
                     <div style="font-size: 0.875rem; color: var(--text-light); margin-bottom: 0.5rem;">
                         Target: ${formatCurrency(target)} by ${plan.deadline || 'No Date'}
@@ -654,19 +1361,347 @@
                         <div class="progress-fill" style="width: ${percent}%"></div>
                     </div>
                     <div class="plan-meta">
-                        <span>Saved: ${formatCurrency(current)}</span>
+                        <span>Total Savings: ${formatCurrency(totalSavings)}</span>
                         <span style="font-weight: bold; color: var(--purple);">${percent}%</span>
+                    </div>
+                    <div style="font-size: 0.75rem; color: var(--text-light); margin-top: 0.5rem;">
+                        Remaining: ${formatCurrency(Math.max(0, target - totalSavings))}
                     </div>
                 `;
                 container.appendChild(div);
             });
         }
 
+        // Budget rendering
+        function renderBudgetsList() {
+            const container = document.getElementById('budgets-container');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            const budgets = state.data.budgets || [];
+
+            if (budgets.length === 0) {
+                container.innerHTML = '<div class="text-center" style="padding: 2rem; color: var(--text-light);">No budgets set. Add a budget to track spending limits.</div>';
+                return;
+            }
+
+            budgets.forEach((budget, index) => {
+                const category = budget.category || 'Uncategorized';
+                const budgetAmount = Number(budget.amount || 0);
+                
+                // Calculate actual spending for this category
+                const actualSpending = state.data.expenses
+                    .filter(exp => exp.category === category)
+                    .reduce((sum, exp) => sum + Number(exp.amount || 0), 0);
+                
+                const percent = budgetAmount > 0 ? Math.min(100, Math.round((actualSpending / budgetAmount) * 100)) : 0;
+                const remaining = Math.max(0, budgetAmount - actualSpending);
+                const isOverBudget = actualSpending > budgetAmount;
+
+                const div = document.createElement('div');
+                div.className = 'budget-item';
+                div.style.borderLeftColor = isOverBudget ? 'var(--danger)' : 'var(--primary)';
+                div.innerHTML = `
+                    <div class="budget-header">
+                        <div class="budget-category">${category}</div>
+                        <div class="action-buttons">
+                            <button class="btn-edit" onclick="editItem('budgets', ${index})">✏️ Edit</button>
+                            <button class="btn-delete" onclick="deleteItem('budgets', ${index})">🗑️ Delete</button>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                        <div>
+                            <div style="font-size: 0.75rem; color: var(--text-light);">Budget</div>
+                            <div class="budget-amount">${formatCurrency(budgetAmount)}</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.75rem; color: var(--text-light);">Spent</div>
+                            <div class="budget-amount budget-spent">${formatCurrency(actualSpending)}</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.75rem; color: var(--text-light);">Remaining</div>
+                            <div class="budget-amount budget-remaining">${formatCurrency(remaining)}</div>
+                        </div>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill" style="width: ${percent}%; background: ${isOverBudget ? 'var(--danger)' : 'var(--primary)'}"></div>
+                    </div>
+                    <div style="font-size: 0.75rem; color: ${isOverBudget ? 'var(--danger)' : 'var(--text-light)'}; margin-top: 0.5rem;">
+                        ${isOverBudget ? `⚠️ Over budget by ${formatCurrency(actualSpending - budgetAmount)}` : `${percent}% used`}
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // Reports rendering
+        function renderReports() {
+            const container = document.getElementById('reports-container');
+            if (!container) return;
+
+            const period = document.getElementById('report-period')?.value || 'month';
+            const now = new Date();
+            let startDate = '', endDate = '';
+
+            if (period === 'month') {
+                startDate = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+                endDate = now.toISOString().split('T')[0];
+            } else if (period === 'lastmonth') {
+                startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString().split('T')[0];
+                endDate = new Date(now.getFullYear(), now.getMonth(), 0).toISOString().split('T')[0];
+            } else if (period === 'year') {
+                startDate = new Date(now.getFullYear(), 0, 1).toISOString().split('T')[0];
+                endDate = now.toISOString().split('T')[0];
+            } else if (period === 'lastyear') {
+                startDate = new Date(now.getFullYear() - 1, 0, 1).toISOString().split('T')[0];
+                endDate = new Date(now.getFullYear() - 1, 11, 31).toISOString().split('T')[0];
+            }
+
+            const filterByDate = (items, dateField) => {
+                if (!startDate) return items;
+                return items.filter(item => {
+                    const itemDate = item[dateField] || '';
+                    return itemDate >= startDate && itemDate <= endDate;
+                });
+            };
+
+            const periodIncome = filterByDate(state.data.income, 'date');
+            const periodExpenses = filterByDate(state.data.expenses, 'date');
+            const periodReceivables = filterByDate(state.data.receivables, 'dueDate');
+            const periodPayables = filterByDate(state.data.payables, 'dueDate');
+
+            const totalIncome = periodIncome.reduce((sum, i) => sum + Number(i.amount || 0), 0);
+            const totalExpenses = periodExpenses.reduce((sum, i) => sum + Number(i.amount || 0), 0);
+            const netBalance = totalIncome - totalExpenses;
+            const totalReceivables = periodReceivables.reduce((sum, i) => sum + Number(i.amount || 0), 0);
+            const totalPayables = periodPayables.reduce((sum, i) => sum + Number(i.amount || 0), 0);
+
+            container.innerHTML = `
+                <div class="report-section">
+                    <div class="report-title">Summary</div>
+                    <div class="report-grid">
+                        <div class="stat-card" style="border-color: var(--success);">
+                            <div class="stat-label">Total Income</div>
+                            <div class="stat-value">${formatCurrency(totalIncome)}</div>
+                        </div>
+                        <div class="stat-card" style="border-color: var(--danger);">
+                            <div class="stat-label">Total Expenses</div>
+                            <div class="stat-value">${formatCurrency(totalExpenses)}</div>
+                        </div>
+                        <div class="stat-card" style="border-color: var(--primary);">
+                            <div class="stat-label">Net Balance</div>
+                            <div class="stat-value">${formatCurrency(netBalance)}</div>
+                        </div>
+                        <div class="stat-card" style="border-color: var(--warning);">
+                            <div class="stat-label">Due Receivables</div>
+                            <div class="stat-value">${formatCurrency(totalReceivables)}</div>
+                        </div>
+                        <div class="stat-card" style="border-color: #c53030;">
+                            <div class="stat-label">Due Payables</div>
+                            <div class="stat-value">${formatCurrency(totalPayables)}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="report-section">
+                    <div class="report-title">Top Expense Categories</div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Amount</th>
+                                    <th>Transactions</th>
+                                    <th>Percentage</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${getCategoryBreakdown(periodExpenses).map(cat => `
+                                    <tr>
+                                        <td><span class="tag tag-danger">${cat.name}</span></td>
+                                        <td>${formatCurrency(cat.amount)}</td>
+                                        <td>${cat.count}</td>
+                                        <td>${cat.percentage}%</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="report-section">
+                    <div class="report-title">Top Income Categories</div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Amount</th>
+                                    <th>Transactions</th>
+                                    <th>Percentage</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${getCategoryBreakdown(periodIncome).map(cat => `
+                                    <tr>
+                                        <td><span class="tag tag-success">${cat.name}</span></td>
+                                        <td>${formatCurrency(cat.amount)}</td>
+                                        <td>${cat.count}</td>
+                                        <td>${cat.percentage}%</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getCategoryBreakdown(items) {
+            const categoryMap = {};
+            items.forEach(item => {
+                const cat = item.category || 'Other';
+                if (!categoryMap[cat]) {
+                    categoryMap[cat] = { amount: 0, count: 0 };
+                }
+                categoryMap[cat].amount += Number(item.amount || 0);
+                categoryMap[cat].count++;
+            });
+
+            const total = items.reduce((sum, item) => sum + Number(item.amount || 0), 0);
+            return Object.entries(categoryMap)
+                .map(([name, data]) => ({
+                    name,
+                    amount: data.amount,
+                    count: data.count,
+                    percentage: total > 0 ? ((data.amount / total) * 100).toFixed(1) : 0
+                }))
+                .sort((a, b) => b.amount - a.amount)
+                .slice(0, 10);
+        }
+
+        function printReport() {
+            window.print();
+        }
+
+        // Analytics rendering
+        function renderAnalytics() {
+            const container = document.getElementById('analytics-container');
+            if (!container) return;
+
+            const monthlyData = getMonthlyData();
+            const expenseCategories = getCategoryData('expenses');
+            const incomeCategories = getCategoryData('income');
+
+            // Calculate trends
+            const recentMonths = 3;
+            const recentExpenses = monthlyData.expenses.slice(-recentMonths);
+            const recentIncome = monthlyData.income.slice(-recentMonths);
+            const avgRecentExpense = recentExpenses.length > 0 
+                ? recentExpenses.reduce((a, b) => a + b, 0) / recentExpenses.length 
+                : 0;
+            const avgRecentIncome = recentIncome.length > 0 
+                ? recentIncome.reduce((a, b) => a + b, 0) / recentIncome.length 
+                : 0;
+
+            container.innerHTML = `
+                <div class="analytics-grid">
+                    <div class="insight-card">
+                        <div class="insight-title">Average Monthly Spending</div>
+                        <div class="insight-value">${formatCurrency(avgRecentExpense)}</div>
+                        <div class="insight-trend">Last ${recentMonths} months average</div>
+                    </div>
+                    <div class="insight-card">
+                        <div class="insight-title">Average Monthly Income</div>
+                        <div class="insight-value">${formatCurrency(avgRecentIncome)}</div>
+                        <div class="insight-trend">Last ${recentMonths} months average</div>
+                    </div>
+                    <div class="insight-card">
+                        <div class="insight-title">Savings Rate</div>
+                        <div class="insight-value">${avgRecentIncome > 0 ? ((avgRecentIncome - avgRecentExpense) / avgRecentIncome * 100).toFixed(1) : 0}%</div>
+                        <div class="insight-trend">Income vs Expenses</div>
+                    </div>
+                    <div class="insight-card">
+                        <div class="insight-title">Total Transactions</div>
+                        <div class="insight-value">${state.data.expenses.length + state.data.income.length}</div>
+                        <div class="insight-trend">${state.data.expenses.length} expenses, ${state.data.income.length} income</div>
+                    </div>
+                </div>
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <h3>Top Spending Categories</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Total Amount</th>
+                                    <th>Percentage</th>
+                                    <th>Transactions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${expenseCategories.labels.slice(0, 10).map((label, idx) => {
+                                    const amount = expenseCategories.values[idx];
+                                    const total = expenseCategories.values.reduce((a, b) => a + b, 0);
+                                    const percentage = total > 0 ? ((amount / total) * 100).toFixed(1) : 0;
+                                    const count = state.data.expenses.filter(e => e.category === label).length;
+                                    return `
+                                        <tr>
+                                            <td><span class="tag tag-danger">${label}</span></td>
+                                            <td>${formatCurrency(amount)}</td>
+                                            <td>${percentage}%</td>
+                                            <td>${count}</td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Top Income Categories</h3>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Total Amount</th>
+                                    <th>Percentage</th>
+                                    <th>Transactions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${incomeCategories.labels.slice(0, 10).map((label, idx) => {
+                                    const amount = incomeCategories.values[idx];
+                                    const total = incomeCategories.values.reduce((a, b) => a + b, 0);
+                                    const percentage = total > 0 ? ((amount / total) * 100).toFixed(1) : 0;
+                                    const count = state.data.income.filter(i => i.category === label).length;
+                                    return `
+                                        <tr>
+                                            <td><span class="tag tag-success">${label}</span></td>
+                                            <td>${formatCurrency(amount)}</td>
+                                            <td>${percentage}%</td>
+                                            <td>${count}</td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
         // --- 4. MODAL & FORM LOGIC ---
 
-        function openModal(mode, type = null) {
+        // Edit state
+        let editingIndex = null;
+        let editingType = null;
+
+        function openModal(mode, type = null, editIndex = null) {
             const overlay = document.getElementById('modal-overlay');
             const content = document.getElementById('modal-content');
+            
+            editingIndex = editIndex;
+            editingType = type;
             
             overlay.classList.add('active');
 
@@ -694,124 +1729,161 @@
                             <span class="type-icon">🎯</span>
                             <div class="type-label">Future Plan</div>
                         </div>
+                        <div class="type-card" style="grid-column: span 2;" onclick="openModal('form', 'budget')">
+                            <span class="type-icon">💰</span>
+                            <div class="type-label">Budget</div>
+                        </div>
                     </div>
                     <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
                 `;
             } else if (mode === 'form') {
-                let formHTML = `<div class="modal-header">Add ${type.charAt(0).toUpperCase() + type.slice(1)}</div>`;
+                const isEditing = editIndex !== null;
+                // Map form type back to data type for retrieving item
+                const dataTypeMap = {
+                    'income': 'income',
+                    'expense': 'expenses',
+                    'receivable': 'receivables',
+                    'payable': 'payables',
+                    'plan': 'plans',
+                    'budget': 'budgets'
+                };
+                const dataType = dataTypeMap[type] || type;
+                const item = isEditing && editIndex !== null ? (state.data[dataType] && state.data[dataType][editIndex]) : null;
+                const today = new Date().toISOString().split('T')[0]; // Default date
+                
+                let formHTML = `<div class="modal-header">${isEditing ? 'Edit' : 'Add'} ${type.charAt(0).toUpperCase() + type.slice(1)}</div>`;
 
                 if (type === 'income') {
                     formHTML += `
                         <div class="form-group">
                             <label class="form-label">Source</label>
-                            <input type="text" class="form-input" id="inp-source" placeholder="e.g. Salary, Freelance">
+                            <input type="text" class="form-input" id="inp-source" placeholder="e.g. Salary, Freelance" value="${item?.source || ''}">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Category</label>
                             <select class="form-select" id="inp-category">
-                                <option>Salary</option>
-                                <option>Freelance</option>
-                                <option>Business</option>
-                                <option>Investment</option>
-                                <option>Other</option>
+                                <option${item?.category === 'Salary' ? ' selected' : ''}>Salary</option>
+                                <option${item?.category === 'Freelance' ? ' selected' : ''}>Freelance</option>
+                                <option${item?.category === 'Business' ? ' selected' : ''}>Business</option>
+                                <option${item?.category === 'Investment' ? ' selected' : ''}>Investment</option>
+                                <option${item?.category === 'Other' ? ' selected' : ''}>Other</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Amount</label>
-                            <input type="number" class="form-input" id="inp-amount" placeholder="0">
+                            <input type="number" class="form-input" id="inp-amount" placeholder="0" value="${item?.amount || ''}">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Date</label>
-                            <input type="date" class="form-input" id="inp-date">
+                            <input type="date" class="form-input" id="inp-date" value="${item?.date || today}">
                         </div>
                     `;
                 } else if (type === 'expense') {
                     formHTML += `
                         <div class="form-group">
                             <label class="form-label">Description</label>
-                            <input type="text" class="form-input" id="inp-desc" placeholder="e.g. Groceries">
+                            <input type="text" class="form-input" id="inp-desc" placeholder="e.g. Groceries" value="${item?.description || ''}">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Category</label>
                             <select class="form-select" id="inp-category">
-                                <option>Food</option>
-                                <option>Housing</option>
-                                <option>Transport</option>
-                                <option>Utilities</option>
-                                <option>Health</option>
-                                <option>Other</option>
+                                <option${item?.category === 'Food' ? ' selected' : ''}>Food</option>
+                                <option${item?.category === 'Housing' ? ' selected' : ''}>Housing</option>
+                                <option${item?.category === 'Transport' ? ' selected' : ''}>Transport</option>
+                                <option${item?.category === 'Utilities' ? ' selected' : ''}>Utilities</option>
+                                <option${item?.category === 'Health' ? ' selected' : ''}>Health</option>
+                                <option${item?.category === 'Other' ? ' selected' : ''}>Other</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Amount</label>
-                            <input type="number" class="form-input" id="inp-amount" placeholder="0">
+                            <input type="number" class="form-input" id="inp-amount" placeholder="0" value="${item?.amount || ''}">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Date</label>
-                            <input type="date" class="form-input" id="inp-date">
+                            <input type="date" class="form-input" id="inp-date" value="${item?.date || today}">
                         </div>
                     `;
                 } else if (type === 'receivable') {
                     formHTML += `
                         <div class="form-group">
                             <label class="form-label">From (Client/Person)</label>
-                            <input type="text" class="form-input" id="inp-from" placeholder="Name">
+                            <input type="text" class="form-input" id="inp-from" placeholder="Name" value="${item?.from || ''}">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Description</label>
-                            <input type="text" class="form-input" id="inp-desc" placeholder="Reason">
+                            <input type="text" class="form-input" id="inp-desc" placeholder="Reason" value="${item?.description || ''}">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Amount</label>
-                            <input type="number" class="form-input" id="inp-amount" placeholder="0">
+                            <input type="number" class="form-input" id="inp-amount" placeholder="0" value="${item?.amount || ''}">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Due Date</label>
-                            <input type="date" class="form-input" id="inp-duedate">
+                            <input type="date" class="form-input" id="inp-duedate" value="${item?.dueDate || today}">
                         </div>
                     `;
                 } else if (type === 'payable') {
                     formHTML += `
                         <div class="form-group">
                             <label class="form-label">To (Vendor/Person)</label>
-                            <input type="text" class="form-input" id="inp-to" placeholder="Name">
+                            <input type="text" class="form-input" id="inp-to" placeholder="Name" value="${item?.to || ''}">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Description</label>
-                            <input type="text" class="form-input" id="inp-desc" placeholder="Reason">
+                            <input type="text" class="form-input" id="inp-desc" placeholder="Reason" value="${item?.description || ''}">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Amount</label>
-                            <input type="number" class="form-input" id="inp-amount" placeholder="0">
+                            <input type="number" class="form-input" id="inp-amount" placeholder="0" value="${item?.amount || ''}">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Due Date</label>
-                            <input type="date" class="form-input" id="inp-duedate">
+                            <input type="date" class="form-input" id="inp-duedate" value="${item?.dueDate || today}">
                         </div>
                     `;
                 } else if (type === 'plan') {
                     formHTML += `
                         <div class="form-group">
                             <label class="form-label">Plan Title</label>
-                            <input type="text" class="form-input" id="inp-title" placeholder="e.g. New Laptop">
+                            <input type="text" class="form-input" id="inp-title" placeholder="e.g. New Laptop" value="${item?.title || ''}">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Target Amount</label>
-                            <input type="number" class="form-input" id="inp-target" placeholder="0">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Current Saved Amount</label>
-                            <input type="number" class="form-input" id="inp-current" placeholder="0">
+                            <input type="number" class="form-input" id="inp-target" placeholder="0" value="${item?.targetAmount || ''}">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Target Deadline</label>
-                            <input type="date" class="form-input" id="inp-deadline">
+                            <input type="date" class="form-input" id="inp-deadline" value="${item?.deadline || today}">
+                        </div>
+                        <div style="padding: 1rem; background: #f7fafc; border-radius: 8px; font-size: 0.875rem; color: var(--text-light);">
+                            Note: Progress will be calculated based on Total Savings (Income - Expenses + Receivables).
+                        </div>
+                    `;
+                } else if (type === 'budget') {
+                    const categories = [...new Set(state.data.expenses.map(e => e.category).filter(Boolean))].sort();
+                    const categoryOptions = categories.map(cat => `<option${item?.category === cat ? ' selected' : ''}>${cat}</option>`).join('');
+                    formHTML += `
+                        <div class="form-group">
+                            <label class="form-label">Category</label>
+                            <select class="form-select" id="inp-category" ${isEditing ? 'disabled' : ''}>
+                                <option value="">Select Category</option>
+                                ${categoryOptions}
+                            </select>
+                            ${isEditing ? '<small style="color: var(--text-light);">Category cannot be changed after creation</small>' : ''}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Budget Amount</label>
+                            <input type="number" class="form-input" id="inp-amount" placeholder="0" value="${item?.amount || ''}">
+                        </div>
+                        <div style="padding: 1rem; background: #f7fafc; border-radius: 8px; font-size: 0.875rem; color: var(--text-light);">
+                            Budget tracks actual spending against this limit for the selected category.
                         </div>
                     `;
                 }
 
                 formHTML += `
-                    <button class="btn btn-primary" onclick="submitForm('${type}')">Save Item</button>
+                    <button class="btn btn-primary" onclick="submitForm('${type}')">${isEditing ? 'Update' : 'Save'} Item</button>
                     <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
                 `;
                 
@@ -821,14 +1893,28 @@
 
         function closeModal() {
             document.getElementById('modal-overlay').classList.remove('active');
+            editingIndex = null;
+            editingType = null;
+        }
+
+        function editItem(type, index) {
+            // Map data type to form type
+            if (type === 'income') openModal('form', 'income', index);
+            else if (type === 'expenses') openModal('form', 'expense', index);
+            else if (type === 'receivables') openModal('form', 'receivable', index);
+            else if (type === 'payables') openModal('form', 'payable', index);
+            else if (type === 'plans') openModal('form', 'plan', index);
+            else if (type === 'budgets') openModal('form', 'budget', index);
         }
 
         function submitForm(type) {
             let newItem = {};
             
             // Helper to get value
-            const val = (id) => document.getElementById(id).value;
-            const num = (id) => Number(document.getElementById(id).value) || 0;
+            const val = (id) => document.getElementById(id)?.value || '';
+            const num = (id) => Number(document.getElementById(id)?.value) || 0;
+
+            const isEditing = editingIndex !== null;
 
             if (type === 'income') {
                 newItem = {
@@ -837,7 +1923,11 @@
                     amount: num('inp-amount'),
                     date: val('inp-date')
                 };
-                state.data.income.push(newItem);
+                if (isEditing) {
+                    state.data.income[editingIndex] = newItem;
+                } else {
+                    state.data.income.push(newItem);
+                }
             } else if (type === 'expense') {
                 newItem = {
                     description: val('inp-desc'),
@@ -845,7 +1935,11 @@
                     amount: num('inp-amount'),
                     date: val('inp-date')
                 };
-                state.data.expenses.push(newItem);
+                if (isEditing && editingIndex !== null) {
+                    state.data.expenses[editingIndex] = newItem;
+                } else {
+                    state.data.expenses.push(newItem);
+                }
             } else if (type === 'receivable') {
                 newItem = {
                     from: val('inp-from'),
@@ -853,7 +1947,11 @@
                     amount: num('inp-amount'),
                     dueDate: val('inp-duedate')
                 };
-                state.data.receivables.push(newItem);
+                if (isEditing && editingIndex !== null) {
+                    state.data.receivables[editingIndex] = newItem;
+                } else {
+                    state.data.receivables.push(newItem);
+                }
             } else if (type === 'payable') {
                 newItem = {
                     to: val('inp-to'),
@@ -861,15 +1959,32 @@
                     amount: num('inp-amount'),
                     dueDate: val('inp-duedate')
                 };
-                state.data.payables.push(newItem);
+                if (isEditing && editingIndex !== null) {
+                    state.data.payables[editingIndex] = newItem;
+                } else {
+                    state.data.payables.push(newItem);
+                }
             } else if (type === 'plan') {
                 newItem = {
                     title: val('inp-title'),
                     targetAmount: num('inp-target'),
-                    currentAmount: num('inp-current'),
                     deadline: val('inp-deadline')
                 };
-                state.data.plans.push(newItem);
+                if (isEditing && editingIndex !== null) {
+                    state.data.plans[editingIndex] = newItem;
+                } else {
+                    state.data.plans.push(newItem);
+                }
+            } else if (type === 'budget') {
+                newItem = {
+                    category: val('inp-category'),
+                    amount: num('inp-amount')
+                };
+                if (isEditing && editingIndex !== null) {
+                    state.data.budgets[editingIndex] = newItem;
+                } else {
+                    state.data.budgets.push(newItem);
+                }
             }
 
             // Save to Excel and UI
@@ -888,9 +2003,36 @@
             }
         }
 
-        // --- 5. INITIALIZATION ---
+        // --- 6. EXPORT FUNCTIONALITY ---
+        function exportData() {
+            if (!state.isConnected) {
+                alert('Please connect to Excel file first.');
+                return;
+            }
+
+            const wb = XLSX.utils.book_new();
+            const incomeSheet = XLSX.utils.json_to_sheet(state.data.income);
+            const expensesSheet = XLSX.utils.json_to_sheet(state.data.expenses);
+            const receivablesSheet = XLSX.utils.json_to_sheet(state.data.receivables);
+            const payablesSheet = XLSX.utils.json_to_sheet(state.data.payables);
+            const plansSheet = XLSX.utils.json_to_sheet(state.data.plans);
+            const budgetsSheet = XLSX.utils.json_to_sheet(state.data.budgets || []);
+
+            XLSX.utils.book_append_sheet(wb, incomeSheet, "Income");
+            XLSX.utils.book_append_sheet(wb, expensesSheet, "Expenses");
+            XLSX.utils.book_append_sheet(wb, receivablesSheet, "Receivables");
+            XLSX.utils.book_append_sheet(wb, payablesSheet, "Payables");
+            XLSX.utils.book_append_sheet(wb, plansSheet, "Plans");
+            XLSX.utils.book_append_sheet(wb, budgetsSheet, "Budgets");
+
+            const dateStr = new Date().toISOString().split('T')[0];
+            XLSX.writeFile(wb, `finance_data_export_${dateStr}.xlsx`);
+        }
+
+        // --- 7. INITIALIZATION ---
         // Check if previously connected (optional advanced feature, skipped for simplicity to stick to manual connect for security)
         // Just wait for user to click connect.
     </script>
 </body>
 </html>
+
