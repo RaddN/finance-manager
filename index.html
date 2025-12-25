@@ -2551,7 +2551,9 @@
             const totalIncome = state.data.income.reduce((sum, i) => sum + Number(i.amount || 0), 0);
             const totalExpenses = state.data.expenses.reduce((sum, i) => sum + Number(i.amount || 0), 0);
             const netBalance = totalIncome - totalExpenses;
-            const totalReceivables = state.data.receivables.reduce((sum, i) => sum + Number(i.amount || 0), 0);
+            const totalReceivables = state.data.receivables
+                .filter(i => (i.status || 'unpaid') === 'unpaid')
+                .reduce((sum, i) => sum + Number(i.amount || 0), 0);
             return totalReceivables + (netBalance > 0 ? netBalance : 0);
         }
 
@@ -2562,8 +2564,12 @@
             const netBalance = totalIncome - totalExpenses;
             const totalSavings = calculateTotalSavings();
 
-            const totalReceivables = state.data.receivables.reduce((sum, i) => sum + Number(i.amount || 0), 0);
-            const totalPayables = state.data.payables.reduce((sum, i) => sum + Number(i.amount || 0), 0);
+            const totalReceivables = state.data.receivables
+                .filter(i => (i.status || 'unpaid') === 'unpaid')
+                .reduce((sum, i) => sum + Number(i.amount || 0), 0);
+            const totalPayables = state.data.payables
+                .filter(i => (i.status || 'unpaid') === 'unpaid')
+                .reduce((sum, i) => sum + Number(i.amount || 0), 0);
 
             document.getElementById('dash-income').textContent = formatCurrency(totalIncome);
             document.getElementById('dash-expenses').textContent = formatCurrency(totalExpenses);
@@ -2606,7 +2612,11 @@
             const renderSmallList = (items, containerId, type) => {
                 const container = document.getElementById(containerId);
                 container.innerHTML = '';
-                const list = items.slice(0, 5); // Show top 5
+                // Filter out paid payables for dashboard display
+                const filteredItems = type === 'payable' 
+                    ? items.filter(item => (item.status || 'unpaid') === 'unpaid')
+                    : items;
+                const list = filteredItems.slice(0, 5); // Show top 5
 
                 if (list.length === 0) {
                     container.innerHTML = '<div style="color:#cbd5e0; font-style:italic;">No items</div>';
@@ -2617,8 +2627,11 @@
                     const row = document.createElement('div');
                     row.style.cssText = "display:flex; justify-content:space-between; padding:0.5rem 0; border-bottom:1px solid #f7fafc;";
                     const title = type === 'receivable' ? (item.from || 'Unknown') : (item.to || 'Unknown');
+                    const statusBadge = type === 'payable' || type === 'receivable'
+                        ? '<span style="background: #e53e3e; color: white; padding: 0.125rem 0.375rem; border-radius: 3px; font-size: 0.625rem; margin-left: 0.25rem;">Unpaid</span>'
+                        : '';
                     row.innerHTML = `
-                        <span>${title} <small style="color:#a0aec0">(${item.dueDate || '-'})</small></span>
+                        <span>${title} <small style="color:#a0aec0">(${item.dueDate || '-'})</small>${statusBadge}</span>
                         <strong style="color: ${type === 'receivable' ? 'var(--success)' : 'var(--danger)'}">${formatCurrency(item.amount)}</strong>
                     `;
                     container.appendChild(row);
@@ -2639,24 +2652,27 @@
             const today = new Date();
             today.setHours(0, 0, 0, 0);
 
-            // Check overdue receivables
+            // Check overdue receivables (only unpaid)
             const overdueReceivables = state.data.receivables.filter(item => {
+                if ((item.status || 'unpaid') === 'paid') return false;
                 if (!item.dueDate) return false;
                 const due = new Date(item.dueDate);
                 due.setHours(0, 0, 0, 0);
                 return due < today;
             });
 
-            // Check overdue payables
+            // Check overdue payables (only unpaid)
             const overduePayables = state.data.payables.filter(item => {
+                if ((item.status || 'unpaid') === 'paid') return false;
                 if (!item.dueDate) return false;
                 const due = new Date(item.dueDate);
                 due.setHours(0, 0, 0, 0);
                 return due < today;
             });
 
-            // Check due soon (within 3 days)
+            // Check due soon (within 3 days) - only unpaid
             const dueSoonReceivables = state.data.receivables.filter(item => {
+                if ((item.status || 'unpaid') === 'paid') return false;
                 if (!item.dueDate) return false;
                 const due = new Date(item.dueDate);
                 due.setHours(0, 0, 0, 0);
@@ -2665,6 +2681,7 @@
             });
 
             const dueSoonPayables = state.data.payables.filter(item => {
+                if ((item.status || 'unpaid') === 'paid') return false;
                 if (!item.dueDate) return false;
                 const due = new Date(item.dueDate);
                 due.setHours(0, 0, 0, 0);
@@ -2672,13 +2689,48 @@
                 return diffDays >= 0 && diffDays <= 3 && !overduePayables.includes(item);
             });
 
-            // Check over-budget categories
+            // Check over-budget categories (with period filtering)
+            const filterExpensesByPeriod = (expenses, periodType) => {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                return expenses.filter(exp => {
+                    if (!exp.date) return false;
+                    const expDate = new Date(exp.date);
+                    expDate.setHours(0, 0, 0, 0);
+                    
+                    switch(periodType) {
+                        case 'daily':
+                            return expDate.getTime() === today.getTime();
+                        case 'monthly':
+                            return expDate.getMonth() === today.getMonth() && 
+                                   expDate.getFullYear() === today.getFullYear();
+                        case 'per 3 month':
+                            const threeMonthsAgo = new Date(today);
+                            threeMonthsAgo.setMonth(today.getMonth() - 3);
+                            return expDate >= threeMonthsAgo && expDate <= today;
+                        case 'per 6 month':
+                            const sixMonthsAgo = new Date(today);
+                            sixMonthsAgo.setMonth(today.getMonth() - 6);
+                            return expDate >= sixMonthsAgo && expDate <= today;
+                        case 'yearly':
+                            return expDate.getFullYear() === today.getFullYear();
+                        default:
+                            return true; // fallback to all expenses
+                    }
+                });
+            };
+            
             const overBudgetCategories = (state.data.budgets || []).filter(budget => {
                 const category = budget.category;
                 const budgetAmount = Number(budget.amount || 0);
-                const actualSpending = state.data.expenses
-                    .filter(exp => exp.category === category)
-                    .reduce((sum, exp) => sum + Number(exp.amount || 0), 0);
+                const period = budget.period || 'monthly';
+                
+                const periodExpenses = filterExpensesByPeriod(
+                    state.data.expenses.filter(exp => exp.category === category),
+                    period
+                );
+                const actualSpending = periodExpenses.reduce((sum, exp) => sum + Number(exp.amount || 0), 0);
                 return actualSpending > budgetAmount;
             });
 
@@ -3263,10 +3315,10 @@
                 headers = ['', 'Date', 'Description', 'Category', 'Amount', 'Actions'];
             } else if (type === 'receivables') {
                 titleEl.textContent = 'Receivables (Due)';
-                headers = ['', 'Due Date', 'From', 'Description', 'Amount', 'Actions'];
+                headers = ['', 'Due Date', 'From', 'Description', 'Status', 'Priority', 'Amount', 'Actions'];
             } else if (type === 'payables') {
                 titleEl.textContent = 'Payables';
-                headers = ['', 'Due Date', 'To', 'Description', 'Amount', 'Actions'];
+                headers = ['', 'Due Date', 'To', 'Description', 'Status', 'Priority', 'Amount', 'Actions'];
             }
 
             // Populate category filter
@@ -3382,6 +3434,7 @@
                                 <span class="mobile-details-label">Category:</span>
                                 <span class="mobile-details-value"><span class="tag tag-success">${item.category || 'Other'}</span></span>
                             </div>
+                            ${item.paymentMethod ? `<div class="mobile-details-row"><span class="mobile-details-label">Payment:</span><span class="mobile-details-value">${item.paymentMethod}</span></div>` : ''}
                             ${item.notes ? `<div class="mobile-details-row"><span class="mobile-details-value transaction-note">${item.notes}</span></div>` : ''}
                         </div>
                     `;
@@ -3390,6 +3443,7 @@
                         <td>
                             ${item.source || '-'}
                             ${item.recurring ? '<span class="recurring-badge">🔄 Recurring</span>' : ''}
+                            ${item.paymentMethod ? `<div style="font-size: 0.75rem; color: var(--text-light); margin-top: 0.25rem;">💳 ${item.paymentMethod}</div>` : ''}
                             ${item.notes ? `<div class="transaction-note">${item.notes}</div>` : ''}
                         </td>
                         <td><span class="tag tag-success">${item.category || 'Other'}</span></td>
@@ -3410,6 +3464,7 @@
                                 <span class="mobile-details-label">Category:</span>
                                 <span class="mobile-details-value"><span class="tag tag-danger">${item.category || 'Other'}</span></span>
                             </div>
+                            ${item.paymentMethod ? `<div class="mobile-details-row"><span class="mobile-details-label">Payment:</span><span class="mobile-details-value">${item.paymentMethod}</span></div>` : ''}
                             ${item.notes ? `<div class="mobile-details-row"><span class="mobile-details-value transaction-note">${item.notes}</span></div>` : ''}
                         </div>
                     `;
@@ -3418,12 +3473,23 @@
                         <td>
                             ${item.description || '-'}
                             ${item.recurring ? '<span class="recurring-badge">🔄 Recurring</span>' : ''}
+                            ${item.paymentMethod ? `<div style="font-size: 0.75rem; color: var(--text-light); margin-top: 0.25rem;">💳 ${item.paymentMethod}</div>` : ''}
                             ${item.notes ? `<div class="transaction-note">${item.notes}</div>` : ''}
                         </td>
                         <td><span class="tag tag-danger">${item.category || 'Other'}</span></td>
                         <td>${formatCurrency(item.amount)}</td>
                     `;
                 } else if (type === 'receivables') {
+                    const status = item.status || 'unpaid';
+                    const statusBadge = status === 'paid' 
+                        ? '<span style="background: #48bb78; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 500;">Paid</span>'
+                        : '<span style="background: #e53e3e; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 500;">Unpaid</span>';
+                    const priority = item.priority || 'medium';
+                    const priorityBadge = priority === 'high' 
+                        ? '<span style="background: #e53e3e; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 500;">High</span>'
+                        : priority === 'low'
+                        ? '<span style="background: #48bb78; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 500;">Low</span>'
+                        : '<span style="background: #d69e2e; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 500;">Medium</span>';
                     mobileDetails = `
                         <div class="mobile-details-content">
                             <div class="mobile-details-row">
@@ -3438,6 +3504,15 @@
                                 <span class="mobile-details-label">Description:</span>
                                 <span class="mobile-details-value">${item.description || '-'}</span>
                             </div>
+                            <div class="mobile-details-row">
+                                <span class="mobile-details-label">Status:</span>
+                                <span class="mobile-details-value">${statusBadge}</span>
+                            </div>
+                            <div class="mobile-details-row">
+                                <span class="mobile-details-label">Priority:</span>
+                                <span class="mobile-details-value">${priorityBadge}</span>
+                            </div>
+                            ${item.notes ? `<div class="mobile-details-row"><span class="mobile-details-value transaction-note">${item.notes}</span></div>` : ''}
                         </div>
                     `;
                     cols += `
@@ -3447,9 +3522,21 @@
                         </td>
                         <td>${item.from || '-'}</td>
                         <td>${item.description || '-'}</td>
+                        <td>${statusBadge}</td>
+                        <td>${priorityBadge}</td>
                         <td style="color:var(--success); font-weight:bold;">${formatCurrency(item.amount)}</td>
                     `;
                 } else if (type === 'payables') {
+                    const status = item.status || 'unpaid';
+                    const statusBadge = status === 'paid' 
+                        ? '<span style="background: #48bb78; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 500;">Paid</span>'
+                        : '<span style="background: #e53e3e; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 500;">Unpaid</span>';
+                    const priority = item.priority || 'medium';
+                    const priorityBadge = priority === 'high' 
+                        ? '<span style="background: #e53e3e; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 500;">High</span>'
+                        : priority === 'low'
+                        ? '<span style="background: #48bb78; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 500;">Low</span>'
+                        : '<span style="background: #d69e2e; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 500;">Medium</span>';
                     mobileDetails = `
                         <div class="mobile-details-content">
                             <div class="mobile-details-row">
@@ -3464,6 +3551,15 @@
                                 <span class="mobile-details-label">Description:</span>
                                 <span class="mobile-details-value">${item.description || '-'}</span>
                             </div>
+                            <div class="mobile-details-row">
+                                <span class="mobile-details-label">Status:</span>
+                                <span class="mobile-details-value">${statusBadge}</span>
+                            </div>
+                            <div class="mobile-details-row">
+                                <span class="mobile-details-label">Priority:</span>
+                                <span class="mobile-details-value">${priorityBadge}</span>
+                            </div>
+                            ${item.notes ? `<div class="mobile-details-row"><span class="mobile-details-value transaction-note">${item.notes}</span></div>` : ''}
                         </div>
                     `;
                     cols += `
@@ -3473,6 +3569,8 @@
                         </td>
                         <td>${item.to || '-'}</td>
                         <td>${item.description || '-'}</td>
+                        <td>${statusBadge}</td>
+                        <td>${priorityBadge}</td>
                         <td style="color:var(--danger); font-weight:bold;">${formatCurrency(item.amount)}</td>
                     `;
                 }
@@ -3805,12 +3903,33 @@
             data.forEach((plan, index) => {
                 const target = Number(plan.targetAmount || 1);
                 const percent = Math.min(100, Math.round((totalSavings / target) * 100));
+                const status = plan.status || 'in progress';
+                const statusBadge = status === 'completed' 
+                    ? '<span style="background: #48bb78; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 500;">Completed</span>'
+                    : status === 'cancelled'
+                    ? '<span style="background: #a0aec0; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 500;">Cancelled</span>'
+                    : '<span style="background: #4299e1; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 500;">In Progress</span>';
+                const priority = plan.priority || 'medium';
+                const priorityBadge = priority === 'high' 
+                    ? '<span style="background: #e53e3e; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 500;">High</span>'
+                    : priority === 'low'
+                    ? '<span style="background: #48bb78; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 500;">Low</span>'
+                    : '<span style="background: #d69e2e; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 500;">Medium</span>';
 
                 const div = document.createElement('div');
                 div.className = 'plan-item';
                 div.innerHTML = `
                     <div class="plan-header">
-                        <h3 style="font-size: 1.1rem;">${plan.title || 'Untitled'}</h3>
+                        <div>
+                            <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">${plan.title || 'Untitled'}</h3>
+                            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; margin-bottom: 0.5rem;">
+                                ${statusBadge}
+                                ${priorityBadge}
+                                ${plan.startDate ? `<span style="font-size: 0.75rem; color: var(--text-light);">Start: ${plan.startDate}</span>` : ''}
+                                ${plan.deadline ? `<span style="font-size: 0.75rem; color: var(--text-light);">Deadline: ${plan.deadline}</span>` : ''}
+                            </div>
+                            ${plan.notes ? `<div style="font-size: 0.875rem; color: var(--text-light); margin-top: 0.25rem; font-style: italic;">${plan.notes}</div>` : ''}
+                        </div>
                         <div class="action-buttons">
                             <button class="btn-edit" onclick="editItem('plans', ${index})">
                                 <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -3862,11 +3981,59 @@
             budgets.forEach((budget, index) => {
                 const category = budget.category || 'Uncategorized';
                 const budgetAmount = Number(budget.amount || 0);
+                const period = budget.period || 'monthly';
 
-                // Calculate actual spending for this category
-                const actualSpending = state.data.expenses
-                    .filter(exp => exp.category === category)
-                    .reduce((sum, exp) => sum + Number(exp.amount || 0), 0);
+                // Helper function to filter expenses by period
+                const filterExpensesByPeriod = (expenses, periodType) => {
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    
+                    return expenses.filter(exp => {
+                        if (!exp.date) return false;
+                        const expDate = new Date(exp.date);
+                        expDate.setHours(0, 0, 0, 0);
+                        
+                        switch(periodType) {
+                            case 'daily':
+                                return expDate.getTime() === today.getTime();
+                            case 'monthly':
+                                return expDate.getMonth() === today.getMonth() && 
+                                       expDate.getFullYear() === today.getFullYear();
+                            case 'per 3 month':
+                                const threeMonthsAgo = new Date(today);
+                                threeMonthsAgo.setMonth(today.getMonth() - 3);
+                                return expDate >= threeMonthsAgo && expDate <= today;
+                            case 'per 6 month':
+                                const sixMonthsAgo = new Date(today);
+                                sixMonthsAgo.setMonth(today.getMonth() - 6);
+                                return expDate >= sixMonthsAgo && expDate <= today;
+                            case 'yearly':
+                                return expDate.getFullYear() === today.getFullYear();
+                            default:
+                                return true; // fallback to all expenses
+                        }
+                    });
+                };
+
+                // Get all expenses for this category
+                const categoryExpenses = state.data.expenses.filter(exp => exp.category === category);
+                
+                // Calculate overall expenses (all time)
+                const overallExpenses = categoryExpenses.reduce((sum, exp) => sum + Number(exp.amount || 0), 0);
+                
+                // Calculate actual spending for this category within the budget period
+                const periodExpenses = filterExpensesByPeriod(categoryExpenses, period);
+                const actualSpending = periodExpenses.reduce((sum, exp) => sum + Number(exp.amount || 0), 0);
+                
+                // Calculate period-wise expenses
+                const dailyExpenses = filterExpensesByPeriod(categoryExpenses, 'daily');
+                const dailySpending = dailyExpenses.reduce((sum, exp) => sum + Number(exp.amount || 0), 0);
+                
+                const monthlyExpenses = filterExpensesByPeriod(categoryExpenses, 'monthly');
+                const monthlySpending = monthlyExpenses.reduce((sum, exp) => sum + Number(exp.amount || 0), 0);
+                
+                const yearlyExpenses = filterExpensesByPeriod(categoryExpenses, 'yearly');
+                const yearlySpending = yearlyExpenses.reduce((sum, exp) => sum + Number(exp.amount || 0), 0);
 
                 const percent = budgetAmount > 0 ? Math.min(100, Math.round((actualSpending / budgetAmount) * 100)) : 0;
                 const remaining = Math.max(0, budgetAmount - actualSpending);
@@ -3875,9 +4042,13 @@
                 const div = document.createElement('div');
                 div.className = 'budget-item';
                 div.style.borderLeftColor = isOverBudget ? 'var(--danger)' : 'var(--primary)';
+                const periodLabel = period.charAt(0).toUpperCase() + period.slice(1);
                 div.innerHTML = `
                     <div class="budget-header">
-                        <div class="budget-category">${category}</div>
+                        <div>
+                            <div class="budget-category">${category}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-light); margin-top: 0.25rem;">Period: ${periodLabel}</div>
+                        </div>
                         <div class="action-buttons">
                             <button class="btn-edit" onclick="editItem('budgets', ${index})">
                                 <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -3901,19 +4072,40 @@
                             <div class="budget-amount">${formatCurrency(budgetAmount)}</div>
                         </div>
                         <div>
-                            <div style="font-size: 0.75rem; color: var(--text-light);">Spent</div>
+                            <div style="font-size: 0.75rem; color: var(--text-light);">Spent (${periodLabel})</div>
                             <div class="budget-amount budget-spent">${formatCurrency(actualSpending)}</div>
                         </div>
                         <div>
                             <div style="font-size: 0.75rem; color: var(--text-light);">Remaining</div>
                             <div class="budget-amount budget-remaining">${formatCurrency(remaining)}</div>
                         </div>
+                        <div>
+                            <div style="font-size: 0.75rem; color: var(--text-light);">Overall Expenses</div>
+                            <div class="budget-amount" style="color: var(--text-main);">${formatCurrency(overallExpenses)}</div>
+                        </div>
                     </div>
                     <div class="progress-track">
                         <div class="progress-fill" style="width: ${percent}%; background: ${isOverBudget ? 'var(--danger)' : 'var(--primary)'}"></div>
                     </div>
-                    <div style="font-size: 0.75rem; color: ${isOverBudget ? 'var(--danger)' : 'var(--text-light)'}; margin-top: 0.5rem;">
+                    <div style="font-size: 0.75rem; color: ${isOverBudget ? 'var(--danger)' : 'var(--text-light)'}; margin-top: 0.5rem; margin-bottom: 1rem;">
                         ${isOverBudget ? `⚠️ Over budget by ${formatCurrency(actualSpending - budgetAmount)}` : `${percent}% used`}
+                    </div>
+                    <div style="background: #f7fafc; border-radius: 8px; padding: 1rem; margin-top: 1rem;">
+                        <div style="font-size: 0.875rem; font-weight: 600; color: var(--text-main); margin-bottom: 0.75rem;">Period-wise Expenses Breakdown</div>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem;">
+                            <div>
+                                <div style="font-size: 0.7rem; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px;">Daily (Today)</div>
+                                <div style="font-size: 1rem; font-weight: 600; color: var(--text-main); margin-top: 0.25rem;">${formatCurrency(dailySpending)}</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 0.7rem; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px;">Monthly (This Month)</div>
+                                <div style="font-size: 1rem; font-weight: 600; color: var(--text-main); margin-top: 0.25rem;">${formatCurrency(monthlySpending)}</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 0.7rem; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px;">Yearly (This Year)</div>
+                                <div style="font-size: 1rem; font-weight: 600; color: var(--text-main); margin-top: 0.25rem;">${formatCurrency(yearlySpending)}</div>
+                            </div>
+                        </div>
                     </div>
                 `;
                 container.appendChild(div);
@@ -4445,6 +4637,17 @@
                             <input type="date" class="form-input" id="inp-date" value="${item?.date || today}">
                         </div>
                         <div class="form-group">
+                            <label class="form-label">Payment Method</label>
+                            <select class="form-select" id="inp-payment-method">
+                                <option value="">Select Method</option>
+                                <option value="cash" ${item?.paymentMethod === 'cash' ? 'selected' : ''}>Cash</option>
+                                <option value="bank" ${item?.paymentMethod === 'bank' ? 'selected' : ''}>Bank Transfer</option>
+                                <option value="card" ${item?.paymentMethod === 'card' ? 'selected' : ''}>Card</option>
+                                <option value="mobile" ${item?.paymentMethod === 'mobile' ? 'selected' : ''}>Mobile Payment</option>
+                                <option value="other" ${item?.paymentMethod === 'other' ? 'selected' : ''}>Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
                             <label class="form-label">Notes (Optional)</label>
                             <textarea class="form-input" id="inp-notes" placeholder="Additional notes..." rows="2">${item?.notes || ''}</textarea>
                         </div>
@@ -4483,6 +4686,17 @@
                             <input type="date" class="form-input" id="inp-date" value="${item?.date || today}">
                         </div>
                         <div class="form-group">
+                            <label class="form-label">Payment Method</label>
+                            <select class="form-select" id="inp-payment-method">
+                                <option value="">Select Method</option>
+                                <option value="cash" ${item?.paymentMethod === 'cash' ? 'selected' : ''}>Cash</option>
+                                <option value="bank" ${item?.paymentMethod === 'bank' ? 'selected' : ''}>Bank Transfer</option>
+                                <option value="card" ${item?.paymentMethod === 'card' ? 'selected' : ''}>Card</option>
+                                <option value="mobile" ${item?.paymentMethod === 'mobile' ? 'selected' : ''}>Mobile Payment</option>
+                                <option value="other" ${item?.paymentMethod === 'other' ? 'selected' : ''}>Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
                             <label class="form-label">Notes (Optional)</label>
                             <textarea class="form-input" id="inp-notes" placeholder="Additional notes..." rows="2">${item?.notes || ''}</textarea>
                         </div>
@@ -4511,6 +4725,25 @@
                             <label class="form-label">Due Date</label>
                             <input type="date" class="form-input" id="inp-duedate" value="${item?.dueDate || today}">
                         </div>
+                        <div class="form-group">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" id="inp-status">
+                                <option value="unpaid" ${(item?.status || 'unpaid') === 'unpaid' ? 'selected' : ''}>Unpaid</option>
+                                <option value="paid" ${item?.status === 'paid' ? 'selected' : ''}>Paid</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Priority</label>
+                            <select class="form-select" id="inp-priority">
+                                <option value="low" ${(item?.priority || 'medium') === 'low' ? 'selected' : ''}>Low</option>
+                                <option value="medium" ${(item?.priority || 'medium') === 'medium' ? 'selected' : ''}>Medium</option>
+                                <option value="high" ${item?.priority === 'high' ? 'selected' : ''}>High</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Notes (Optional)</label>
+                            <textarea class="form-input" id="inp-notes" placeholder="Additional notes..." rows="2">${item?.notes || ''}</textarea>
+                        </div>
                     `;
                 } else if (type === 'payable') {
                     formHTML += `
@@ -4530,6 +4763,25 @@
                             <label class="form-label">Due Date</label>
                             <input type="date" class="form-input" id="inp-duedate" value="${item?.dueDate || today}">
                         </div>
+                        <div class="form-group">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" id="inp-status">
+                                <option value="unpaid" ${(item?.status || 'unpaid') === 'unpaid' ? 'selected' : ''}>Unpaid</option>
+                                <option value="paid" ${item?.status === 'paid' ? 'selected' : ''}>Paid</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Priority</label>
+                            <select class="form-select" id="inp-priority">
+                                <option value="low" ${(item?.priority || 'medium') === 'low' ? 'selected' : ''}>Low</option>
+                                <option value="medium" ${(item?.priority || 'medium') === 'medium' ? 'selected' : ''}>Medium</option>
+                                <option value="high" ${item?.priority === 'high' ? 'selected' : ''}>High</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Notes (Optional)</label>
+                            <textarea class="form-input" id="inp-notes" placeholder="Additional notes..." rows="2">${item?.notes || ''}</textarea>
+                        </div>
                     `;
                 } else if (type === 'plan') {
                     formHTML += `
@@ -4542,8 +4794,32 @@
                             <input type="number" class="form-input" id="inp-target" placeholder="0" value="${item?.targetAmount || ''}">
                         </div>
                         <div class="form-group">
+                            <label class="form-label">Start Date</label>
+                            <input type="date" class="form-input" id="inp-start-date" value="${item?.startDate || today}">
+                        </div>
+                        <div class="form-group">
                             <label class="form-label">Target Deadline</label>
                             <input type="date" class="form-input" id="inp-deadline" value="${item?.deadline || today}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" id="inp-status">
+                                <option value="in progress" ${(item?.status || 'in progress') === 'in progress' ? 'selected' : ''}>In Progress</option>
+                                <option value="completed" ${item?.status === 'completed' ? 'selected' : ''}>Completed</option>
+                                <option value="cancelled" ${item?.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Priority</label>
+                            <select class="form-select" id="inp-priority">
+                                <option value="low" ${(item?.priority || 'medium') === 'low' ? 'selected' : ''}>Low</option>
+                                <option value="medium" ${(item?.priority || 'medium') === 'medium' ? 'selected' : ''}>Medium</option>
+                                <option value="high" ${item?.priority === 'high' ? 'selected' : ''}>High</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Notes (Optional)</label>
+                            <textarea class="form-input" id="inp-notes" placeholder="Additional notes..." rows="2">${item?.notes || ''}</textarea>
                         </div>
                         <div style="padding: 1rem; background: #f7fafc; border-radius: 8px; font-size: 0.875rem; color: var(--text-light);">
                             Note: Progress will be calculated based on Total Savings (Income - Expenses + Receivables).
@@ -4568,6 +4844,7 @@
                 } else if (type === 'budget') {
                     const categories = [...new Set(state.data.expenses.map(e => e.category).filter(Boolean))].sort();
                     const categoryOptions = categories.map(cat => `<option${item?.category === cat ? ' selected' : ''}>${cat}</option>`).join('');
+                    const periodValue = item?.period || 'monthly';
                     formHTML += `
                         <div class="form-group">
                             <label class="form-label">Category</label>
@@ -4581,8 +4858,18 @@
                             <label class="form-label">Budget Amount</label>
                             <input type="number" class="form-input" id="inp-amount" placeholder="0" value="${item?.amount || ''}">
                         </div>
+                        <div class="form-group">
+                            <label class="form-label">Period</label>
+                            <select class="form-select" id="inp-period">
+                                <option value="daily" ${periodValue === 'daily' ? 'selected' : ''}>Daily</option>
+                                <option value="monthly" ${periodValue === 'monthly' ? 'selected' : ''}>Monthly</option>
+                                <option value="per 3 month" ${periodValue === 'per 3 month' ? 'selected' : ''}>Per 3 Month</option>
+                                <option value="per 6 month" ${periodValue === 'per 6 month' ? 'selected' : ''}>Per 6 Month</option>
+                                <option value="yearly" ${periodValue === 'yearly' ? 'selected' : ''}>Yearly</option>
+                            </select>
+                        </div>
                         <div style="padding: 1rem; background: #f7fafc; border-radius: 8px; font-size: 0.875rem; color: var(--text-light);">
-                            Budget tracks actual spending against this limit for the selected category.
+                            Budget tracks actual spending against this limit for the selected category within the selected period.
                         </div>
                     `;
                 }
@@ -4735,6 +5022,7 @@
                     category: val('inp-category') || 'Other',
                     amount: num('inp-amount'),
                     date: val('inp-date'),
+                    paymentMethod: val('inp-payment-method'),
                     notes: val('inp-notes'),
                     recurring: document.getElementById('inp-recurring')?.checked || false
                 };
@@ -4752,6 +5040,7 @@
                     category: val('inp-category') || 'Other',
                     amount: num('inp-amount'),
                     date: val('inp-date'),
+                    paymentMethod: val('inp-payment-method'),
                     notes: val('inp-notes'),
                     recurring: document.getElementById('inp-recurring')?.checked || false
                 };
@@ -4768,7 +5057,10 @@
                     from: val('inp-from'),
                     description: val('inp-desc'),
                     amount: num('inp-amount'),
-                    dueDate: val('inp-duedate')
+                    dueDate: val('inp-duedate'),
+                    status: val('inp-status') || 'unpaid',
+                    priority: val('inp-priority') || 'medium',
+                    notes: val('inp-notes')
                 };
                 if (isEditing && editingIndex !== null) {
                     state.data.receivables[editingIndex] = newItem;
@@ -4783,7 +5075,10 @@
                     to: val('inp-to'),
                     description: val('inp-desc'),
                     amount: num('inp-amount'),
-                    dueDate: val('inp-duedate')
+                    dueDate: val('inp-duedate'),
+                    status: val('inp-status') || 'unpaid',
+                    priority: val('inp-priority') || 'medium',
+                    notes: val('inp-notes')
                 };
                 if (isEditing && editingIndex !== null) {
                     state.data.payables[editingIndex] = newItem;
@@ -4797,7 +5092,11 @@
                 newItem = {
                     title: val('inp-title'),
                     targetAmount: num('inp-target'),
-                    deadline: val('inp-deadline')
+                    startDate: val('inp-start-date') || val('inp-deadline'),
+                    deadline: val('inp-deadline'),
+                    status: val('inp-status') || 'in progress',
+                    priority: val('inp-priority') || 'medium',
+                    notes: val('inp-notes')
                 };
                 if (isEditing && editingIndex !== null) {
                     state.data.plans[editingIndex] = newItem;
@@ -4809,7 +5108,8 @@
                 if (!validateAmount(num('inp-amount'), 'Budget Amount')) return;
                 newItem = {
                     category: val('inp-category'),
-                    amount: num('inp-amount')
+                    amount: num('inp-amount'),
+                    period: val('inp-period') || 'monthly'
                 };
                 if (isEditing && editingIndex !== null) {
                     state.data.budgets[editingIndex] = newItem;
