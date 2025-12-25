@@ -1873,7 +1873,10 @@
                             <div class="settings-label">Export Data</div>
                             <div class="settings-description">Download all data as Excel file</div>
                         </div>
-                        <button class="btn btn-primary" onclick="exportData()">Export to Excel</button>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn btn-primary" onclick="exportData()">Export to Excel</button>
+                            <button class="btn btn-secondary" onclick="exportDataCSV()">Export to CSV</button>
+                        </div>
                     </div>
                     <div class="settings-row">
                         <div>
@@ -4826,7 +4829,10 @@
                     return `
                         <div class="category-item">
                             <div>
-                                <span class="category-name">${cat.name || 'Unnamed'}</span>
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    ${cat.color ? `<span style="width: 16px; height: 16px; border-radius: 50%; background: ${cat.color}; display: inline-block;"></span>` : ''}
+                                    <span class="category-name">${cat.name || 'Unnamed'}</span>
+                                </div>
                                 <span class="category-badge badge-income">Income</span>
                                 <small style="color: var(--text-light); margin-left: 0.5rem;">(${usageCount} transactions)</small>
                             </div>
@@ -4861,7 +4867,10 @@
                     return `
                         <div class="category-item">
                             <div>
-                                <span class="category-name">${cat.name || 'Unnamed'}</span>
+                                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                    ${cat.color ? `<span style="width: 16px; height: 16px; border-radius: 50%; background: ${cat.color}; display: inline-block;"></span>` : ''}
+                                    <span class="category-name">${cat.name || 'Unnamed'}</span>
+                                </div>
                                 <span class="category-badge badge-expense">Expense</span>
                                 <small style="color: var(--text-light); margin-left: 0.5rem;">(${usageCount} transactions)</small>
                             </div>
@@ -5150,9 +5159,24 @@
                         </div>
                         <div class="form-group">
                             <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
-                                <input type="checkbox" id="inp-recurring" ${item?.recurring ? 'checked' : ''}>
+                                <input type="checkbox" id="inp-recurring" ${item?.recurring ? 'checked' : ''} onchange="toggleRecurringOptions('income')">
                                 <span>Recurring Transaction</span>
                             </label>
+                        </div>
+                        <div id="recurring-options-income" style="display: ${item?.recurring ? 'block' : 'none'}; margin-top: 0.5rem; padding: 1rem; background: #f7fafc; border-radius: 8px;">
+                            <div class="form-group">
+                                <label class="form-label">Frequency</label>
+                                <select class="form-select" id="inp-recurring-frequency-income">
+                                    <option value="daily" ${item?.recurringFrequency === 'daily' ? 'selected' : ''}>Daily</option>
+                                    <option value="weekly" ${item?.recurringFrequency === 'weekly' ? 'selected' : ''}>Weekly</option>
+                                    <option value="monthly" ${item?.recurringFrequency === 'monthly' || !item?.recurringFrequency ? 'selected' : ''}>Monthly</option>
+                                    <option value="yearly" ${item?.recurringFrequency === 'yearly' ? 'selected' : ''}>Yearly</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Next Occurrence Date</label>
+                                <input type="date" class="form-input" id="inp-recurring-next-income" value="${item?.recurringNextDate || ''}">
+                            </div>
                         </div>
                     `;
                 } else if (type === 'expense') {
@@ -5199,9 +5223,24 @@
                         </div>
                         <div class="form-group">
                             <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
-                                <input type="checkbox" id="inp-recurring" ${item?.recurring ? 'checked' : ''}>
+                                <input type="checkbox" id="inp-recurring" ${item?.recurring ? 'checked' : ''} onchange="toggleRecurringOptions('expense')">
                                 <span>Recurring Transaction</span>
                             </label>
+                        </div>
+                        <div id="recurring-options-expense" style="display: ${item?.recurring ? 'block' : 'none'}; margin-top: 0.5rem; padding: 1rem; background: #f7fafc; border-radius: 8px;">
+                            <div class="form-group">
+                                <label class="form-label">Frequency</label>
+                                <select class="form-select" id="inp-recurring-frequency-expense">
+                                    <option value="daily" ${item?.recurringFrequency === 'daily' ? 'selected' : ''}>Daily</option>
+                                    <option value="weekly" ${item?.recurringFrequency === 'weekly' ? 'selected' : ''}>Weekly</option>
+                                    <option value="monthly" ${item?.recurringFrequency === 'monthly' || !item?.recurringFrequency ? 'selected' : ''}>Monthly</option>
+                                    <option value="yearly" ${item?.recurringFrequency === 'yearly' ? 'selected' : ''}>Yearly</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Next Occurrence Date</label>
+                                <input type="date" class="form-input" id="inp-recurring-next-expense" value="${item?.recurringNextDate || ''}">
+                            </div>
                         </div>
                     `;
                 } else if (type === 'receivable') {
@@ -5241,6 +5280,11 @@
                             <label class="form-label">Notes (Optional)</label>
                             <textarea class="form-input" id="inp-notes" placeholder="Additional notes..." rows="2">${item?.notes || ''}</textarea>
                         </div>
+                        <div class="form-group">
+                            <label class="form-label">Reminder (Days Before Due)</label>
+                            <input type="number" class="form-input" id="inp-reminder-days" placeholder="e.g. 3" min="0" value="${item?.reminderDays || ''}">
+                            <small style="color: var(--text-light); font-size: 0.75rem;">Get reminder this many days before due date (0 = on due date)</small>
+                        </div>
                     `;
                 } else if (type === 'payable') {
                     formHTML += `
@@ -5278,6 +5322,11 @@
                         <div class="form-group">
                             <label class="form-label">Notes (Optional)</label>
                             <textarea class="form-input" id="inp-notes" placeholder="Additional notes..." rows="2">${item?.notes || ''}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Reminder (Days Before Due)</label>
+                            <input type="number" class="form-input" id="inp-reminder-days" placeholder="e.g. 3" min="0" value="${item?.reminderDays || ''}">
+                            <small style="color: var(--text-light); font-size: 0.75rem;">Get reminder this many days before due date (0 = on due date)</small>
                         </div>
                     `;
                 } else if (type === 'plan') {
@@ -5318,12 +5367,19 @@
                             <label class="form-label">Notes (Optional)</label>
                             <textarea class="form-input" id="inp-notes" placeholder="Additional notes..." rows="2">${item?.notes || ''}</textarea>
                         </div>
+                        <div class="form-group">
+                            <label class="form-label">Reminder (Days Before Deadline)</label>
+                            <input type="number" class="form-input" id="inp-reminder-days" placeholder="e.g. 7" min="0" value="${item?.reminderDays || ''}">
+                            <small style="color: var(--text-light); font-size: 0.75rem;">Get reminder this many days before deadline (0 = on deadline)</small>
+                        </div>
                         <div style="padding: 1rem; background: #f7fafc; border-radius: 8px; font-size: 0.875rem; color: var(--text-light);">
                             Note: Progress will be calculated based on Total Savings (Income - Expenses + Receivables).
                         </div>
                     `;
                 } else if (type === 'category') {
                     const categoryType = editIndex === null && typeof editIndex !== 'number' ? (window.lastCategoryType || 'expense') : (item?.type || 'expense');
+                    const colors = ['#4299e1', '#48bb78', '#ed8936', '#e53e3e', '#9f7aea', '#38b2ac', '#f56565', '#805ad5', '#d69e2e', '#319795'];
+                    const currentColor = item?.color || colors[0];
                     formHTML += `
                         <div class="form-group">
                             <label class="form-label">Category Name</label>
@@ -5336,6 +5392,17 @@
                                 <option value="expense" ${categoryType === 'expense' ? 'selected' : ''}>Expense</option>
                             </select>
                             ${item ? '<small style="color: var(--text-light);">Type cannot be changed after creation</small>' : ''}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Color</label>
+                            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem;">
+                                ${colors.map(color => `
+                                    <label style="cursor: pointer; display: flex; align-items: center; gap: 0.25rem;">
+                                        <input type="radio" name="category-color" value="${color}" ${currentColor === color ? 'checked' : ''} style="display: none;">
+                                        <span style="width: 32px; height: 32px; border-radius: 50%; background: ${color}; border: ${currentColor === color ? '3px solid #000' : '2px solid #e2e8f0'}; display: block;"></span>
+                                    </label>
+                                `).join('')}
+                            </div>
                         </div>
                     `;
                 } else if (type === 'budget') {
@@ -5521,7 +5588,9 @@
                     date: val('inp-date'),
                     paymentMethod: val('inp-payment-method'),
                     notes: val('inp-notes'),
-                    recurring: document.getElementById('inp-recurring')?.checked || false
+                    recurring: document.getElementById('inp-recurring')?.checked || false,
+                    recurringFrequency: document.getElementById('inp-recurring')?.checked ? (val('inp-recurring-frequency-income') || 'monthly') : '',
+                    recurringNextDate: document.getElementById('inp-recurring')?.checked ? val('inp-recurring-next-income') : ''
                 };
                 if (isEditing) {
                     state.data.income[editingIndex] = newItem;
@@ -5539,7 +5608,9 @@
                     date: val('inp-date'),
                     paymentMethod: val('inp-payment-method'),
                     notes: val('inp-notes'),
-                    recurring: document.getElementById('inp-recurring')?.checked || false
+                    recurring: document.getElementById('inp-recurring')?.checked || false,
+                    recurringFrequency: document.getElementById('inp-recurring')?.checked ? (val('inp-recurring-frequency-expense') || 'monthly') : '',
+                    recurringNextDate: document.getElementById('inp-recurring')?.checked ? val('inp-recurring-next-expense') : ''
                 };
                 if (isEditing && editingIndex !== null) {
                     state.data.expenses[editingIndex] = newItem;
@@ -5557,7 +5628,8 @@
                     dueDate: val('inp-duedate'),
                     status: val('inp-status') || 'unpaid',
                     priority: val('inp-priority') || 'medium',
-                    notes: val('inp-notes')
+                    notes: val('inp-notes'),
+                    reminderDays: num('inp-reminder-days') || 0
                 };
                 if (isEditing && editingIndex !== null) {
                     state.data.receivables[editingIndex] = newItem;
@@ -5575,7 +5647,8 @@
                     dueDate: val('inp-duedate'),
                     status: val('inp-status') || 'unpaid',
                     priority: val('inp-priority') || 'medium',
-                    notes: val('inp-notes')
+                    notes: val('inp-notes'),
+                    reminderDays: num('inp-reminder-days') || 0
                 };
                 if (isEditing && editingIndex !== null) {
                     state.data.payables[editingIndex] = newItem;
@@ -5593,7 +5666,8 @@
                     deadline: val('inp-deadline'),
                     status: val('inp-status') || 'in progress',
                     priority: val('inp-priority') || 'medium',
-                    notes: val('inp-notes')
+                    notes: val('inp-notes'),
+                    reminderDays: num('inp-reminder-days') || 0
                 };
                 if (isEditing && editingIndex !== null) {
                     state.data.plans[editingIndex] = newItem;
@@ -5615,9 +5689,11 @@
                 }
             } else if (type === 'category') {
                 if (!validateRequired(val('inp-name'), 'Category Name')) return;
+                const colorInput = document.querySelector('input[name="category-color"]:checked');
                 newItem = {
                     name: val('inp-name'),
-                    type: val('inp-type')
+                    type: val('inp-type'),
+                    color: colorInput?.value || '#4299e1'
                 };
                 if (isEditing && editingIndex !== null) {
                     state.data.categories[editingIndex] = newItem;
@@ -5627,7 +5703,7 @@
                     if (!exists) {
                         state.data.categories.push(newItem);
                     } else {
-                        alert('This category already exists!');
+                        showToast('This category already exists!', 'error');
                         return;
                     }
                 }
@@ -5742,6 +5818,56 @@
 
             const dateStr = new Date().toISOString().split('T')[0];
             XLSX.writeFile(wb, `finance_data_export_${dateStr}.xlsx`);
+            showToast('Data exported to Excel successfully', 'success');
+        }
+
+        function exportDataCSV() {
+            const dateStr = new Date().toISOString().split('T')[0];
+            let csvContent = '';
+            
+            // Export each data type as separate CSV
+            const dataTypes = [
+                { name: 'Income', data: state.data.income },
+                { name: 'Expenses', data: state.data.expenses },
+                { name: 'Receivables', data: state.data.receivables },
+                { name: 'Payables', data: state.data.payables },
+                { name: 'Plans', data: state.data.plans },
+                { name: 'Budgets', data: state.data.budgets || [] },
+                { name: 'Categories', data: state.data.categories || [] }
+            ];
+            
+            dataTypes.forEach(({ name, data }) => {
+                if (data.length > 0) {
+                    csvContent += `\n=== ${name} ===\n`;
+                    const headers = Object.keys(data[0]).join(',');
+                    csvContent += headers + '\n';
+                    data.forEach(item => {
+                        const values = Object.values(item).map(v => {
+                            if (v === null || v === undefined) return '';
+                            if (typeof v === 'string' && v.includes(',')) return `"${v}"`;
+                            return v;
+                        }).join(',');
+                        csvContent += values + '\n';
+                    });
+                    csvContent += '\n';
+                }
+            });
+            
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `finance_data_export_${dateStr}.csv`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+            showToast('Data exported to CSV successfully', 'success');
+        }
+
+        function toggleRecurringOptions(type) {
+            const checkbox = document.getElementById('inp-recurring');
+            const optionsDiv = document.getElementById(`recurring-options-${type}`);
+            if (optionsDiv) {
+                optionsDiv.style.display = checkbox?.checked ? 'block' : 'none';
+            }
         }
 
         // --- 7. INITIALIZATION ---
