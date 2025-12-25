@@ -1610,10 +1610,73 @@
                             <option value="lastmonth">Last Month</option>
                             <option value="year">This Year</option>
                             <option value="lastyear">Last Year</option>
+                            <option value="custom">Custom Range</option>
                             <option value="all">All Time</option>
                         </select>
                         <button class="btn-icon" onclick="printReport()">🖨️ Print</button>
                     </div>
+                </div>
+                <div id="custom-date-range" style="display: none; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; align-items: center;">
+                    <input type="date" class="filter-input" id="custom-from" placeholder="From Date" onchange="renderReports()">
+                    <input type="date" class="filter-input" id="custom-to" placeholder="To Date" onchange="renderReports()">
+                </div>
+                <div style="background: #f7fafc; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                    <div style="font-size: 0.875rem; font-weight: 600; color: var(--text-main); margin-bottom: 0.75rem;">Additional Filters</div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                        <div>
+                            <label style="display: block; font-size: 0.75rem; color: var(--text-light); margin-bottom: 0.25rem;">Transaction Type</label>
+                            <select class="filter-input" id="report-type" onchange="renderReports()" style="width: 100%;">
+                                <option value="all">All Types</option>
+                                <option value="income">Income Only</option>
+                                <option value="expense">Expense Only</option>
+                                <option value="receivable">Receivables Only</option>
+                                <option value="payable">Payables Only</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.75rem; color: var(--text-light); margin-bottom: 0.25rem;">Category</label>
+                            <select class="filter-input" id="report-category" onchange="renderReports()" style="width: 100%;">
+                                <option value="">All Categories</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.75rem; color: var(--text-light); margin-bottom: 0.25rem;">Payment Method</label>
+                            <select class="filter-input" id="report-payment-method" onchange="renderReports()" style="width: 100%;">
+                                <option value="">All Methods</option>
+                                <option value="cash">Cash</option>
+                                <option value="bank">Bank Transfer</option>
+                                <option value="card">Card</option>
+                                <option value="mobile">Mobile Payment</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.75rem; color: var(--text-light); margin-bottom: 0.25rem;">Status (Receivables/Payables)</label>
+                            <select class="filter-input" id="report-status" onchange="renderReports()" style="width: 100%;">
+                                <option value="">All Status</option>
+                                <option value="paid">Paid</option>
+                                <option value="unpaid">Unpaid</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.75rem; color: var(--text-light); margin-bottom: 0.25rem;">Priority</label>
+                            <select class="filter-input" id="report-priority" onchange="renderReports()" style="width: 100%;">
+                                <option value="">All Priorities</option>
+                                <option value="high">High</option>
+                                <option value="medium">Medium</option>
+                                <option value="low">Low</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.75rem; color: var(--text-light); margin-bottom: 0.25rem;">Recurring</label>
+                            <select class="filter-input" id="report-recurring" onchange="renderReports()" style="width: 100%;">
+                                <option value="">All Transactions</option>
+                                <option value="recurring">Recurring Only</option>
+                                <option value="non-recurring">Non-Recurring Only</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn btn-secondary" onclick="resetReportFilters()" style="margin-top: 0.75rem; font-size: 0.875rem;">Reset Filters</button>
                 </div>
                 <div id="reports-container"></div>
             </div>
@@ -4119,11 +4182,32 @@
 
             const period = document.getElementById('report-period')?.value || 'month';
             const customRange = document.getElementById('custom-date-range');
+            const reportType = document.getElementById('report-type')?.value || 'all';
+            const categoryFilter = document.getElementById('report-category')?.value || '';
+            const paymentMethodFilter = document.getElementById('report-payment-method')?.value || '';
+            const statusFilter = document.getElementById('report-status')?.value || '';
+            const priorityFilter = document.getElementById('report-priority')?.value || '';
+            const recurringFilter = document.getElementById('report-recurring')?.value || '';
 
             if (period === 'custom') {
                 if (customRange) customRange.style.display = 'flex';
             } else {
                 if (customRange) customRange.style.display = 'none';
+            }
+
+            // Populate category dropdown
+            const categorySelect = document.getElementById('report-category');
+            if (categorySelect) {
+                const allCategories = [
+                    ...new Set([
+                        ...state.data.income.map(i => i.category).filter(Boolean),
+                        ...state.data.expenses.map(e => e.category).filter(Boolean)
+                    ])
+                ].sort();
+                const currentValue = categorySelect.value;
+                categorySelect.innerHTML = '<option value="">All Categories</option>' + 
+                    allCategories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+                if (currentValue) categorySelect.value = currentValue;
             }
 
             const now = new Date();
@@ -4151,17 +4235,73 @@
             }
 
             const filterByDate = (items, dateField) => {
-                if (!startDate) return items;
+                if (!startDate && period !== 'all') return items;
+                if (period === 'all') return items;
                 return items.filter(item => {
                     const itemDate = item[dateField] || '';
                     return itemDate >= startDate && itemDate <= endDate;
                 });
             };
 
-            const periodIncome = filterByDate(state.data.income, 'date');
-            const periodExpenses = filterByDate(state.data.expenses, 'date');
-            const periodReceivables = filterByDate(state.data.receivables, 'dueDate');
-            const periodPayables = filterByDate(state.data.payables, 'dueDate');
+            // Apply all filters
+            const applyFilters = (items, dateField, itemType) => {
+                let filtered = filterByDate(items, dateField);
+                
+                // Category filter (for income/expenses)
+                if (categoryFilter && (itemType === 'income' || itemType === 'expense')) {
+                    filtered = filtered.filter(item => item.category === categoryFilter);
+                }
+                
+                // Payment method filter (for income/expenses)
+                if (paymentMethodFilter && (itemType === 'income' || itemType === 'expense')) {
+                    filtered = filtered.filter(item => item.paymentMethod === paymentMethodFilter);
+                }
+                
+                // Status filter (for receivables/payables)
+                if (statusFilter && (itemType === 'receivable' || itemType === 'payable')) {
+                    filtered = filtered.filter(item => (item.status || 'unpaid') === statusFilter);
+                }
+                
+                // Priority filter (for receivables/payables)
+                if (priorityFilter && (itemType === 'receivable' || itemType === 'payable')) {
+                    filtered = filtered.filter(item => (item.priority || 'medium') === priorityFilter);
+                }
+                
+                // Recurring filter (for income/expenses)
+                if (recurringFilter && (itemType === 'income' || itemType === 'expense')) {
+                    const isRecurring = recurringFilter === 'recurring';
+                    filtered = filtered.filter(item => {
+                        const itemRecurring = item.recurring === true || item.recurring === 'true';
+                        return isRecurring ? itemRecurring : !itemRecurring;
+                    });
+                }
+                
+                return filtered;
+            };
+
+            let periodIncome = applyFilters(state.data.income, 'date', 'income');
+            let periodExpenses = applyFilters(state.data.expenses, 'date', 'expense');
+            let periodReceivables = applyFilters(state.data.receivables, 'dueDate', 'receivable');
+            let periodPayables = applyFilters(state.data.payables, 'dueDate', 'payable');
+            
+            // Apply transaction type filter
+            if (reportType === 'income') {
+                periodExpenses = [];
+                periodReceivables = [];
+                periodPayables = [];
+            } else if (reportType === 'expense') {
+                periodIncome = [];
+                periodReceivables = [];
+                periodPayables = [];
+            } else if (reportType === 'receivable') {
+                periodIncome = [];
+                periodExpenses = [];
+                periodPayables = [];
+            } else if (reportType === 'payable') {
+                periodIncome = [];
+                periodExpenses = [];
+                periodReceivables = [];
+            }
 
             const totalIncome = periodIncome.reduce((sum, i) => sum + Number(i.amount || 0), 0);
             const totalExpenses = periodExpenses.reduce((sum, i) => sum + Number(i.amount || 0), 0);
@@ -4169,32 +4309,64 @@
             const totalReceivables = periodReceivables.reduce((sum, i) => sum + Number(i.amount || 0), 0);
             const totalPayables = periodPayables.reduce((sum, i) => sum + Number(i.amount || 0), 0);
 
-            container.innerHTML = `
+            let reportHTML = `
                 <div class="report-section">
                     <div class="report-title">Summary</div>
                     <div class="report-grid">
+            `;
+            
+            if (reportType === 'all' || reportType === 'income') {
+                reportHTML += `
                         <div class="stat-card" style="border-color: var(--success);">
                             <div class="stat-label">Total Income</div>
                             <div class="stat-value">${formatCurrency(totalIncome)}</div>
                         </div>
+                `;
+            }
+            
+            if (reportType === 'all' || reportType === 'expense') {
+                reportHTML += `
                         <div class="stat-card" style="border-color: var(--danger);">
                             <div class="stat-label">Total Expenses</div>
                             <div class="stat-value">${formatCurrency(totalExpenses)}</div>
                         </div>
+                `;
+            }
+            
+            if (reportType === 'all' && (periodIncome.length > 0 || periodExpenses.length > 0)) {
+                reportHTML += `
                         <div class="stat-card" style="border-color: var(--primary);">
                             <div class="stat-label">Net Balance</div>
                             <div class="stat-value">${formatCurrency(netBalance)}</div>
                         </div>
+                `;
+            }
+            
+            if (reportType === 'all' || reportType === 'receivable') {
+                reportHTML += `
                         <div class="stat-card" style="border-color: var(--warning);">
                             <div class="stat-label">Due Receivables</div>
                             <div class="stat-value">${formatCurrency(totalReceivables)}</div>
                         </div>
+                `;
+            }
+            
+            if (reportType === 'all' || reportType === 'payable') {
+                reportHTML += `
                         <div class="stat-card" style="border-color: #c53030;">
                             <div class="stat-label">Due Payables</div>
                             <div class="stat-value">${formatCurrency(totalPayables)}</div>
                         </div>
+                `;
+            }
+            
+            reportHTML += `
                     </div>
                 </div>
+            `;
+            
+            if ((reportType === 'all' || reportType === 'expense') && periodExpenses.length > 0) {
+                reportHTML += `
                 <div class="report-section">
                     <div class="report-title">Top Expense Categories</div>
                     <div class="table-container">
@@ -4228,6 +4400,11 @@
                         </table>
                     </div>
                 </div>
+                `;
+            }
+            
+            if ((reportType === 'all' || reportType === 'income') && periodIncome.length > 0) {
+                reportHTML += `
                 <div class="report-section">
                     <div class="report-title">Top Income Categories</div>
                     <div class="table-container">
@@ -4261,7 +4438,28 @@
                         </table>
                     </div>
                 </div>
-            `;
+                `;
+            }
+            
+            if (reportHTML.trim() === '<div class="report-section">') {
+                reportHTML = '<div class="text-center" style="padding: 2rem; color: var(--text-light);">No data found for the selected filters.</div>';
+            }
+            
+            container.innerHTML = reportHTML;
+        }
+        
+        function resetReportFilters() {
+            document.getElementById('report-period').value = 'month';
+            document.getElementById('report-type').value = 'all';
+            document.getElementById('report-category').value = '';
+            document.getElementById('report-payment-method').value = '';
+            document.getElementById('report-status').value = '';
+            document.getElementById('report-priority').value = '';
+            document.getElementById('report-recurring').value = '';
+            document.getElementById('custom-from').value = '';
+            document.getElementById('custom-to').value = '';
+            document.getElementById('custom-date-range').style.display = 'none';
+            renderReports();
         }
 
         function getCategoryBreakdown(items) {
