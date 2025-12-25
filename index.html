@@ -1492,6 +1492,7 @@
         <div class="nav-tab" onclick="switchTab('categories')">Categories</div>
         <div class="nav-tab" onclick="switchTab('reports')">Reports</div>
         <div class="nav-tab" onclick="switchTab('analytics')">Analytics</div>
+        <div class="nav-tab" onclick="switchTab('settings')">⚙️ Settings</div>
     </nav>
 
     <!-- Main Content Area -->
@@ -1745,6 +1746,14 @@
                 <div style="background: #f7fafc; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
                     <div style="font-size: 0.875rem; font-weight: 600; color: var(--text-main); margin-bottom: 0.75rem;">Additional Filters</div>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                        <div>
+                            <label style="display: block; font-size: 0.75rem; color: var(--text-light); margin-bottom: 0.25rem;">Date From</label>
+                            <input type="date" class="filter-input" id="report-date-from" onchange="renderReports()" style="width: 100%;">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.75rem; color: var(--text-light); margin-bottom: 0.25rem;">Date To</label>
+                            <input type="date" class="filter-input" id="report-date-to" onchange="renderReports()" style="width: 100%;">
+                        </div>
                         <div>
                             <label style="display: block; font-size: 0.75rem; color: var(--text-light); margin-bottom: 0.25rem;">Transaction Type</label>
                             <select class="filter-input" id="report-type" onchange="renderReports()" style="width: 100%;">
@@ -2791,13 +2800,14 @@
             if (activeTab) activeTab.classList.add('active');
 
             // Hide all views
-            document.getElementById('view-dashboard').classList.add('hidden');
-            document.getElementById('view-list').classList.add('hidden');
-            document.getElementById('view-plans').classList.add('hidden');
+            document.getElementById('view-dashboard')?.classList.add('hidden');
+            document.getElementById('view-list')?.classList.add('hidden');
+            document.getElementById('view-plans')?.classList.add('hidden');
             document.getElementById('view-budgets')?.classList.add('hidden');
             document.getElementById('view-reports')?.classList.add('hidden');
             document.getElementById('view-analytics')?.classList.add('hidden');
             document.getElementById('view-categories')?.classList.add('hidden');
+            document.getElementById('view-settings')?.classList.add('hidden');
 
             // Show selected view
             if (tabId === 'dashboard') {
@@ -4444,6 +4454,8 @@
             const statusFilter = document.getElementById('report-status')?.value || '';
             const priorityFilter = document.getElementById('report-priority')?.value || '';
             const recurringFilter = document.getElementById('report-recurring')?.value || '';
+            const dateFromFilter = document.getElementById('report-date-from')?.value || '';
+            const dateToFilter = document.getElementById('report-date-to')?.value || '';
 
             if (period === 'custom') {
                 if (customRange) customRange.style.display = 'flex';
@@ -4469,34 +4481,63 @@
             const now = new Date();
             let startDate = '', endDate = '';
 
-            if (period === 'month') {
-                startDate = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
-                endDate = now.toISOString().split('T')[0];
-            } else if (period === 'lastmonth') {
-                startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString().split('T')[0];
-                endDate = new Date(now.getFullYear(), now.getMonth(), 0).toISOString().split('T')[0];
-            } else if (period === 'quarter') {
-                const quarter = Math.floor(now.getMonth() / 3);
-                startDate = new Date(now.getFullYear(), quarter * 3, 1).toISOString().split('T')[0];
-                endDate = now.toISOString().split('T')[0];
-            } else if (period === 'year') {
-                startDate = new Date(now.getFullYear(), 0, 1).toISOString().split('T')[0];
-                endDate = now.toISOString().split('T')[0];
-            } else if (period === 'lastyear') {
-                startDate = new Date(now.getFullYear() - 1, 0, 1).toISOString().split('T')[0];
-                endDate = new Date(now.getFullYear() - 1, 11, 31).toISOString().split('T')[0];
-            } else if (period === 'custom') {
-                startDate = document.getElementById('custom-from')?.value || '';
-                endDate = document.getElementById('custom-to')?.value || '';
+            // If date filters are set, use them (they override period selection)
+            if (dateFromFilter || dateToFilter) {
+                startDate = dateFromFilter;
+                endDate = dateToFilter || now.toISOString().split('T')[0];
+            } else {
+                // Otherwise use period selection
+                if (period === 'month') {
+                    startDate = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+                    endDate = now.toISOString().split('T')[0];
+                } else if (period === 'lastmonth') {
+                    startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString().split('T')[0];
+                    endDate = new Date(now.getFullYear(), now.getMonth(), 0).toISOString().split('T')[0];
+                } else if (period === 'quarter') {
+                    const quarter = Math.floor(now.getMonth() / 3);
+                    startDate = new Date(now.getFullYear(), quarter * 3, 1).toISOString().split('T')[0];
+                    endDate = now.toISOString().split('T')[0];
+                } else if (period === 'year') {
+                    startDate = new Date(now.getFullYear(), 0, 1).toISOString().split('T')[0];
+                    endDate = now.toISOString().split('T')[0];
+                } else if (period === 'lastyear') {
+                    startDate = new Date(now.getFullYear() - 1, 0, 1).toISOString().split('T')[0];
+                    endDate = new Date(now.getFullYear() - 1, 11, 31).toISOString().split('T')[0];
+                } else if (period === 'custom') {
+                    startDate = document.getElementById('custom-from')?.value || '';
+                    endDate = document.getElementById('custom-to')?.value || '';
+                }
             }
 
             const filterByDate = (items, dateField) => {
-                if (!startDate && period !== 'all') return items;
-                if (period === 'all') return items;
-                return items.filter(item => {
-                    const itemDate = item[dateField] || '';
-                    return itemDate >= startDate && itemDate <= endDate;
-                });
+                // If no date filters and period is 'all', return all items
+                if (!startDate && !endDate && (period === 'all' || (!dateFromFilter && !dateToFilter))) {
+                    return items;
+                }
+                
+                // If only one date is set, use it appropriately
+                if (startDate && !endDate) {
+                    return items.filter(item => {
+                        const itemDate = item[dateField] || '';
+                        return itemDate >= startDate;
+                    });
+                }
+                if (!startDate && endDate) {
+                    return items.filter(item => {
+                        const itemDate = item[dateField] || '';
+                        return itemDate <= endDate;
+                    });
+                }
+                
+                // Both dates set
+                if (startDate && endDate) {
+                    return items.filter(item => {
+                        const itemDate = item[dateField] || '';
+                        return itemDate >= startDate && itemDate <= endDate;
+                    });
+                }
+                
+                return items;
             };
 
             // Apply all filters
@@ -4712,6 +4753,8 @@
             document.getElementById('report-status').value = '';
             document.getElementById('report-priority').value = '';
             document.getElementById('report-recurring').value = '';
+            document.getElementById('report-date-from').value = '';
+            document.getElementById('report-date-to').value = '';
             document.getElementById('custom-from').value = '';
             document.getElementById('custom-to').value = '';
             document.getElementById('custom-date-range').style.display = 'none';
