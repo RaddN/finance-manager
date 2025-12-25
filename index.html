@@ -1296,6 +1296,122 @@
             transition: all 0.3s;
         }
 
+        /* Confirmation Modal */
+        .confirm-modal {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 0;
+            max-width: 450px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .confirm-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .confirm-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .confirm-icon.warning {
+            background: #fffaf0;
+            color: var(--warning);
+        }
+
+        .confirm-icon.danger {
+            background: #fff5f5;
+            color: var(--danger);
+        }
+
+        .confirm-icon.info {
+            background: #ebf8ff;
+            color: var(--primary);
+        }
+
+        .confirm-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin: 0;
+        }
+
+        .confirm-body {
+            padding: 1.5rem;
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
+        .confirm-actions {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 0.75rem;
+            justify-content: flex-end;
+        }
+
+        /* Settings Panel */
+        .settings-section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .settings-section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .settings-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .settings-row:last-child {
+            border-bottom: none;
+        }
+
+        .settings-label {
+            font-weight: 500;
+            color: var(--text-main);
+        }
+
+        .settings-description {
+            font-size: 0.875rem;
+            color: var(--text-light);
+            margin-top: 0.25rem;
+        }
+
+        /* Keyboard Shortcuts Help */
+        .shortcut-key {
+            display: inline-block;
+            background: var(--border);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            font-family: monospace;
+            margin: 0 0.25rem;
+        }
+
         .toast.show {
             opacity: 1;
             transform: translateY(0);
@@ -1553,10 +1669,16 @@
                         </select>
                         <select class="filter-input" id="sort-by" onchange="applyFilters()" style="min-width: 150px;">
                             <option value="">Sort by...</option>
-                            <option value="date-asc">Date (Oldest)</option>
-                            <option value="date-desc">Date (Newest)</option>
+                            <option value="date-asc">Date (Oldest First)</option>
+                            <option value="date-desc">Date (Newest First)</option>
                             <option value="amount-asc">Amount (Low to High)</option>
                             <option value="amount-desc">Amount (High to Low)</option>
+                            <option value="category-asc">Category (A-Z)</option>
+                            <option value="category-desc">Category (Z-A)</option>
+                            <option value="status-asc">Status (Paid First)</option>
+                            <option value="status-desc">Status (Unpaid First)</option>
+                            <option value="priority-asc">Priority (Low to High)</option>
+                            <option value="priority-desc">Priority (High to Low)</option>
                         </select>
                         <button class="btn-icon" onclick="clearFilters()">
                             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -1687,6 +1809,111 @@
             <div class="card">
                 <h2>Advanced Analytics</h2>
                 <div id="analytics-container"></div>
+            </div>
+        </div>
+
+        <!-- Settings View -->
+        <div id="view-settings" class="hidden">
+            <div class="card">
+                <h2>Settings & Preferences</h2>
+                
+                <div class="settings-section">
+                    <div class="settings-section-title">General Settings</div>
+                    <div class="settings-row">
+                        <div>
+                            <div class="settings-label">Currency Symbol</div>
+                            <div class="settings-description">Default currency symbol for all amounts</div>
+                        </div>
+                        <select class="form-select" id="setting-currency" style="width: 200px;" onchange="saveSettings()">
+                            <option value="৳">৳ (Taka)</option>
+                            <option value="$">$ (Dollar)</option>
+                            <option value="€">€ (Euro)</option>
+                            <option value="£">£ (Pound)</option>
+                            <option value="₹">₹ (Rupee)</option>
+                            <option value="¥">¥ (Yen)</option>
+                        </select>
+                    </div>
+                    <div class="settings-row">
+                        <div>
+                            <div class="settings-label">Date Format</div>
+                            <div class="settings-description">Preferred date display format</div>
+                        </div>
+                        <select class="form-select" id="setting-date-format" style="width: 200px;" onchange="saveSettings()">
+                            <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+                            <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+                            <option value="MM/DD/YYYY">MM/DD/YYYY</option>
+                            <option value="DD-MM-YYYY">DD-MM-YYYY</option>
+                        </select>
+                    </div>
+                    <div class="settings-row">
+                        <div>
+                            <div class="settings-label">Auto-save</div>
+                            <div class="settings-description">Automatically save changes to Excel file</div>
+                        </div>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                            <input type="checkbox" id="setting-auto-save" onchange="saveSettings()">
+                            <span>Enable</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <div class="settings-section-title">Data Management</div>
+                    <div class="settings-row">
+                        <div>
+                            <div class="settings-label">Export Data</div>
+                            <div class="settings-description">Download all data as Excel file</div>
+                        </div>
+                        <button class="btn btn-primary" onclick="exportData()">Export to Excel</button>
+                    </div>
+                    <div class="settings-row">
+                        <div>
+                            <div class="settings-label">Import Data</div>
+                            <div class="settings-description">Import data from Excel file (will merge with existing data)</div>
+                        </div>
+                        <button class="btn btn-primary" onclick="importData()">Import from Excel</button>
+                    </div>
+                    <div class="settings-row">
+                        <div>
+                            <div class="settings-label">Backup Data</div>
+                            <div class="settings-description">Create a backup of all your data</div>
+                        </div>
+                        <button class="btn btn-secondary" onclick="backupData()">Create Backup</button>
+                    </div>
+                    <div class="settings-row">
+                        <div>
+                            <div class="settings-label">Restore Data</div>
+                            <div class="settings-description">Restore data from a backup file</div>
+                        </div>
+                        <button class="btn btn-secondary" onclick="restoreData()">Restore Backup</button>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <div class="settings-section-title">Keyboard Shortcuts</div>
+                    <div style="padding: 1rem 0;">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
+                            <div>
+                                <div style="font-weight: 600; margin-bottom: 0.5rem;">Navigation</div>
+                                <div style="font-size: 0.875rem; line-height: 2;">
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">1</span> - Dashboard</div>
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">2</span> - Income</div>
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">3</span> - Expenses</div>
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">N</span> - New Item</div>
+                                </div>
+                            </div>
+                            <div>
+                                <div style="font-weight: 600; margin-bottom: 0.5rem;">Actions</div>
+                                <div style="font-size: 0.875rem; line-height: 2;">
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">S</span> - Save</div>
+                                    <div><span class="shortcut-key">Esc</span> - Close Modal</div>
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">F</span> - Search</div>
+                                    <div><span class="shortcut-key">Del</span> - Delete Selected</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -2588,6 +2815,9 @@
             } else if (tabId === 'analytics') {
                 document.getElementById('view-analytics').classList.remove('hidden');
                 renderAnalytics();
+            } else if (tabId === 'settings') {
+                document.getElementById('view-settings').classList.remove('hidden');
+                loadSettings();
             } else if (tabId === 'categories') {
                 document.getElementById('view-categories').classList.remove('hidden');
                 renderCategoriesList();
@@ -3845,26 +4075,34 @@
 
         function bulkDelete() {
             if (selectedItems.size === 0) return;
-            if (!confirm(`Are you sure you want to delete ${selectedItems.size} item(s)?`)) return;
+            showConfirmModal({
+                title: 'Delete Multiple Items',
+                message: `Are you sure you want to delete ${selectedItems.size} selected item(s)? This action cannot be undone.`,
+                type: 'danger',
+                confirmText: 'Delete All',
+                cancelText: 'Cancel'
+            }).then(confirmed => {
+                if (!confirmed) return;
 
-            // Sort indices in descending order to avoid index shifting issues
-            const indicesToDelete = Array.from(selectedItems)
-                .map(key => {
-                    const [type, index] = key.split('-');
-                    return { type, index: parseInt(index) };
-                })
-                .filter(item => item.type === currentListType)
-                .map(item => item.index)
-                .sort((a, b) => b - a);
+                // Sort indices in descending order to avoid index shifting issues
+                const indicesToDelete = Array.from(selectedItems)
+                    .map(key => {
+                        const [type, index] = key.split('-');
+                        return { type, index: parseInt(index) };
+                    })
+                    .filter(item => item.type === currentListType)
+                    .map(item => item.index)
+                    .sort((a, b) => b - a);
 
-            indicesToDelete.forEach(index => {
-                state.data[currentListType].splice(index, 1);
-            });
+                indicesToDelete.forEach(index => {
+                    state.data[currentListType].splice(index, 1);
+                });
 
-            selectedItems.clear();
-            writeExcelFile().then(() => {
-                renderAll();
-                showToast(`Successfully deleted ${indicesToDelete.length} item(s)`, 'success');
+                selectedItems.clear();
+                writeExcelFile().then(() => {
+                    renderAll();
+                    showToast(`Successfully deleted ${indicesToDelete.length} item(s)`, 'success');
+                });
             });
         }
 
@@ -3919,6 +4157,24 @@
                         const amountA = Number(a.amount || 0);
                         const amountB = Number(b.amount || 0);
                         return sortBy === 'amount-asc' ? amountA - amountB : amountB - amountA;
+                    } else if (sortBy === 'category-asc' || sortBy === 'category-desc') {
+                        const catA = (a.category || 'Other').toLowerCase();
+                        const catB = (b.category || 'Other').toLowerCase();
+                        return sortBy === 'category-asc' ? catA.localeCompare(catB) : catB.localeCompare(catA);
+                    } else if (sortBy === 'status-asc' || sortBy === 'status-desc') {
+                        const statusA = (a.status || 'unpaid').toLowerCase();
+                        const statusB = (b.status || 'unpaid').toLowerCase();
+                        // Paid comes before unpaid in asc, reverse in desc
+                        if (sortBy === 'status-asc') {
+                            return statusA === 'paid' ? -1 : statusB === 'paid' ? 1 : statusA.localeCompare(statusB);
+                        } else {
+                            return statusA === 'unpaid' ? -1 : statusB === 'unpaid' ? 1 : statusB.localeCompare(statusA);
+                        }
+                    } else if (sortBy === 'priority-asc' || sortBy === 'priority-desc') {
+                        const priorityOrder = { 'low': 1, 'medium': 2, 'high': 3 };
+                        const priorityA = priorityOrder[a.priority || 'medium'] || 2;
+                        const priorityB = priorityOrder[b.priority || 'medium'] || 2;
+                        return sortBy === 'priority-asc' ? priorityA - priorityB : priorityB - priorityA;
                     }
                     return 0;
                 });
@@ -5345,13 +5601,72 @@
             });
         }
 
+        // Professional Confirmation Modal
+        function showConfirmModal(options) {
+            return new Promise((resolve) => {
+                const { title, message, type = 'warning', confirmText = 'Confirm', cancelText = 'Cancel', icon = '⚠️' } = options;
+                const iconClass = type === 'danger' ? 'danger' : type === 'info' ? 'info' : 'warning';
+                const iconEmoji = type === 'danger' ? '🗑️' : type === 'info' ? 'ℹ️' : '⚠️';
+                
+                const modalHTML = `
+                    <div class="confirm-modal">
+                        <div class="confirm-header">
+                            <div class="confirm-icon ${iconClass}">${iconEmoji}</div>
+                            <h3 class="confirm-title">${title}</h3>
+                        </div>
+                        <div class="confirm-body">
+                            ${message}
+                        </div>
+                        <div class="confirm-actions">
+                            <button class="btn btn-secondary" onclick="closeConfirmModal(false)">${cancelText}</button>
+                            <button class="btn ${type === 'danger' ? 'btn-danger' : 'btn-primary'}" onclick="closeConfirmModal(true)">${confirmText}</button>
+                        </div>
+                    </div>
+                `;
+                
+                const overlay = document.getElementById('modal-overlay');
+                const content = document.getElementById('modal-content');
+                content.innerHTML = modalHTML;
+                overlay.classList.add('active');
+                
+                window.closeConfirmModal = (result) => {
+                    overlay.classList.remove('active');
+                    delete window.closeConfirmModal;
+                    resolve(result);
+                };
+                
+                // Close on overlay click
+                overlay.onclick = (e) => {
+                    if (e.target === overlay) {
+                        window.closeConfirmModal(false);
+                    }
+                };
+            });
+        }
+
         function deleteItem(type, index) {
-            if (confirm('Are you sure you want to delete this item?')) {
-                state.data[type].splice(index, 1);
-                writeExcelFile().then(() => {
-                    renderAll();
-                });
-            }
+            const itemName = type === 'income' ? 'income entry' : 
+                           type === 'expenses' ? 'expense entry' :
+                           type === 'receivables' ? 'receivable' :
+                           type === 'payables' ? 'payable' :
+                           type === 'plans' ? 'plan' :
+                           type === 'budgets' ? 'budget' : 'item';
+            
+            showConfirmModal({
+                title: 'Delete Item',
+                message: `Are you sure you want to delete this ${itemName}? This action cannot be undone.`,
+                type: 'danger',
+                confirmText: 'Delete',
+                cancelText: 'Cancel'
+            }).then(confirmed => {
+                if (confirmed) {
+                    state.data[type].splice(index, 1);
+                    writeExcelFile().then(() => {
+                        showToast(`${itemName.charAt(0).toUpperCase() + itemName.slice(1)} deleted successfully`, 'success');
+                        renderAll();
+                    });
+                }
+            });
         }
 
         // --- 6. EXPORT FUNCTIONALITY ---
@@ -5441,6 +5756,206 @@
                 updateStatus(false);
             }
         })();
+        // --- SETTINGS MANAGEMENT ---
+        function loadSettings() {
+            const settings = JSON.parse(localStorage.getItem('financeManagerSettings') || '{}');
+            if (document.getElementById('setting-currency')) {
+                document.getElementById('setting-currency').value = settings.currency || '৳';
+            }
+            if (document.getElementById('setting-date-format')) {
+                document.getElementById('setting-date-format').value = settings.dateFormat || 'YYYY-MM-DD';
+            }
+            if (document.getElementById('setting-auto-save')) {
+                document.getElementById('setting-auto-save').checked = settings.autoSave !== false;
+            }
+        }
+
+        function saveSettings() {
+            const settings = {
+                currency: document.getElementById('setting-currency')?.value || '৳',
+                dateFormat: document.getElementById('setting-date-format')?.value || 'YYYY-MM-DD',
+                autoSave: document.getElementById('setting-auto-save')?.checked !== false
+            };
+            localStorage.setItem('financeManagerSettings', JSON.stringify(settings));
+            showToast('Settings saved successfully', 'success');
+        }
+
+        // --- IMPORT FUNCTIONALITY ---
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.xlsx,.xls';
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const data = new Uint8Array(event.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        
+                        showConfirmModal({
+                            title: 'Import Data',
+                            message: 'This will merge imported data with your existing data. Duplicate entries may be created. Continue?',
+                            type: 'warning',
+                            confirmText: 'Import',
+                            cancelText: 'Cancel'
+                        }).then(confirmed => {
+                            if (!confirmed) return;
+
+                            const sheetNames = ['Income', 'Expenses', 'Receivables', 'Payables', 'Plans', 'Budgets', 'Categories'];
+                            let importedCount = 0;
+
+                            sheetNames.forEach(sheetName => {
+                                const sheet = workbook.Sheets[sheetName];
+                                if (sheet) {
+                                    const jsonData = XLSX.utils.sheet_to_json(sheet);
+                                    const dataKey = sheetName.toLowerCase();
+                                    if (state.data[dataKey]) {
+                                        state.data[dataKey].push(...jsonData);
+                                        importedCount += jsonData.length;
+                                    }
+                                }
+                            });
+
+                            writeExcelFile().then(() => {
+                                showToast(`Successfully imported ${importedCount} items`, 'success');
+                                renderAll();
+                            });
+                        });
+                    } catch (error) {
+                        showToast('Error importing file: ' + error.message, 'error');
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            };
+            input.click();
+        }
+
+        // --- BACKUP & RESTORE ---
+        function backupData() {
+            const backup = {
+                timestamp: new Date().toISOString(),
+                version: '1.0',
+                data: state.data
+            };
+            const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `finance_backup_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Backup created successfully', 'success');
+        }
+
+        function restoreData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const backup = JSON.parse(event.target.result);
+                        
+                        showConfirmModal({
+                            title: 'Restore Backup',
+                            message: `This will replace all your current data with the backup from ${new Date(backup.timestamp).toLocaleString()}. This action cannot be undone. Continue?`,
+                            type: 'danger',
+                            confirmText: 'Restore',
+                            cancelText: 'Cancel'
+                        }).then(confirmed => {
+                            if (!confirmed) return;
+
+                            state.data = backup.data;
+                            writeExcelFile().then(() => {
+                                showToast('Data restored successfully', 'success');
+                                renderAll();
+                            });
+                        });
+                    } catch (error) {
+                        showToast('Error restoring backup: ' + error.message, 'error');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        // --- KEYBOARD SHORTCUTS ---
+        document.addEventListener('keydown', (e) => {
+            // Ctrl/Cmd combinations
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case '1':
+                        e.preventDefault();
+                        switchTab('dashboard');
+                        break;
+                    case '2':
+                        e.preventDefault();
+                        switchTab('income');
+                        break;
+                    case '3':
+                        e.preventDefault();
+                        switchTab('expenses');
+                        break;
+                    case 'n':
+                        e.preventDefault();
+                        const activeTab = document.querySelector('.nav-tab.active')?.getAttribute('onclick');
+                        if (activeTab) {
+                            const match = activeTab.match(/'([^']+)'/);
+                            if (match) {
+                                const tab = match[1];
+                                if (tab === 'income') openModal('form', 'income');
+                                else if (tab === 'expenses') openModal('form', 'expense');
+                                else if (tab === 'receivables') openModal('form', 'receivable');
+                                else if (tab === 'payables') openModal('form', 'payable');
+                                else if (tab === 'plans') openModal('form', 'plan');
+                                else if (tab === 'budgets') openModal('form', 'budget');
+                            }
+                        }
+                        break;
+                    case 's':
+                        e.preventDefault();
+                        if (state.isConnected) {
+                            writeExcelFile().then(() => {
+                                showToast('Saved successfully', 'success');
+                            });
+                        }
+                        break;
+                    case 'f':
+                        e.preventDefault();
+                        const searchInput = document.getElementById('search-input');
+                        if (searchInput) searchInput.focus();
+                        break;
+                }
+            }
+            
+            // Escape key
+            if (e.key === 'Escape') {
+                const overlay = document.getElementById('modal-overlay');
+                if (overlay && overlay.classList.contains('active')) {
+                    closeModal();
+                }
+            }
+            
+            // Delete key for bulk delete
+            if (e.key === 'Delete' && selectedItems.size > 0) {
+                bulkDelete();
+            }
+        });
+
+        // Initialize settings on load
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadSettings);
+        } else {
+            loadSettings();
+        }
     </script>
 </body>
 
