@@ -25,6 +25,21 @@
             --border: #e2e8f0;
         }
 
+        [data-theme="dark"] {
+            --primary: #4299e1;
+            --primary-dark: #2b6cb0;
+            --success: #48bb78;
+            --danger: #f56565;
+            --warning: #ed8936;
+            --purple: #9f7aea;
+            --bg-grad-start: #1a202c;
+            --bg-grad-end: #2d3748;
+            --card-bg: #2d3748;
+            --text-main: #f7fafc;
+            --text-light: #a0aec0;
+            --border: #4a5568;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -870,9 +885,23 @@
             transition: background 0.2s;
         }
 
+        .desktop-only {
+            display: inline;
+        }
+
         @media (max-width: 768px) {
             .mobile-menu-button {
-                display: flex;
+                display: flex !important;
+            }
+            .desktop-only {
+                display: none;
+            }
+            .mobile-actions-menu {
+                display: block !important;
+            }
+            .action-buttons .btn-edit,
+            .action-buttons .btn-delete {
+                display: none !important;
             }
         }
 
@@ -1471,6 +1500,19 @@
                 <button class="btn btn-secondary" style="width: auto;" id="connect-btn" onclick="connectExcelFile()">
                     <svg width="16" height="16" viewBox="-0.08 0 1.28 1.28" xmlns="http://www.w3.org/2000/svg"><path d="M.103 0a.1.1 0 0 0-.101.102v1.077a.1.1 0 0 0 .101.101h.915a.1.1 0 0 0 .101-.101V.406L.742 0z" fill-rule="evenodd" clip-rule="evenodd" fill="#0c8fe8"/><g fill-rule="evenodd" clip-rule="evenodd"><path d="M1.12.407v.02H.864S.738.402.741.293c0 0 .004.114.12.114z" fill="#0973e2"/><path d="M.741 0v.291c0 .033.022.116.122.116h.256z" opacity=".5" fill="#fff"/></g><path d="M.565.712a.106.106 0 0 0-.151 0L.353.773a.11.11 0 0 0 0 .151.025.025 0 0 0 .035 0 .024.024 0 0 0 0-.035.06.06 0 0 1 0-.082L.45.746a.057.057 0 0 1 .081 0 .06.06 0 0 1 0 .081l-.029.03q.01.03.008.061L.566.862a.106.106 0 0 0 0-.151M.412.83a.025.025 0 0 0 0 .035.057.057 0 0 1 0 .081l-.061.061a.057.057 0 0 1-.081 0 .06.06 0 0 1 0-.081L.299.897A.14.14 0 0 1 .291.835L.235.891a.106.106 0 0 0 0 .151.11.11 0 0 0 .151 0L.448.98a.106.106 0 0 0 0-.151.025.025 0 0 0-.035 0" fill="#fff"/></svg>
                 </button>
+                <button class="btn btn-secondary" style="width: auto;" id="dark-mode-toggle" onclick="toggleDarkMode()" title="Toggle Dark Mode">
+                    <svg class="icon" id="dark-mode-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
             </div>
         </div>
     </header>
@@ -1492,6 +1534,14 @@
         <div class="nav-tab" onclick="switchTab('categories')">Categories</div>
         <div class="nav-tab" onclick="switchTab('reports')">Reports</div>
         <div class="nav-tab" onclick="switchTab('analytics')">Analytics</div>
+        <div class="nav-tab" onclick="switchTab('templates')">📋 Templates</div>
+        <div class="nav-tab" onclick="switchTab('accounts')">💳 Accounts</div>
+        <div class="nav-tab" onclick="switchTab('debts')">💸 Debts</div>
+        <div class="nav-tab" onclick="switchTab('goals')">🎯 Goals</div>
+        <div class="nav-tab" onclick="switchTab('recurring')">🔄 Recurring</div>
+        <div class="nav-tab" onclick="switchTab('calendar')">📅 Calendar</div>
+        <div class="nav-tab" onclick="switchTab('cashflow')">💰 Cash Flow</div>
+        <div class="nav-tab" onclick="switchTab('investments')">📈 Investments</div>
         <div class="nav-tab" onclick="switchTab('settings')">⚙️ Settings</div>
     </nav>
 
@@ -1536,6 +1586,67 @@
                 <div class="stat-card" style="border-color: #c53030;">
                     <div class="stat-label">Due Payables</div>
                     <div class="stat-value" id="dash-payables-total">৳0</div>
+                </div>
+            </div>
+
+            <!-- Quick Actions Widget -->
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <h2>⚡ Quick Actions</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                    <button class="btn btn-primary" onclick="openModal('income')" style="display: flex; align-items: center; gap: 0.5rem; justify-content: center;">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Add Income
+                    </button>
+                    <button class="btn" style="background: var(--danger); color: white;" onclick="openModal('expense')" style="display: flex; align-items: center; gap: 0.5rem; justify-content: center;">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Add Expense
+                    </button>
+                    <button class="btn" style="background: var(--warning); color: white;" onclick="openModal('receivable')" style="display: flex; align-items: center; gap: 0.5rem; justify-content: center;">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                        Add Receivable
+                    </button>
+                    <button class="btn" style="background: var(--purple); color: white;" onclick="openModal('payable')" style="display: flex; align-items: center; gap: 0.5rem; justify-content: center;">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                        Add Payable
+                    </button>
+                    <button class="btn" style="background: var(--success); color: white;" onclick="openModal('budget')" style="display: flex; align-items: center; gap: 0.5rem; justify-content: center;">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                        Add Budget
+                    </button>
+                    <button class="btn" style="background: var(--primary); color: white;" onclick="openModal('plan')" style="display: flex; align-items: center; gap: 0.5rem; justify-content: center;">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                        </svg>
+                        Add Plan
+                    </button>
+                </div>
+            </div>
+
+            <!-- Bill Reminders Widget -->
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <h2>📅 Upcoming Bills & Reminders</h2>
+                <div id="bill-reminders-content" style="margin-top: 1rem;">
+                    <div class="text-center" style="padding: 1rem; color: var(--text-light);">Loading reminders...</div>
                 </div>
             </div>
 
@@ -1821,6 +1932,96 @@
             </div>
         </div>
 
+        <!-- Templates View -->
+        <div id="view-templates" class="hidden">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h2>Transaction Templates</h2>
+                    <button class="btn btn-primary" onclick="openTemplateModal()">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Create Template
+                    </button>
+                </div>
+                <div id="templates-container"></div>
+            </div>
+        </div>
+
+        <!-- Accounts View -->
+        <div id="view-accounts" class="hidden">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h2>Account Management</h2>
+                    <button class="btn btn-primary" onclick="openAccountModal()">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Add Account
+                    </button>
+                </div>
+                <div id="accounts-container"></div>
+            </div>
+        </div>
+
+        <!-- Debts View -->
+        <div id="view-debts" class="hidden">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h2>Debt Tracker</h2>
+                    <button class="btn btn-primary" onclick="openDebtModal()">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Add Debt
+                    </button>
+                </div>
+                <div id="debts-container"></div>
+            </div>
+        </div>
+
+        <!-- Goals View -->
+        <div id="view-goals" class="hidden">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h2>Financial Goals</h2>
+                    <button class="btn btn-primary" onclick="openGoalModal()">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Add Goal
+                    </button>
+                </div>
+                <div id="goals-container"></div>
+            </div>
+        </div>
+
+        <!-- Recurring Transactions View -->
+        <div id="view-recurring" class="hidden">
+            <div class="card">
+                <h2>Recurring Transactions Manager</h2>
+                <div style="margin-bottom: 1rem; padding: 1rem; background: #f0f9ff; border-radius: 8px; border-left: 4px solid var(--primary);">
+                    <div style="font-weight: 600; margin-bottom: 0.5rem;">💡 Auto-Generate Recurring Transactions</div>
+                    <div style="font-size: 0.875rem; color: var(--text-light); margin-bottom: 0.75rem;">
+                        This will automatically create transactions for all recurring items based on their frequency and next due date.
+                    </div>
+                    <button class="btn btn-primary" onclick="generateRecurringTransactions()">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="23 4 23 10 17 10"></polyline>
+                            <polyline points="1 20 1 14 7 14"></polyline>
+                            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                        </svg>
+                        Generate Recurring Transactions
+                    </button>
+                </div>
+                <div id="recurring-container"></div>
+            </div>
+        </div>
+
         <!-- Settings View -->
         <div id="view-settings" class="hidden">
             <div class="card">
@@ -1898,6 +2099,13 @@
                             <div class="settings-description">Restore data from a backup file</div>
                         </div>
                         <button class="btn btn-secondary" onclick="restoreData()">Restore Backup</button>
+                    </div>
+                    <div class="settings-row">
+                        <div>
+                            <div class="settings-label">Undo Last Action</div>
+                            <div class="settings-description">Undo the last transaction (add/edit/delete)</div>
+                        </div>
+                        <button class="btn btn-secondary" onclick="undoLastAction()" id="undo-btn">Undo</button>
                     </div>
                 </div>
 
@@ -1983,7 +2191,16 @@
                 payables: [],
                 plans: [],
                 budgets: [],
-                categories: []
+                categories: [],
+                templates: [],
+                accounts: [],
+                tags: [],
+                transactionHistory: []
+            },
+            settings: {
+                darkMode: false,
+                currency: '৳',
+                dateFormat: 'YYYY-MM-DD'
             }
         };
 
@@ -2613,10 +2830,19 @@
                 state.data.plans = parseSheet('Plans', 'plans');
                 state.data.budgets = parseSheet('Budgets', 'budgets') || [];
                 state.data.categories = parseSheet('Categories', 'categories') || [];
+                state.data.templates = parseSheet('Templates', 'templates') || [];
+                state.data.accounts = parseSheet('Accounts', 'accounts') || [];
+                state.data.debts = parseSheet('Debts', 'debts') || [];
+                state.data.goals = parseSheet('Goals', 'goals') || [];
 
                 // Ensure arrays exist
                 if (!Array.isArray(state.data.budgets)) state.data.budgets = [];
                 if (!Array.isArray(state.data.categories)) state.data.categories = [];
+                if (!Array.isArray(state.data.templates)) state.data.templates = [];
+                if (!Array.isArray(state.data.accounts)) state.data.accounts = [];
+                if (!Array.isArray(state.data.debts)) state.data.debts = [];
+                if (!Array.isArray(state.data.goals)) state.data.goals = [];
+                if (!Array.isArray(state.data.transactionHistory)) state.data.transactionHistory = [];
 
             } catch (err) {
                 console.error('Error reading Excel file:', err);
@@ -2640,6 +2866,8 @@
                 const plansSheet = XLSX.utils.json_to_sheet(state.data.plans);
                 const budgetsSheet = XLSX.utils.json_to_sheet(state.data.budgets || []);
                 const categoriesSheet = XLSX.utils.json_to_sheet(state.data.categories || []);
+                const templatesSheet = XLSX.utils.json_to_sheet(state.data.templates || []);
+                const accountsSheet = XLSX.utils.json_to_sheet(state.data.accounts || []);
 
                 // Append sheets
                 XLSX.utils.book_append_sheet(wb, incomeSheet, "Income");
@@ -2649,6 +2877,8 @@
                 XLSX.utils.book_append_sheet(wb, plansSheet, "Plans");
                 XLSX.utils.book_append_sheet(wb, budgetsSheet, "Budgets");
                 XLSX.utils.book_append_sheet(wb, categoriesSheet, "Categories");
+                XLSX.utils.book_append_sheet(wb, templatesSheet, "Templates");
+                XLSX.utils.book_append_sheet(wb, accountsSheet, "Accounts");
 
                 // Write to file
                 const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
@@ -2810,6 +3040,14 @@
             document.getElementById('view-reports')?.classList.add('hidden');
             document.getElementById('view-analytics')?.classList.add('hidden');
             document.getElementById('view-categories')?.classList.add('hidden');
+            document.getElementById('view-templates')?.classList.add('hidden');
+            document.getElementById('view-accounts')?.classList.add('hidden');
+            document.getElementById('view-debts')?.classList.add('hidden');
+            document.getElementById('view-goals')?.classList.add('hidden');
+            document.getElementById('view-recurring')?.classList.add('hidden');
+            document.getElementById('view-calendar')?.classList.add('hidden');
+            document.getElementById('view-cashflow')?.classList.add('hidden');
+            document.getElementById('view-investments')?.classList.add('hidden');
             document.getElementById('view-settings')?.classList.add('hidden');
 
             // Show selected view
@@ -2834,6 +3072,30 @@
             } else if (tabId === 'categories') {
                 document.getElementById('view-categories').classList.remove('hidden');
                 renderCategoriesList();
+            } else if (tabId === 'templates') {
+                document.getElementById('view-templates').classList.remove('hidden');
+                renderTemplatesList();
+            } else if (tabId === 'accounts') {
+                document.getElementById('view-accounts').classList.remove('hidden');
+                renderAccountsList();
+            } else if (tabId === 'debts') {
+                document.getElementById('view-debts').classList.remove('hidden');
+                renderDebtsList();
+            } else if (tabId === 'goals') {
+                document.getElementById('view-goals').classList.remove('hidden');
+                renderGoalsList();
+            } else if (tabId === 'recurring') {
+                document.getElementById('view-recurring').classList.remove('hidden');
+                renderRecurringList();
+            } else if (tabId === 'calendar') {
+                document.getElementById('view-calendar').classList.remove('hidden');
+                renderFinancialCalendar();
+            } else if (tabId === 'cashflow') {
+                document.getElementById('view-cashflow').classList.remove('hidden');
+                renderCashFlow();
+            } else if (tabId === 'investments') {
+                document.getElementById('view-investments').classList.remove('hidden');
+                renderInvestmentsList();
             } else {
                 document.getElementById('view-list').classList.remove('hidden');
                 renderListTable(tabId);
@@ -2841,6 +3103,20 @@
         }
 
         function renderAll() {
+            // Save current filter state if on a list view
+            let savedFilterState = null;
+            if (currentListType && document.getElementById('view-list') && !document.getElementById('view-list').classList.contains('hidden')) {
+                savedFilterState = {
+                    searchTerm: document.getElementById('search-input')?.value || '',
+                    categoryFilter: document.getElementById('category-filter')?.value || '',
+                    dateFrom: document.getElementById('date-from-filter')?.value || '',
+                    dateTo: document.getElementById('date-to-filter')?.value || '',
+                    recurringFilter: document.getElementById('recurring-filter')?.value || '',
+                    sortBy: document.getElementById('sort-by')?.value || '',
+                    listType: currentListType
+                };
+            }
+
             // Determine current tab and render it specifically
             const activeTab = document.querySelector('.nav-tab.active');
             if (activeTab) {
@@ -2849,6 +3125,28 @@
                 else switchTab(activeTab.getAttribute('onclick').match(/'([^']+)'/)[1]);
             } else {
                 switchTab('dashboard');
+            }
+
+            // Restore filter state if we were on a list view
+            if (savedFilterState && savedFilterState.listType === currentListType) {
+                setTimeout(() => {
+                    const searchInput = document.getElementById('search-input');
+                    const categoryFilter = document.getElementById('category-filter');
+                    const dateFromFilter = document.getElementById('date-from-filter');
+                    const dateToFilter = document.getElementById('date-to-filter');
+                    const recurringFilter = document.getElementById('recurring-filter');
+                    const sortBy = document.getElementById('sort-by');
+
+                    if (searchInput) searchInput.value = savedFilterState.searchTerm;
+                    if (categoryFilter) categoryFilter.value = savedFilterState.categoryFilter;
+                    if (dateFromFilter) dateFromFilter.value = savedFilterState.dateFrom;
+                    if (dateToFilter) dateToFilter.value = savedFilterState.dateTo;
+                    if (recurringFilter) recurringFilter.value = savedFilterState.recurringFilter;
+                    if (sortBy) sortBy.value = savedFilterState.sortBy;
+
+                    // Reapply filters
+                    applyFilters();
+                }, 100);
             }
         }
 
@@ -2913,6 +3211,9 @@
 
             // Render Charts
             renderCharts();
+
+            // Render Bill Reminders
+            renderBillReminders();
 
             // Render Dashboard Lists (Top 5)
             const renderSmallList = (items, containerId, type) => {
@@ -3196,14 +3497,15 @@
             // Top spending category
             const expenseCategories = getCategoryData('expenses');
             const topCategory = expenseCategories.labels.length > 0 ? expenseCategories.labels[0] : '-';
-            const topCategoryAmount = expenseCategories.values.length > 0 ? expenseCategories.values[0] : 0;
-            const topCatEl = document.getElementById('top-category');
-            if (topCatEl) topCatEl.textContent = topCategory;
-            const topCatAmountEl = document.getElementById('top-category-amount');
-            if (topCatAmountEl) topCatAmountEl.textContent = topCategoryAmount > 0 ? formatCurrency(topCategoryAmount) : '-';
+            const topCategoryEl = document.getElementById('top-category');
+            if (topCategoryEl) topCategoryEl.textContent = topCategory;
+            const topCategoryAmountEl = document.getElementById('top-category-amount');
+            if (topCategoryAmountEl && expenseCategories.labels.length > 0) {
+                topCategoryAmountEl.textContent = formatCurrency(expenseCategories.data[0]);
+            }
 
             // Average transaction size
-            const totalTransactions = state.data.expenses.length + state.data.income.length;
+            const totalTransactions = state.data.income.length + state.data.expenses.length;
             const avgTransaction = totalTransactions > 0
                 ? (totalIncome + totalExpenses) / totalTransactions
                 : 0;
@@ -3255,6 +3557,218 @@
 
             // Calculate Financial Health Score
             calculateFinancialHealth(totalIncome, totalExpenses, avgMonthlyIncome, avgMonthlyExpense);
+        }
+
+        // Dark Mode Toggle
+        function toggleDarkMode() {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            if (isDark) {
+                document.documentElement.removeAttribute('data-theme');
+                state.settings.darkMode = false;
+            } else {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                state.settings.darkMode = true;
+            }
+            updateDarkModeIcon();
+            saveSettingsToStorage();
+        }
+
+        function updateDarkModeIcon() {
+            const icon = document.getElementById('dark-mode-icon');
+            if (!icon) return;
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            if (isDark) {
+                icon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+            } else {
+                icon.innerHTML = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
+            }
+        }
+
+        function saveSettingsToStorage() {
+            try {
+                localStorage.setItem('financeManagerSettings', JSON.stringify(state.settings));
+            } catch (e) {
+                console.error('Error saving settings:', e);
+            }
+        }
+
+        function loadSettingsFromStorage() {
+            try {
+                const saved = localStorage.getItem('financeManagerSettings');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    state.settings = { ...state.settings, ...parsed };
+                    if (state.settings.darkMode) {
+                        document.documentElement.setAttribute('data-theme', 'dark');
+                    }
+                    updateDarkModeIcon();
+                }
+            } catch (e) {
+                console.error('Error loading settings:', e);
+            }
+        }
+
+        // Bill Reminders Widget
+        function renderBillReminders() {
+            const container = document.getElementById('bill-reminders-content');
+            if (!container) return;
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const nextWeek = new Date(today);
+            nextWeek.setDate(today.getDate() + 7);
+
+            // Get upcoming unpaid payables and receivables
+            const upcomingBills = [
+                ...state.data.payables.filter(item => {
+                    if ((item.status || 'unpaid') === 'paid') return false;
+                    if (!item.dueDate) return false;
+                    const due = new Date(item.dueDate);
+                    due.setHours(0, 0, 0, 0);
+                    return due >= today && due <= nextWeek;
+                }).map(item => ({ ...item, type: 'payable', label: 'Payable' })),
+                ...state.data.receivables.filter(item => {
+                    if ((item.status || 'unpaid') === 'paid') return false;
+                    if (!item.dueDate) return false;
+                    const due = new Date(item.dueDate);
+                    due.setHours(0, 0, 0, 0);
+                    return due >= today && due <= nextWeek;
+                }).map(item => ({ ...item, type: 'receivable', label: 'Receivable' }))
+            ].sort((a, b) => {
+                const dateA = new Date(a.dueDate);
+                const dateB = new Date(b.dueDate);
+                return dateA - dateB;
+            });
+
+            if (upcomingBills.length === 0) {
+                container.innerHTML = '<div class="text-center" style="padding: 1rem; color: var(--text-light);">No upcoming bills in the next 7 days.</div>';
+                return;
+            }
+
+            container.innerHTML = upcomingBills.map(bill => {
+                const dueDate = new Date(bill.dueDate);
+                const daysUntil = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+                const isToday = daysUntil === 0;
+                const isTomorrow = daysUntil === 1;
+                const daysText = isToday ? 'Today' : isTomorrow ? 'Tomorrow' : `In ${daysUntil} days`;
+                const priority = bill.priority || 'medium';
+                const priorityColor = priority === 'high' ? 'var(--danger)' : priority === 'medium' ? 'var(--warning)' : 'var(--success)';
+                
+                return `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: var(--card-bg); border-radius: 8px; margin-bottom: 0.5rem; border-left: 3px solid ${priorityColor};">
+                        <div style="flex: 1;">
+                            <div style="font-weight: 600; margin-bottom: 0.25rem;">${bill.to || bill.from || 'Unknown'}</div>
+                            <div style="font-size: 0.875rem; color: var(--text-light);">
+                                ${bill.description || 'No description'} • ${bill.label}
+                            </div>
+                            <div style="font-size: 0.75rem; color: var(--text-light); margin-top: 0.25rem;">
+                                Due: ${bill.dueDate} (${daysText})
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-weight: bold; font-size: 1.1rem; color: ${bill.type === 'payable' ? 'var(--danger)' : 'var(--success)'};">
+                                ${formatCurrency(bill.amount)}
+                            </div>
+                            <button class="btn btn-sm" style="margin-top: 0.5rem; padding: 0.25rem 0.5rem; font-size: 0.75rem;" onclick="editItem('${bill.type === 'payable' ? 'payables' : 'receivables'}', ${state.data[bill.type === 'payable' ? 'payables' : 'receivables'].indexOf(bill)})">
+                                View
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Budget Alerts Widget
+        function renderBudgetAlerts() {
+            const alertsContainer = document.getElementById('dashboard-alerts');
+            if (!alertsContainer) return;
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            const filterExpensesByPeriod = (expenses, periodType) => {
+                return expenses.filter(exp => {
+                    if (!exp.date) return false;
+                    const expDate = new Date(exp.date);
+                    expDate.setHours(0, 0, 0, 0);
+                    
+                    switch(periodType) {
+                        case 'daily':
+                            return expDate.getTime() === today.getTime();
+                        case 'monthly':
+                            return expDate.getMonth() === today.getMonth() && 
+                                   expDate.getFullYear() === today.getFullYear();
+                        case 'per 3 month':
+                            const threeMonthsAgo = new Date(today);
+                            threeMonthsAgo.setMonth(today.getMonth() - 3);
+                            return expDate >= threeMonthsAgo && expDate <= today;
+                        case 'per 6 month':
+                            const sixMonthsAgo = new Date(today);
+                            sixMonthsAgo.setMonth(today.getMonth() - 6);
+                            return expDate >= sixMonthsAgo && expDate <= today;
+                        case 'yearly':
+                            return expDate.getFullYear() === today.getFullYear();
+                        default:
+                            return true;
+                    }
+                });
+            };
+
+            const budgets = state.data.budgets || [];
+            const budgetAlerts = [];
+
+            budgets.forEach(budget => {
+                const category = budget.category;
+                const budgetAmount = Number(budget.amount || 0);
+                const period = budget.period || 'monthly';
+                
+                const periodExpenses = filterExpensesByPeriod(
+                    state.data.expenses.filter(exp => exp.category === category),
+                    period
+                );
+                const actualSpending = periodExpenses.reduce((sum, exp) => sum + Number(exp.amount || 0), 0);
+                const percentUsed = budgetAmount > 0 ? (actualSpending / budgetAmount) * 100 : 0;
+                const remaining = budgetAmount - actualSpending;
+
+                // Alert if over 80% used or over budget
+                if (percentUsed >= 80 || actualSpending > budgetAmount) {
+                    budgetAlerts.push({
+                        category: category,
+                        period: period,
+                        budgetAmount: budgetAmount,
+                        actualSpending: actualSpending,
+                        percentUsed: percentUsed,
+                        remaining: remaining,
+                        isOverBudget: actualSpending > budgetAmount
+                    });
+                }
+            });
+
+            if (budgetAlerts.length > 0) {
+                const existingAlerts = alertsContainer.querySelectorAll('.alert');
+                const budgetAlertDiv = document.createElement('div');
+                budgetAlertDiv.className = 'alert alert-warning';
+                budgetAlertDiv.style.marginBottom = '1rem';
+                budgetAlertDiv.innerHTML = `
+                    <div style="display: flex; align-items: start; gap: 1rem;">
+                        <div style="font-size: 1.5rem;">⚠️</div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 600; margin-bottom: 0.5rem;">Budget Alerts</div>
+                            ${budgetAlerts.map(alert => `
+                                <div style="margin-bottom: 0.5rem; padding: 0.5rem; background: rgba(255,255,255,0.5); border-radius: 4px;">
+                                    <strong>${alert.category}</strong> (${alert.period}): 
+                                    ${alert.isOverBudget 
+                                        ? `<span style="color: var(--danger);">Over budget by ${formatCurrency(Math.abs(alert.remaining))}</span>` 
+                                        : `<span style="color: var(--warning);">${Math.round(alert.percentUsed)}% used, ${formatCurrency(alert.remaining)} remaining</span>`
+                                    }
+                                </div>
+                            `).join('')}
+                            <button class="btn btn-sm" style="margin-top: 0.5rem;" onclick="switchTab('budgets')">View Budgets</button>
+                        </div>
+                    </div>
+                `;
+                alertsContainer.insertBefore(budgetAlertDiv, alertsContainer.firstChild);
+            }
         }
 
         function calculateFinancialHealth(totalIncome, totalExpenses, avgMonthlyIncome, avgMonthlyExpense) {
@@ -4262,21 +4776,46 @@
                             </div>
                             ${plan.notes ? `<div style="font-size: 0.875rem; color: var(--text-light); margin-top: 0.25rem; font-style: italic;">${plan.notes}</div>` : ''}
                         </div>
-                        <div class="action-buttons">
+                        <div class="action-buttons" style="position: relative;">
                             <button class="btn-edit" onclick="editItem('plans', ${index})">
                                 <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                                 </svg>
-                                Edit
+                                <span class="desktop-only">Edit</span>
                             </button>
                             <button class="btn-delete" onclick="deleteItem('plans', ${index})">
                                 <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <polyline points="3 6 5 6 21 6"></polyline>
                                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                                 </svg>
-                                Delete
+                                <span class="desktop-only">Delete</span>
                             </button>
+                            <div class="mobile-actions-menu" style="display: none;">
+                                <button class="mobile-menu-button" onclick="toggleMobileMenu(event)" title="Actions">
+                                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="12" cy="12" r="1"></circle>
+                                        <circle cx="12" cy="5" r="1"></circle>
+                                        <circle cx="12" cy="19" r="1"></circle>
+                                    </svg>
+                                </button>
+                                <div class="mobile-menu-dropdown" id="menu-plan-${index}">
+                                    <button class="mobile-menu-item" onclick="editItem('plans', ${index}); closeMobileMenu(event);">
+                                        <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                        </svg>
+                                        Edit
+                                    </button>
+                                    <button class="mobile-menu-item delete" onclick="deleteItem('plans', ${index}); closeMobileMenu(event);">
+                                        <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="3 6 5 6 21 6"></polyline>
+                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                        </svg>
+                                        Delete
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div style="font-size: 0.875rem; color: var(--text-light); margin-bottom: 0.5rem;">
@@ -4381,21 +4920,46 @@
                             <div class="budget-category">${category}</div>
                             <div style="font-size: 0.75rem; color: var(--text-light); margin-top: 0.25rem;">Period: ${periodLabel}</div>
                         </div>
-                        <div class="action-buttons">
+                        <div class="action-buttons" style="position: relative;">
                             <button class="btn-edit" onclick="editItem('budgets', ${index})">
                                 <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                                 </svg>
-                                Edit
+                                <span class="desktop-only">Edit</span>
                             </button>
                             <button class="btn-delete" onclick="deleteItem('budgets', ${index})">
                                 <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <polyline points="3 6 5 6 21 6"></polyline>
                                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                                 </svg>
-                                Delete
+                                <span class="desktop-only">Delete</span>
                             </button>
+                            <div class="mobile-actions-menu" style="display: none;">
+                                <button class="mobile-menu-button" onclick="toggleMobileMenu(event)" title="Actions">
+                                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="12" cy="12" r="1"></circle>
+                                        <circle cx="12" cy="5" r="1"></circle>
+                                        <circle cx="12" cy="19" r="1"></circle>
+                                    </svg>
+                                </button>
+                                <div class="mobile-menu-dropdown" id="menu-budget-${index}">
+                                    <button class="mobile-menu-item" onclick="editItem('budgets', ${index}); closeMobileMenu(event);">
+                                        <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                        </svg>
+                                        Edit
+                                    </button>
+                                    <button class="mobile-menu-item delete" onclick="deleteItem('budgets', ${index}); closeMobileMenu(event);">
+                                        <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="3 6 5 6 21 6"></polyline>
+                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                        </svg>
+                                        Delete
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
@@ -5560,6 +6124,20 @@
 
             const isEditing = editingIndex !== null;
 
+            // Save to transaction history before making changes
+            if (!state.data.transactionHistory) state.data.transactionHistory = [];
+            const historyEntry = {
+                timestamp: new Date().toISOString(),
+                action: isEditing ? 'edit' : 'add',
+                type: type,
+                data: isEditing ? JSON.parse(JSON.stringify(state.data[type][editingIndex])) : null
+            };
+            state.data.transactionHistory.push(historyEntry);
+            // Keep only last 50 history entries
+            if (state.data.transactionHistory.length > 50) {
+                state.data.transactionHistory.shift();
+            }
+
             // Validation helper
             const validateRequired = (value, fieldName) => {
                 if (!value || value.trim() === '') {
@@ -6056,6 +6634,1418 @@
             input.click();
         }
 
+        // --- TEMPLATES MANAGEMENT ---
+        function renderTemplatesList() {
+            const container = document.getElementById('templates-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const templates = state.data.templates || [];
+            if (templates.length === 0) {
+                container.innerHTML = '<div class="text-center" style="padding: 2rem; color: var(--text-light);">No templates created. Create one to quickly add common transactions.</div>';
+                return;
+            }
+
+            templates.forEach((template, index) => {
+                const div = document.createElement('div');
+                div.className = 'card';
+                div.style.marginBottom = '1rem';
+                div.style.padding = '1rem';
+                const typeLabel = template.type === 'income' ? 'Income' : template.type === 'expense' ? 'Expense' : template.type === 'receivable' ? 'Receivable' : 'Payable';
+                const typeColor = template.type === 'income' ? 'var(--success)' : template.type === 'expense' ? 'var(--danger)' : template.type === 'receivable' ? 'var(--warning)' : 'var(--purple)';
+                
+                div.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap; gap: 1rem;">
+                        <div style="flex: 1;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                <h3 style="margin: 0; font-size: 1.1rem;">${template.name || 'Untitled Template'}</h3>
+                                <span style="background: ${typeColor}; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 500;">${typeLabel}</span>
+                            </div>
+                            <div style="color: var(--text-light); font-size: 0.875rem; margin-bottom: 0.5rem;">
+                                <div><strong>Amount:</strong> ${formatCurrency(template.amount || 0)}</div>
+                                ${template.category ? `<div><strong>Category:</strong> ${template.category}</div>` : ''}
+                                ${template.description ? `<div><strong>Description:</strong> ${template.description}</div>` : ''}
+                                ${template.paymentMethod ? `<div><strong>Payment Method:</strong> ${template.paymentMethod}</div>` : ''}
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn btn-primary" onclick="useTemplate(${index})" style="font-size: 0.875rem;">
+                                Use Template
+                            </button>
+                            <button class="btn-edit" onclick="editTemplate(${index})">
+                                <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                </svg>
+                            </button>
+                            <button class="btn-delete" onclick="deleteTemplate(${index})">
+                                <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function openTemplateModal(templateIndex = null) {
+            const template = templateIndex !== null ? state.data.templates[templateIndex] : null;
+            const modal = document.getElementById('modal');
+            const modalTitle = document.getElementById('modal-title');
+            modalTitle.textContent = template ? 'Edit Template' : 'Create Template';
+            
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 id="modal-title">${template ? 'Edit Template' : 'Create Template'}</h2>
+                        <button class="modal-close" onclick="closeModal()">×</button>
+                    </div>
+                    <form id="template-form" onsubmit="saveTemplate(event, ${templateIndex})">
+                        <div class="form-group">
+                            <label class="form-label">Template Name *</label>
+                            <input type="text" class="form-input" id="template-name" required value="${template?.name || ''}" placeholder="e.g. Monthly Salary">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Transaction Type *</label>
+                            <select class="form-input" id="template-type" required>
+                                <option value="income" ${template?.type === 'income' ? 'selected' : ''}>Income</option>
+                                <option value="expense" ${template?.type === 'expense' ? 'selected' : ''}>Expense</option>
+                                <option value="receivable" ${template?.type === 'receivable' ? 'selected' : ''}>Receivable</option>
+                                <option value="payable" ${template?.type === 'payable' ? 'selected' : ''}>Payable</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Amount *</label>
+                            <input type="number" class="form-input" id="template-amount" required step="0.01" value="${template?.amount || ''}" placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Category</label>
+                            <input type="text" class="form-input" id="template-category" value="${template?.category || ''}" placeholder="e.g. Salary, Groceries">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-input" id="template-description" rows="3" placeholder="Optional description">${template?.description || ''}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Payment Method</label>
+                            <select class="form-input" id="template-payment-method">
+                                <option value="">Select Method</option>
+                                <option value="Cash" ${template?.paymentMethod === 'Cash' ? 'selected' : ''}>Cash</option>
+                                <option value="Bank Transfer" ${template?.paymentMethod === 'Bank Transfer' ? 'selected' : ''}>Bank Transfer</option>
+                                <option value="Card" ${template?.paymentMethod === 'Card' ? 'selected' : ''}>Card</option>
+                                <option value="Mobile Payment" ${template?.paymentMethod === 'Mobile Payment' ? 'selected' : ''}>Mobile Payment</option>
+                                <option value="Other" ${template?.paymentMethod === 'Other' ? 'selected' : ''}>Other</option>
+                            </select>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                            <button type="submit" class="btn btn-primary">${template ? 'Update' : 'Create'} Template</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            modal.classList.add('show');
+        }
+
+        function saveTemplate(event, templateIndex) {
+            event.preventDefault();
+            if (!state.data.templates) state.data.templates = [];
+            
+            const template = {
+                name: document.getElementById('template-name').value,
+                type: document.getElementById('template-type').value,
+                amount: document.getElementById('template-amount').value,
+                category: document.getElementById('template-category').value,
+                description: document.getElementById('template-description').value,
+                paymentMethod: document.getElementById('template-payment-method').value
+            };
+
+            if (templateIndex !== null) {
+                state.data.templates[templateIndex] = template;
+            } else {
+                state.data.templates.push(template);
+            }
+
+            writeExcelFile().then(() => {
+                renderTemplatesList();
+                closeModal();
+                showToast(`Template ${templateIndex !== null ? 'updated' : 'created'} successfully`, 'success');
+            });
+        }
+
+        function useTemplate(templateIndex) {
+            const template = state.data.templates[templateIndex];
+            if (!template) return;
+            
+            openModal('form', template.type);
+            // Wait for modal to render, then fill in values
+            setTimeout(() => {
+                const amountInput = document.getElementById('inp-amount');
+                const categoryInput = document.getElementById('inp-category') || document.getElementById('inp-source');
+                const descriptionInput = document.getElementById('inp-description') || document.getElementById('inp-notes');
+                const paymentMethodInput = document.getElementById('inp-payment-method');
+                
+                if (amountInput) amountInput.value = template.amount;
+                if (categoryInput) categoryInput.value = template.category;
+                if (descriptionInput) descriptionInput.value = template.description;
+                if (paymentMethodInput) paymentMethodInput.value = template.paymentMethod;
+            }, 100);
+        }
+
+        function editTemplate(templateIndex) {
+            openTemplateModal(templateIndex);
+        }
+
+        function deleteTemplate(templateIndex) {
+            showConfirmModal({
+                title: 'Delete Template',
+                message: 'Are you sure you want to delete this template?',
+                type: 'danger'
+            }).then(confirmed => {
+                if (!confirmed) return;
+                state.data.templates.splice(templateIndex, 1);
+                writeExcelFile().then(() => {
+                    renderTemplatesList();
+                    showToast('Template deleted successfully', 'success');
+                });
+            });
+        }
+
+        // --- ACCOUNTS MANAGEMENT ---
+        function renderAccountsList() {
+            const container = document.getElementById('accounts-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const accounts = state.data.accounts || [];
+            if (accounts.length === 0) {
+                container.innerHTML = '<div class="text-center" style="padding: 2rem; color: var(--text-light);">No accounts added. Add an account to track balances across different sources.</div>';
+                return;
+            }
+
+            // Calculate balances for each account
+            accounts.forEach((account, index) => {
+                const div = document.createElement('div');
+                div.className = 'card';
+                div.style.marginBottom = '1rem';
+                div.style.padding = '1.5rem';
+                
+                // Calculate account balance from transactions
+                let balance = Number(account.initialBalance || 0);
+                state.data.income.forEach(item => {
+                    if (item.account === account.name) balance += Number(item.amount || 0);
+                });
+                state.data.expenses.forEach(item => {
+                    if (item.account === account.name) balance -= Number(item.amount || 0);
+                });
+
+                const typeColors = {
+                    'Cash': 'var(--success)',
+                    'Bank': 'var(--primary)',
+                    'Credit Card': 'var(--danger)',
+                    'Savings': 'var(--purple)',
+                    'Investment': 'var(--warning)'
+                };
+                const typeColor = typeColors[account.type] || 'var(--text-light)';
+
+                div.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap; gap: 1rem;">
+                        <div style="flex: 1;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                <h3 style="margin: 0; font-size: 1.2rem;">${account.name || 'Unnamed Account'}</h3>
+                                <span style="background: ${typeColor}; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 500;">${account.type || 'Other'}</span>
+                            </div>
+                            <div style="color: var(--text-light); font-size: 0.875rem; margin-bottom: 0.75rem;">
+                                ${account.description || 'No description'}
+                            </div>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+                                <div>
+                                    <div style="font-size: 0.75rem; color: var(--text-light);">Current Balance</div>
+                                    <div style="font-size: 1.5rem; font-weight: bold; color: ${balance >= 0 ? 'var(--success)' : 'var(--danger)'};">
+                                        ${formatCurrency(balance)}
+                                    </div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 0.75rem; color: var(--text-light);">Initial Balance</div>
+                                    <div style="font-size: 1.1rem; font-weight: 600;">
+                                        ${formatCurrency(account.initialBalance || 0)}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn-edit" onclick="editAccount(${index})">
+                                <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                </svg>
+                            </button>
+                            <button class="btn-delete" onclick="deleteAccount(${index})">
+                                <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function openAccountModal(accountIndex = null) {
+            const account = accountIndex !== null ? state.data.accounts[accountIndex] : null;
+            const modal = document.getElementById('modal');
+            const modalTitle = document.getElementById('modal-title');
+            modalTitle.textContent = account ? 'Edit Account' : 'Add Account';
+            
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 id="modal-title">${account ? 'Edit Account' : 'Add Account'}</h2>
+                        <button class="modal-close" onclick="closeModal()">×</button>
+                    </div>
+                    <form id="account-form" onsubmit="saveAccount(event, ${accountIndex})">
+                        <div class="form-group">
+                            <label class="form-label">Account Name *</label>
+                            <input type="text" class="form-input" id="account-name" required value="${account?.name || ''}" placeholder="e.g. Main Bank Account">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Account Type *</label>
+                            <select class="form-input" id="account-type" required>
+                                <option value="Cash" ${account?.type === 'Cash' ? 'selected' : ''}>Cash</option>
+                                <option value="Bank" ${account?.type === 'Bank' ? 'selected' : ''}>Bank</option>
+                                <option value="Credit Card" ${account?.type === 'Credit Card' ? 'selected' : ''}>Credit Card</option>
+                                <option value="Savings" ${account?.type === 'Savings' ? 'selected' : ''}>Savings</option>
+                                <option value="Investment" ${account?.type === 'Investment' ? 'selected' : ''}>Investment</option>
+                                <option value="Other" ${account?.type === 'Other' ? 'selected' : ''}>Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Initial Balance</label>
+                            <input type="number" class="form-input" id="account-balance" step="0.01" value="${account?.initialBalance || 0}" placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-input" id="account-description" rows="3" placeholder="Optional description">${account?.description || ''}</textarea>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                            <button type="submit" class="btn btn-primary">${account ? 'Update' : 'Add'} Account</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            modal.classList.add('show');
+        }
+
+        function saveAccount(event, accountIndex) {
+            event.preventDefault();
+            if (!state.data.accounts) state.data.accounts = [];
+            
+            const account = {
+                name: document.getElementById('account-name').value,
+                type: document.getElementById('account-type').value,
+                initialBalance: Number(document.getElementById('account-balance').value) || 0,
+                description: document.getElementById('account-description').value
+            };
+
+            if (accountIndex !== null) {
+                state.data.accounts[accountIndex] = account;
+            } else {
+                state.data.accounts.push(account);
+            }
+
+            writeExcelFile().then(() => {
+                renderAccountsList();
+                closeModal();
+                showToast(`Account ${accountIndex !== null ? 'updated' : 'added'} successfully`, 'success');
+            });
+        }
+
+        function editAccount(accountIndex) {
+            openAccountModal(accountIndex);
+        }
+
+        function deleteAccount(accountIndex) {
+            showConfirmModal({
+                title: 'Delete Account',
+                message: 'Are you sure you want to delete this account? This will not delete transactions associated with it.',
+                type: 'danger'
+            }).then(confirmed => {
+                if (!confirmed) return;
+                state.data.accounts.splice(accountIndex, 1);
+                writeExcelFile().then(() => {
+                    renderAccountsList();
+                    showToast('Account deleted successfully', 'success');
+                });
+            });
+        }
+
+        // Undo Last Action
+        function undoLastAction() {
+            if (!state.data.transactionHistory || state.data.transactionHistory.length === 0) {
+                showToast('No actions to undo', 'warning');
+                return;
+            }
+
+            const lastAction = state.data.transactionHistory.pop();
+            
+            if (lastAction.action === 'delete') {
+                // Restore deleted item
+                if (lastAction.data && lastAction.index !== undefined) {
+                    state.data[lastAction.type].splice(lastAction.index, 0, lastAction.data);
+                    writeExcelFile().then(() => {
+                        showToast('Last deletion undone', 'success');
+                        renderAll();
+                    });
+                }
+            } else if (lastAction.action === 'edit') {
+                // Restore previous version
+                if (lastAction.data && lastAction.index !== undefined) {
+                    state.data[lastAction.type][lastAction.index] = lastAction.data;
+                    writeExcelFile().then(() => {
+                        showToast('Last edit undone', 'success');
+                        renderAll();
+                    });
+                }
+            } else if (lastAction.action === 'add') {
+                // Remove last added item
+                if (state.data[lastAction.type].length > 0) {
+                    state.data[lastAction.type].pop();
+                    writeExcelFile().then(() => {
+                        showToast('Last addition undone', 'success');
+                        renderAll();
+                    });
+                }
+            }
+        }
+
+        // --- DEBT TRACKER ---
+        function renderDebtsList() {
+            const container = document.getElementById('debts-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const debts = state.data.debts || [];
+            if (debts.length === 0) {
+                container.innerHTML = '<div class="text-center" style="padding: 2rem; color: var(--text-light);">No debts tracked. Add a debt to start tracking.</div>';
+                return;
+            }
+
+            let totalDebt = 0;
+            debts.forEach((debt, index) => {
+                const div = document.createElement('div');
+                div.className = 'card';
+                div.style.marginBottom = '1rem';
+                div.style.padding = '1.5rem';
+                
+                const principal = Number(debt.principal || 0);
+                const paid = Number(debt.paid || 0);
+                const remaining = principal - paid;
+                totalDebt += remaining;
+                const percentPaid = principal > 0 ? (paid / principal) * 100 : 0;
+
+                div.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap; gap: 1rem;">
+                        <div style="flex: 1;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                <h3 style="margin: 0; font-size: 1.2rem;">${debt.name || 'Unnamed Debt'}</h3>
+                                <span style="background: ${debt.type === 'Loan' ? 'var(--primary)' : 'var(--danger)'}; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 500;">${debt.type || 'Debt'}</span>
+                            </div>
+                            <div style="color: var(--text-light); font-size: 0.875rem; margin-bottom: 0.75rem;">
+                                ${debt.description || 'No description'} ${debt.creditor ? `• Creditor: ${debt.creditor}` : ''}
+                            </div>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                                <div>
+                                    <div style="font-size: 0.75rem; color: var(--text-light);">Principal</div>
+                                    <div style="font-size: 1.2rem; font-weight: bold;">${formatCurrency(principal)}</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 0.75rem; color: var(--text-light);">Paid</div>
+                                    <div style="font-size: 1.2rem; font-weight: bold; color: var(--success);">${formatCurrency(paid)}</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 0.75rem; color: var(--text-light);">Remaining</div>
+                                    <div style="font-size: 1.2rem; font-weight: bold; color: var(--danger);">${formatCurrency(remaining)}</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 0.75rem; color: var(--text-light);">Progress</div>
+                                    <div style="font-size: 1.2rem; font-weight: bold;">${Math.round(percentPaid)}%</div>
+                                </div>
+                            </div>
+                            <div class="progress-track" style="margin-bottom: 0.5rem;">
+                                <div class="progress-fill" style="width: ${Math.min(100, percentPaid)}%; background: var(--success);"></div>
+                            </div>
+                            ${debt.dueDate ? `<div style="font-size: 0.75rem; color: var(--text-light);">Due Date: ${debt.dueDate}</div>` : ''}
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn btn-primary" onclick="makePayment(${index})" style="font-size: 0.875rem;">
+                                Record Payment
+                            </button>
+                            <button class="btn-edit" onclick="editDebt(${index})">
+                                <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                </svg>
+                            </button>
+                            <button class="btn-delete" onclick="deleteDebt(${index})">
+                                <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+
+            // Add summary
+            const summaryDiv = document.createElement('div');
+            summaryDiv.className = 'card';
+            summaryDiv.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;';
+            summaryDiv.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div style="font-size: 0.875rem; opacity: 0.9; margin-bottom: 0.5rem;">Total Debt Remaining</div>
+                        <div style="font-size: 2rem; font-weight: bold;">${formatCurrency(totalDebt)}</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-size: 0.875rem; opacity: 0.9; margin-bottom: 0.5rem;">Total Debts</div>
+                        <div style="font-size: 1.5rem; font-weight: bold;">${debts.length}</div>
+                    </div>
+                </div>
+            `;
+            container.insertBefore(summaryDiv, container.firstChild);
+        }
+
+        function openDebtModal(debtIndex = null) {
+            const debt = debtIndex !== null ? state.data.debts[debtIndex] : null;
+            const modal = document.getElementById('modal');
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>${debt ? 'Edit Debt' : 'Add Debt'}</h2>
+                        <button class="modal-close" onclick="closeModal()">×</button>
+                    </div>
+                    <form onsubmit="saveDebt(event, ${debtIndex})">
+                        <div class="form-group">
+                            <label class="form-label">Debt Name *</label>
+                            <input type="text" class="form-input" id="debt-name" required value="${debt?.name || ''}" placeholder="e.g. Home Loan">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Debt Type *</label>
+                            <select class="form-input" id="debt-type" required>
+                                <option value="Loan" ${debt?.type === 'Loan' ? 'selected' : ''}>Loan</option>
+                                <option value="Credit Card" ${debt?.type === 'Credit Card' ? 'selected' : ''}>Credit Card</option>
+                                <option value="Mortgage" ${debt?.type === 'Mortgage' ? 'selected' : ''}>Mortgage</option>
+                                <option value="Personal Loan" ${debt?.type === 'Personal Loan' ? 'selected' : ''}>Personal Loan</option>
+                                <option value="Other" ${debt?.type === 'Other' ? 'selected' : ''}>Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Principal Amount *</label>
+                            <input type="number" class="form-input" id="debt-principal" required step="0.01" value="${debt?.principal || ''}" placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Amount Paid</label>
+                            <input type="number" class="form-input" id="debt-paid" step="0.01" value="${debt?.paid || 0}" placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Creditor/Lender</label>
+                            <input type="text" class="form-input" id="debt-creditor" value="${debt?.creditor || ''}" placeholder="e.g. Bank Name">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Due Date</label>
+                            <input type="date" class="form-input" id="debt-due-date" value="${debt?.dueDate || ''}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-input" id="debt-description" rows="3" placeholder="Optional description">${debt?.description || ''}</textarea>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                            <button type="submit" class="btn btn-primary">${debt ? 'Update' : 'Add'} Debt</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            modal.classList.add('show');
+        }
+
+        function saveDebt(event, debtIndex) {
+            event.preventDefault();
+            if (!state.data.debts) state.data.debts = [];
+            
+            const debt = {
+                name: document.getElementById('debt-name').value,
+                type: document.getElementById('debt-type').value,
+                principal: Number(document.getElementById('debt-principal').value) || 0,
+                paid: Number(document.getElementById('debt-paid').value) || 0,
+                creditor: document.getElementById('debt-creditor').value,
+                dueDate: document.getElementById('debt-due-date').value,
+                description: document.getElementById('debt-description').value
+            };
+
+            if (debtIndex !== null) {
+                state.data.debts[debtIndex] = debt;
+            } else {
+                state.data.debts.push(debt);
+            }
+
+            writeExcelFile().then(() => {
+                renderDebtsList();
+                closeModal();
+                showToast(`Debt ${debtIndex !== null ? 'updated' : 'added'} successfully`, 'success');
+            });
+        }
+
+        function makePayment(debtIndex) {
+            const debt = state.data.debts[debtIndex];
+            const modal = document.getElementById('modal');
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>Record Payment</h2>
+                        <button class="modal-close" onclick="closeModal()">×</button>
+                    </div>
+                    <form onsubmit="savePayment(event, ${debtIndex})">
+                        <div class="form-group">
+                            <label class="form-label">Payment Amount *</label>
+                            <input type="number" class="form-input" id="payment-amount" required step="0.01" placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Payment Date</label>
+                            <input type="date" class="form-input" id="payment-date" value="${new Date().toISOString().split('T')[0]}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Notes</label>
+                            <textarea class="form-input" id="payment-notes" rows="3" placeholder="Optional notes"></textarea>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Record Payment</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            modal.classList.add('show');
+        }
+
+        function savePayment(event, debtIndex) {
+            event.preventDefault();
+            const paymentAmount = Number(document.getElementById('payment-amount').value) || 0;
+            const debt = state.data.debts[debtIndex];
+            
+            debt.paid = (Number(debt.paid || 0) + paymentAmount);
+            if (debt.paid > debt.principal) debt.paid = debt.principal;
+
+            writeExcelFile().then(() => {
+                renderDebtsList();
+                closeModal();
+                showToast('Payment recorded successfully', 'success');
+            });
+        }
+
+        function editDebt(debtIndex) {
+            openDebtModal(debtIndex);
+        }
+
+        function deleteDebt(debtIndex) {
+            showConfirmModal({
+                title: 'Delete Debt',
+                message: 'Are you sure you want to delete this debt?',
+                type: 'danger'
+            }).then(confirmed => {
+                if (!confirmed) return;
+                state.data.debts.splice(debtIndex, 1);
+                writeExcelFile().then(() => {
+                    renderDebtsList();
+                    showToast('Debt deleted successfully', 'success');
+                });
+            });
+        }
+
+        // --- FINANCIAL GOALS ---
+        function renderGoalsList() {
+            const container = document.getElementById('goals-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const goals = state.data.goals || [];
+            if (goals.length === 0) {
+                container.innerHTML = '<div class="text-center" style="padding: 2rem; color: var(--text-light);">No financial goals set. Add a goal to start tracking your progress.</div>';
+                return;
+            }
+
+            goals.forEach((goal, index) => {
+                const div = document.createElement('div');
+                div.className = 'card';
+                div.style.marginBottom = '1rem';
+                div.style.padding = '1.5rem';
+                
+                const target = Number(goal.targetAmount || 0);
+                const current = Number(goal.currentAmount || 0);
+                const remaining = target - current;
+                const percent = target > 0 ? Math.min(100, (current / target) * 100) : 0;
+                const status = percent >= 100 ? 'completed' : goal.status || 'active';
+
+                div.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap; gap: 1rem;">
+                        <div style="flex: 1;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                <h3 style="margin: 0; font-size: 1.2rem;">${goal.name || 'Unnamed Goal'}</h3>
+                                <span style="background: ${status === 'completed' ? 'var(--success)' : status === 'paused' ? 'var(--warning)' : 'var(--primary)'}; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 500;">${status === 'completed' ? 'Completed' : status === 'paused' ? 'Paused' : 'Active'}</span>
+                            </div>
+                            <div style="color: var(--text-light); font-size: 0.875rem; margin-bottom: 0.75rem;">
+                                ${goal.description || 'No description'} ${goal.deadline ? `• Deadline: ${goal.deadline}` : ''}
+                            </div>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                                <div>
+                                    <div style="font-size: 0.75rem; color: var(--text-light);">Target</div>
+                                    <div style="font-size: 1.2rem; font-weight: bold;">${formatCurrency(target)}</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 0.75rem; color: var(--text-light);">Current</div>
+                                    <div style="font-size: 1.2rem; font-weight: bold; color: var(--success);">${formatCurrency(current)}</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 0.75rem; color: var(--text-light);">Remaining</div>
+                                    <div style="font-size: 1.2rem; font-weight: bold; color: ${remaining > 0 ? 'var(--danger)' : 'var(--success)'};">${formatCurrency(Math.max(0, remaining))}</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 0.75rem; color: var(--text-light);">Progress</div>
+                                    <div style="font-size: 1.2rem; font-weight: bold;">${Math.round(percent)}%</div>
+                                </div>
+                            </div>
+                            <div class="progress-track" style="margin-bottom: 0.5rem;">
+                                <div class="progress-fill" style="width: ${percent}%; background: ${percent >= 100 ? 'var(--success)' : 'var(--primary)'};"></div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn btn-primary" onclick="updateGoalProgress(${index})" style="font-size: 0.875rem;">
+                                Update Progress
+                            </button>
+                            <button class="btn-edit" onclick="editGoal(${index})">
+                                <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                </svg>
+                            </button>
+                            <button class="btn-delete" onclick="deleteGoal(${index})">
+                                <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function openGoalModal(goalIndex = null) {
+            const goal = goalIndex !== null ? state.data.goals[goalIndex] : null;
+            const modal = document.getElementById('modal');
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>${goal ? 'Edit Goal' : 'Add Goal'}</h2>
+                        <button class="modal-close" onclick="closeModal()">×</button>
+                    </div>
+                    <form onsubmit="saveGoal(event, ${goalIndex})">
+                        <div class="form-group">
+                            <label class="form-label">Goal Name *</label>
+                            <input type="text" class="form-input" id="goal-name" required value="${goal?.name || ''}" placeholder="e.g. Emergency Fund">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Target Amount *</label>
+                            <input type="number" class="form-input" id="goal-target" required step="0.01" value="${goal?.targetAmount || ''}" placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Current Amount</label>
+                            <input type="number" class="form-input" id="goal-current" step="0.01" value="${goal?.currentAmount || 0}" placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Deadline</label>
+                            <input type="date" class="form-input" id="goal-deadline" value="${goal?.deadline || ''}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Status</label>
+                            <select class="form-input" id="goal-status">
+                                <option value="active" ${goal?.status === 'active' ? 'selected' : ''}>Active</option>
+                                <option value="paused" ${goal?.status === 'paused' ? 'selected' : ''}>Paused</option>
+                                <option value="completed" ${goal?.status === 'completed' ? 'selected' : ''}>Completed</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-input" id="goal-description" rows="3" placeholder="Optional description">${goal?.description || ''}</textarea>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                            <button type="submit" class="btn btn-primary">${goal ? 'Update' : 'Add'} Goal</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            modal.classList.add('show');
+        }
+
+        function saveGoal(event, goalIndex) {
+            event.preventDefault();
+            if (!state.data.goals) state.data.goals = [];
+            
+            const goal = {
+                name: document.getElementById('goal-name').value,
+                targetAmount: Number(document.getElementById('goal-target').value) || 0,
+                currentAmount: Number(document.getElementById('goal-current').value) || 0,
+                deadline: document.getElementById('goal-deadline').value,
+                status: document.getElementById('goal-status').value,
+                description: document.getElementById('goal-description').value
+            };
+
+            if (goalIndex !== null) {
+                state.data.goals[goalIndex] = goal;
+            } else {
+                state.data.goals.push(goal);
+            }
+
+            writeExcelFile().then(() => {
+                renderGoalsList();
+                closeModal();
+                showToast(`Goal ${goalIndex !== null ? 'updated' : 'added'} successfully`, 'success');
+            });
+        }
+
+        function updateGoalProgress(goalIndex) {
+            const goal = state.data.goals[goalIndex];
+            const modal = document.getElementById('modal');
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>Update Goal Progress</h2>
+                        <button class="modal-close" onclick="closeModal()">×</button>
+                    </div>
+                    <form onsubmit="saveGoalProgress(event, ${goalIndex})">
+                        <div class="form-group">
+                            <label class="form-label">Current Amount *</label>
+                            <input type="number" class="form-input" id="goal-progress-amount" required step="0.01" value="${goal?.currentAmount || 0}" placeholder="0.00">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Update Progress</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            modal.classList.add('show');
+        }
+
+        function saveGoalProgress(event, goalIndex) {
+            event.preventDefault();
+            const currentAmount = Number(document.getElementById('goal-progress-amount').value) || 0;
+            const goal = state.data.goals[goalIndex];
+            
+            goal.currentAmount = currentAmount;
+            if (currentAmount >= goal.targetAmount) {
+                goal.status = 'completed';
+            }
+
+            writeExcelFile().then(() => {
+                renderGoalsList();
+                closeModal();
+                showToast('Goal progress updated successfully', 'success');
+            });
+        }
+
+        function editGoal(goalIndex) {
+            openGoalModal(goalIndex);
+        }
+
+        function deleteGoal(goalIndex) {
+            showConfirmModal({
+                title: 'Delete Goal',
+                message: 'Are you sure you want to delete this goal?',
+                type: 'danger'
+            }).then(confirmed => {
+                if (!confirmed) return;
+                state.data.goals.splice(goalIndex, 1);
+                writeExcelFile().then(() => {
+                    renderGoalsList();
+                    showToast('Goal deleted successfully', 'success');
+                });
+            });
+        }
+
+        // --- RECURRING TRANSACTIONS MANAGER ---
+        function renderRecurringList() {
+            const container = document.getElementById('recurring-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const allRecurring = [
+                ...state.data.income.filter(item => item.recurring).map(item => ({ ...item, type: 'income', typeLabel: 'Income' })),
+                ...state.data.expenses.filter(item => item.recurring).map(item => ({ ...item, type: 'expense', typeLabel: 'Expense' })),
+                ...state.data.receivables.filter(item => item.recurring).map(item => ({ ...item, type: 'receivable', typeLabel: 'Receivable' })),
+                ...state.data.payables.filter(item => item.recurring).map(item => ({ ...item, type: 'payable', typeLabel: 'Payable' }))
+            ];
+
+            if (allRecurring.length === 0) {
+                container.innerHTML = '<div class="text-center" style="padding: 2rem; color: var(--text-light);">No recurring transactions found. Mark transactions as recurring to see them here.</div>';
+                return;
+            }
+
+            allRecurring.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'card';
+                div.style.marginBottom = '1rem';
+                div.style.padding = '1rem';
+                
+                const typeColor = item.type === 'income' ? 'var(--success)' : item.type === 'expense' ? 'var(--danger)' : item.type === 'receivable' ? 'var(--warning)' : 'var(--purple)';
+                const nextDate = item.recurringNextDate || item.date || item.dueDate || 'Not set';
+                const frequency = item.recurringFrequency || 'monthly';
+
+                div.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap; gap: 1rem;">
+                        <div style="flex: 1;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                <span style="background: ${typeColor}; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 500;">${item.typeLabel}</span>
+                                <strong>${item.source || item.description || item.from || item.to || 'Unnamed'}</strong>
+                            </div>
+                            <div style="color: var(--text-light); font-size: 0.875rem; margin-bottom: 0.5rem;">
+                                Amount: <strong style="color: ${typeColor};">${formatCurrency(item.amount)}</strong> • Frequency: ${frequency} • Next: ${nextDate}
+                            </div>
+                            ${item.category ? `<div style="font-size: 0.75rem; color: var(--text-light);">Category: ${item.category}</div>` : ''}
+                        </div>
+                        <button class="btn btn-secondary" onclick="editRecurringItem('${item.type}', ${state.data[item.type === 'income' ? 'income' : item.type === 'expense' ? 'expenses' : item.type === 'receivable' ? 'receivables' : 'payables'].indexOf(item)})" style="font-size: 0.875rem;">
+                            Edit
+                        </button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function generateRecurringTransactions() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            let generatedCount = 0;
+
+            const generateForType = (items, type) => {
+                items.forEach(item => {
+                    if (!item.recurring || !item.recurringNextDate) return;
+                    
+                    const nextDate = new Date(item.recurringNextDate);
+                    nextDate.setHours(0, 0, 0, 0);
+                    
+                    if (nextDate <= today) {
+                        // Create new transaction
+                        const newItem = { ...item };
+                        delete newItem.recurringNextDate;
+                        
+                        // Set date based on type
+                        if (type === 'income' || type === 'expense') {
+                            newItem.date = item.recurringNextDate;
+                        } else {
+                            newItem.dueDate = item.recurringNextDate;
+                        }
+
+                        // Calculate next date
+                        const frequency = item.recurringFrequency || 'monthly';
+                        const next = new Date(nextDate);
+                        switch(frequency) {
+                            case 'daily':
+                                next.setDate(next.getDate() + 1);
+                                break;
+                            case 'weekly':
+                                next.setDate(next.getDate() + 7);
+                                break;
+                            case 'monthly':
+                                next.setMonth(next.getMonth() + 1);
+                                break;
+                            case 'yearly':
+                                next.setFullYear(next.getFullYear() + 1);
+                                break;
+                        }
+
+                        // Update next date
+                        item.recurringNextDate = next.toISOString().split('T')[0];
+                        
+                        // Add to appropriate array
+                        if (type === 'income') {
+                            state.data.income.push(newItem);
+                        } else if (type === 'expense') {
+                            state.data.expenses.push(newItem);
+                        } else if (type === 'receivable') {
+                            state.data.receivables.push(newItem);
+                        } else if (type === 'payable') {
+                            state.data.payables.push(newItem);
+                        }
+                        
+                        generatedCount++;
+                    }
+                });
+            };
+
+            generateForType(state.data.income, 'income');
+            generateForType(state.data.expenses, 'expense');
+            generateForType(state.data.receivables, 'receivable');
+            generateForType(state.data.payables, 'payable');
+
+            if (generatedCount > 0) {
+                writeExcelFile().then(() => {
+                    showToast(`Generated ${generatedCount} recurring transaction(s)`, 'success');
+                    renderAll();
+                });
+            } else {
+                showToast('No recurring transactions due at this time', 'info');
+            }
+        }
+
+        function editRecurringItem(type, index) {
+            openModal('form', type);
+            setTimeout(() => {
+                const item = state.data[type === 'income' ? 'income' : type === 'expenses' ? 'expenses' : type === 'receivable' ? 'receivables' : 'payables'][index];
+                editingIndex = index;
+                // Form will be populated by openModal function
+            }, 100);
+        }
+
+        // --- FINANCIAL CALENDAR ---
+        let currentCalendarDate = new Date();
+
+        function renderFinancialCalendar() {
+            const container = document.getElementById('calendar-container');
+            if (!container) return;
+
+            const year = currentCalendarDate.getFullYear();
+            const month = currentCalendarDate.getMonth();
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const daysInMonth = lastDay.getDate();
+            const startingDayOfWeek = firstDay.getDay();
+
+            // Get all transactions for the month
+            const monthStart = `${year}-${String(month + 1).padStart(2, '0')}-01`;
+            const monthEnd = `${year}-${String(month + 1).padStart(2, '0')}-${String(daysInMonth).padStart(2, '0')}`;
+
+            const transactionsByDate = {};
+            
+            [...state.data.income, ...state.data.expenses, ...state.data.receivables, ...state.data.payables].forEach(item => {
+                const date = item.date || item.dueDate;
+                if (date && date >= monthStart && date <= monthEnd) {
+                    if (!transactionsByDate[date]) transactionsByDate[date] = [];
+                    transactionsByDate[date].push(item);
+                }
+            });
+
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+            let html = `
+                <div style="text-align: center; margin-bottom: 1.5rem;">
+                    <h3 style="font-size: 1.5rem; margin-bottom: 0.5rem;">${monthNames[month]} ${year}</h3>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.5rem; margin-bottom: 1rem;">
+            `;
+
+            // Day headers
+            dayNames.forEach(day => {
+                html += `<div style="text-align: center; font-weight: 600; padding: 0.5rem; background: var(--card-bg); border-radius: 4px;">${day}</div>`;
+            });
+
+            // Empty cells for days before month starts
+            for (let i = 0; i < startingDayOfWeek; i++) {
+                html += `<div style="min-height: 80px; border: 1px solid var(--border); border-radius: 4px;"></div>`;
+            }
+
+            // Days of the month
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const dayTransactions = transactionsByDate[dateStr] || [];
+                const isToday = dateStr === new Date().toISOString().split('T')[0];
+                
+                let incomeTotal = 0;
+                let expenseTotal = 0;
+                dayTransactions.forEach(t => {
+                    if (t.amount) {
+                        if (state.data.income.includes(t) || (t.type === 'receivable' && (t.status || 'unpaid') === 'unpaid')) {
+                            incomeTotal += Number(t.amount);
+                        } else {
+                            expenseTotal += Number(t.amount);
+                        }
+                    }
+                });
+
+                html += `
+                    <div style="min-height: 80px; border: 1px solid var(--border); border-radius: 4px; padding: 0.5rem; ${isToday ? 'background: #e6f3ff; border: 2px solid var(--primary);' : ''}">
+                        <div style="font-weight: 600; margin-bottom: 0.25rem; ${isToday ? 'color: var(--primary);' : ''}">${day}</div>
+                        ${incomeTotal > 0 ? `<div style="font-size: 0.75rem; color: var(--success);">+${formatCurrency(incomeTotal)}</div>` : ''}
+                        ${expenseTotal > 0 ? `<div style="font-size: 0.75rem; color: var(--danger);">-${formatCurrency(expenseTotal)}</div>` : ''}
+                        ${dayTransactions.length > 0 ? `<div style="font-size: 0.7rem; color: var(--text-light); margin-top: 0.25rem;">${dayTransactions.length} transaction(s)</div>` : ''}
+                    </div>
+                `;
+            }
+
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function changeCalendarMonth(direction) {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + direction);
+            renderFinancialCalendar();
+        }
+
+        // --- CASH FLOW ANALYSIS ---
+        function renderCashFlow() {
+            const container = document.getElementById('cashflow-container');
+            if (!container) return;
+
+            const period = document.getElementById('cashflow-period')?.value || 'monthly';
+            const today = new Date();
+            const periods = [];
+
+            // Get data for last 12 periods
+            for (let i = 11; i >= 0; i--) {
+                let periodStart, periodEnd, periodLabel;
+                const periodDate = new Date(today);
+
+                if (period === 'monthly') {
+                    periodDate.setMonth(today.getMonth() - i);
+                    periodStart = `${periodDate.getFullYear()}-${String(periodDate.getMonth() + 1).padStart(2, '0')}-01`;
+                    const lastDay = new Date(periodDate.getFullYear(), periodDate.getMonth() + 1, 0).getDate();
+                    periodEnd = `${periodDate.getFullYear()}-${String(periodDate.getMonth() + 1).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+                    periodLabel = periodDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+                } else if (period === 'quarterly') {
+                    const quarter = Math.floor((today.getMonth() - i * 3) / 3);
+                    const year = periodDate.getFullYear() - Math.floor((today.getMonth() - i * 3) / 12);
+                    periodDate.setFullYear(year);
+                    periodDate.setMonth(quarter * 3);
+                    periodStart = `${periodDate.getFullYear()}-${String(periodDate.getMonth() + 1).padStart(2, '0')}-01`;
+                    const lastDay = new Date(periodDate.getFullYear(), periodDate.getMonth() + 3, 0).getDate();
+                    periodEnd = `${periodDate.getFullYear()}-${String(periodDate.getMonth() + 3).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+                    periodLabel = `Q${quarter + 1} ${year}`;
+                } else {
+                    periodDate.setFullYear(today.getFullYear() - i);
+                    periodStart = `${periodDate.getFullYear()}-01-01`;
+                    periodEnd = `${periodDate.getFullYear()}-12-31`;
+                    periodLabel = periodDate.getFullYear().toString();
+                }
+
+                const income = state.data.income
+                    .filter(item => item.date && item.date >= periodStart && item.date <= periodEnd)
+                    .reduce((sum, item) => sum + Number(item.amount || 0), 0);
+                
+                const expenses = state.data.expenses
+                    .filter(item => item.date && item.date >= periodStart && item.date <= periodEnd)
+                    .reduce((sum, item) => sum + Number(item.amount || 0), 0);
+
+                const cashFlow = income - expenses;
+                periods.push({ label: periodLabel, income, expenses, cashFlow });
+            }
+
+            let html = `
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; min-width: 600px;">
+                        <thead>
+                            <tr style="background: var(--card-bg);">
+                                <th style="padding: 1rem; text-align: left;">Period</th>
+                                <th style="padding: 1rem; text-align: right;">Income</th>
+                                <th style="padding: 1rem; text-align: right;">Expenses</th>
+                                <th style="padding: 1rem; text-align: right;">Cash Flow</th>
+                                <th style="padding: 1rem; text-align: center;">Trend</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            periods.forEach((p, index) => {
+                const trend = index > 0 ? (p.cashFlow - periods[index - 1].cashFlow) : 0;
+                html += `
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 1rem; font-weight: 600;">${p.label}</td>
+                        <td style="padding: 1rem; text-align: right; color: var(--success);">${formatCurrency(p.income)}</td>
+                        <td style="padding: 1rem; text-align: right; color: var(--danger);">${formatCurrency(p.expenses)}</td>
+                        <td style="padding: 1rem; text-align: right; font-weight: bold; color: ${p.cashFlow >= 0 ? 'var(--success)' : 'var(--danger)'};">
+                            ${formatCurrency(p.cashFlow)}
+                        </td>
+                        <td style="padding: 1rem; text-align: center;">
+                            ${trend > 0 ? '📈' : trend < 0 ? '📉' : '➡️'}
+                            ${trend !== 0 ? `<span style="font-size: 0.75rem; color: ${trend > 0 ? 'var(--success)' : 'var(--danger)'};">${trend > 0 ? '+' : ''}${formatCurrency(trend)}</span>` : ''}
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        // --- INVESTMENT PORTFOLIO TRACKER ---
+        function renderInvestmentsList() {
+            const container = document.getElementById('investments-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const investments = state.data.investments || [];
+            if (investments.length === 0) {
+                container.innerHTML = '<div class="text-center" style="padding: 2rem; color: var(--text-light);">No investments tracked. Add an investment to start tracking your portfolio.</div>';
+                return;
+            }
+
+            let totalValue = 0;
+            let totalCost = 0;
+
+            investments.forEach((investment, index) => {
+                const div = document.createElement('div');
+                div.className = 'card';
+                div.style.marginBottom = '1rem';
+                div.style.padding = '1.5rem';
+                
+                const cost = Number(investment.cost || 0);
+                const currentValue = Number(investment.currentValue || cost);
+                const gain = currentValue - cost;
+                const gainPercent = cost > 0 ? ((gain / cost) * 100) : 0;
+                totalValue += currentValue;
+                totalCost += cost;
+
+                div.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap; gap: 1rem;">
+                        <div style="flex: 1;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                <h3 style="margin: 0; font-size: 1.2rem;">${investment.name || 'Unnamed Investment'}</h3>
+                                <span style="background: ${investment.type === 'Stock' ? 'var(--primary)' : investment.type === 'Bond' ? 'var(--success)' : investment.type === 'Mutual Fund' ? 'var(--purple)' : 'var(--warning)'}; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 500;">${investment.type || 'Investment'}</span>
+                            </div>
+                            <div style="color: var(--text-light); font-size: 0.875rem; margin-bottom: 0.75rem;">
+                                ${investment.description || 'No description'} ${investment.symbol ? `• Symbol: ${investment.symbol}` : ''}
+                            </div>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+                                <div>
+                                    <div style="font-size: 0.75rem; color: var(--text-light);">Cost Basis</div>
+                                    <div style="font-size: 1.2rem; font-weight: bold;">${formatCurrency(cost)}</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 0.75rem; color: var(--text-light);">Current Value</div>
+                                    <div style="font-size: 1.2rem; font-weight: bold; color: ${currentValue >= cost ? 'var(--success)' : 'var(--danger)'};">
+                                        ${formatCurrency(currentValue)}
+                                    </div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 0.75rem; color: var(--text-light);">Gain/Loss</div>
+                                    <div style="font-size: 1.2rem; font-weight: bold; color: ${gain >= 0 ? 'var(--success)' : 'var(--danger)'};">
+                                        ${gain >= 0 ? '+' : ''}${formatCurrency(gain)}
+                                    </div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 0.75rem; color: var(--text-light);">Return %</div>
+                                    <div style="font-size: 1.2rem; font-weight: bold; color: ${gainPercent >= 0 ? 'var(--success)' : 'var(--danger)'};">
+                                        ${gainPercent >= 0 ? '+' : ''}${gainPercent.toFixed(2)}%
+                                    </div>
+                                </div>
+                            </div>
+                            ${investment.purchaseDate ? `<div style="font-size: 0.75rem; color: var(--text-light); margin-top: 0.5rem;">Purchase Date: ${investment.purchaseDate}</div>` : ''}
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn btn-primary" onclick="updateInvestmentValue(${index})" style="font-size: 0.875rem;">
+                                Update Value
+                            </button>
+                            <button class="btn-edit" onclick="editInvestment(${index})">
+                                <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                </svg>
+                            </button>
+                            <button class="btn-delete" onclick="deleteInvestment(${index})">
+                                <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+
+            // Add portfolio summary
+            const totalGain = totalValue - totalCost;
+            const totalGainPercent = totalCost > 0 ? ((totalGain / totalCost) * 100) : 0;
+            const summaryDiv = document.createElement('div');
+            summaryDiv.className = 'card';
+            summaryDiv.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;';
+            summaryDiv.innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+                    <div>
+                        <div style="font-size: 0.875rem; opacity: 0.9; margin-bottom: 0.5rem;">Total Portfolio Value</div>
+                        <div style="font-size: 2rem; font-weight: bold;">${formatCurrency(totalValue)}</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.875rem; opacity: 0.9; margin-bottom: 0.5rem;">Total Cost Basis</div>
+                        <div style="font-size: 1.5rem; font-weight: bold;">${formatCurrency(totalCost)}</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.875rem; opacity: 0.9; margin-bottom: 0.5rem;">Total Gain/Loss</div>
+                        <div style="font-size: 1.5rem; font-weight: bold;">${totalGain >= 0 ? '+' : ''}${formatCurrency(totalGain)}</div>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.875rem; opacity: 0.9; margin-bottom: 0.5rem;">Total Return</div>
+                        <div style="font-size: 1.5rem; font-weight: bold;">${totalGainPercent >= 0 ? '+' : ''}${totalGainPercent.toFixed(2)}%</div>
+                    </div>
+                </div>
+            `;
+            container.insertBefore(summaryDiv, container.firstChild);
+        }
+
+        function openInvestmentModal(investmentIndex = null) {
+            const investment = investmentIndex !== null ? state.data.investments[investmentIndex] : null;
+            const modal = document.getElementById('modal');
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>${investment ? 'Edit Investment' : 'Add Investment'}</h2>
+                        <button class="modal-close" onclick="closeModal()">×</button>
+                    </div>
+                    <form onsubmit="saveInvestment(event, ${investmentIndex})">
+                        <div class="form-group">
+                            <label class="form-label">Investment Name *</label>
+                            <input type="text" class="form-input" id="investment-name" required value="${investment?.name || ''}" placeholder="e.g. Apple Inc.">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Type *</label>
+                            <select class="form-input" id="investment-type" required>
+                                <option value="Stock" ${investment?.type === 'Stock' ? 'selected' : ''}>Stock</option>
+                                <option value="Bond" ${investment?.type === 'Bond' ? 'selected' : ''}>Bond</option>
+                                <option value="Mutual Fund" ${investment?.type === 'Mutual Fund' ? 'selected' : ''}>Mutual Fund</option>
+                                <option value="ETF" ${investment?.type === 'ETF' ? 'selected' : ''}>ETF</option>
+                                <option value="Crypto" ${investment?.type === 'Crypto' ? 'selected' : ''}>Cryptocurrency</option>
+                                <option value="Other" ${investment?.type === 'Other' ? 'selected' : ''}>Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Symbol/Ticker</label>
+                            <input type="text" class="form-input" id="investment-symbol" value="${investment?.symbol || ''}" placeholder="e.g. AAPL">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Cost Basis *</label>
+                            <input type="number" class="form-input" id="investment-cost" required step="0.01" value="${investment?.cost || ''}" placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Current Value</label>
+                            <input type="number" class="form-input" id="investment-value" step="0.01" value="${investment?.currentValue || investment?.cost || ''}" placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Purchase Date</label>
+                            <input type="date" class="form-input" id="investment-date" value="${investment?.purchaseDate || ''}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-input" id="investment-description" rows="3" placeholder="Optional description">${investment?.description || ''}</textarea>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                            <button type="submit" class="btn btn-primary">${investment ? 'Update' : 'Add'} Investment</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            modal.classList.add('show');
+        }
+
+        function saveInvestment(event, investmentIndex) {
+            event.preventDefault();
+            if (!state.data.investments) state.data.investments = [];
+            
+            const investment = {
+                name: document.getElementById('investment-name').value,
+                type: document.getElementById('investment-type').value,
+                symbol: document.getElementById('investment-symbol').value,
+                cost: Number(document.getElementById('investment-cost').value) || 0,
+                currentValue: Number(document.getElementById('investment-value').value) || Number(document.getElementById('investment-cost').value) || 0,
+                purchaseDate: document.getElementById('investment-date').value,
+                description: document.getElementById('investment-description').value
+            };
+
+            if (investmentIndex !== null) {
+                state.data.investments[investmentIndex] = investment;
+            } else {
+                state.data.investments.push(investment);
+            }
+
+            writeExcelFile().then(() => {
+                renderInvestmentsList();
+                closeModal();
+                showToast(`Investment ${investmentIndex !== null ? 'updated' : 'added'} successfully`, 'success');
+            });
+        }
+
+        function updateInvestmentValue(investmentIndex) {
+            const investment = state.data.investments[investmentIndex];
+            const modal = document.getElementById('modal');
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>Update Investment Value</h2>
+                        <button class="modal-close" onclick="closeModal()">×</button>
+                    </div>
+                    <form onsubmit="saveInvestmentValue(event, ${investmentIndex})">
+                        <div class="form-group">
+                            <label class="form-label">Current Value *</label>
+                            <input type="number" class="form-input" id="investment-update-value" required step="0.01" value="${investment?.currentValue || investment?.cost || 0}" placeholder="0.00">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Update Value</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            modal.classList.add('show');
+        }
+
+        function saveInvestmentValue(event, investmentIndex) {
+            event.preventDefault();
+            const currentValue = Number(document.getElementById('investment-update-value').value) || 0;
+            const investment = state.data.investments[investmentIndex];
+            
+            investment.currentValue = currentValue;
+
+            writeExcelFile().then(() => {
+                renderInvestmentsList();
+                closeModal();
+                showToast('Investment value updated successfully', 'success');
+            });
+        }
+
+        function editInvestment(investmentIndex) {
+            openInvestmentModal(investmentIndex);
+        }
+
+        function deleteInvestment(investmentIndex) {
+            showConfirmModal({
+                title: 'Delete Investment',
+                message: 'Are you sure you want to delete this investment?',
+                type: 'danger'
+            }).then(confirmed => {
+                if (!confirmed) return;
+                state.data.investments.splice(investmentIndex, 1);
+                writeExcelFile().then(() => {
+                    renderInvestmentsList();
+                    showToast('Investment deleted successfully', 'success');
+                });
+            });
+        }
+
         // --- KEYBOARD SHORTCUTS ---
         document.addEventListener('keydown', (e) => {
             // Ctrl/Cmd combinations
@@ -6121,9 +8111,13 @@
 
         // Initialize settings on load
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', loadSettings);
+            document.addEventListener('DOMContentLoaded', () => {
+                loadSettings();
+                loadSettingsFromStorage();
+            });
         } else {
             loadSettings();
+            loadSettingsFromStorage();
         }
     </script>
 </body>
