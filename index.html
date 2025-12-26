@@ -7227,6 +7227,12 @@
                                 <span class="mobile-details-label">Description:</span>
                                 <span class="mobile-details-value">${item.description || '-'} ${item.recurring ? '<span class="recurring-badge">🔄 Recurring</span>' : ''}</span>
                             </div>
+                            ${item.expenseFor ? `
+                            <div class="mobile-details-row">
+                                <span class="mobile-details-label">Given to:</span>
+                                <span class="mobile-details-value">🎁 ${item.expenseFor}</span>
+                            </div>
+                            ` : ''}
                             ${item.familyMembers && Array.isArray(item.familyMembers) && item.familyMembers.length > 0 ? `
                             <div class="mobile-details-row">
                                 <span class="mobile-details-label">Contributors:</span>
@@ -7246,6 +7252,9 @@
                             ${item.notes ? `<div class="mobile-details-row"><span class="mobile-details-value transaction-note">${item.notes}</span></div>` : ''}
                         </div>
                     `;
+                    // Build "Given to" badge
+                    const givenToBadge = item.expenseFor ? `<span style="background: #fff3cd; color: #856404; padding: 0.125rem 0.5rem; border-radius: 12px; font-size: 0.75rem; margin-left: 0.5rem; font-weight: 500;">🎁 Given to: ${item.expenseFor}</span>` : '';
+                    
                     // Build contributor badges for expenses
                     let contributorBadges = '';
                     if (item.familyMembers && Array.isArray(item.familyMembers) && item.familyMembers.length > 0) {
@@ -7257,7 +7266,6 @@
                             }).join('');
                         } else {
                             // Show equal contributions
-                            const perPerson = item.amount / item.familyMembers.length;
                             contributorBadges = item.familyMembers.map(name => 
                                 `<span style="background: #e6f3ff; color: #0066cc; padding: 0.125rem 0.5rem; border-radius: 12px; font-size: 0.75rem; margin-left: 0.5rem; font-weight: 500;">👤 ${name}</span>`
                             ).join('');
@@ -7267,6 +7275,7 @@
                         <td>${item.date ? formatDate(item.date) : '-'}</td>
                         <td>
                             ${item.description || '-'}
+                            ${givenToBadge}
                             ${contributorBadges}
                             ${item.recurring ? '<span class="recurring-badge">🔄 Recurring</span>' : ''}
                             ${item.account ? `<div style="font-size: 0.75rem; color: var(--text-light); margin-top: 0.25rem;">🏦 ${item.account}</div>` : ''}
@@ -8784,7 +8793,20 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">${t('family_members')} (${t('optional')})</label>
+                            <label class="form-label">Expense for / Given to (${t('optional')})</label>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <select class="form-select" id="inp-expense-for" style="flex: 1;" onchange="updateContributionUI()">
+                                    <option value="">None (Shared expense)</option>
+                                    ${(state.data.familyMembers || []).filter(m => m.active !== false).map(member => `<option value="${member.name}" ${item?.expenseFor === member.name ? 'selected' : ''}>${member.name}${member.relation ? ` (${member.relation})` : ''}</option>`).join('')}
+                                </select>
+                                <button type="button" class="btn-icon" onclick="closeModal(); setTimeout(() => switchTab('family'), 100);" title="Manage Family Members">⚙️</button>
+                            </div>
+                            <small style="color: var(--text-light); font-size: 0.75rem; display: block; margin-top: 0.25rem;">
+                                Select a family member if this expense is given to them. The full amount will be counted for both the recipient and all selected contributors below.
+                            </small>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">${t('family_members')} - Contributors (${t('optional')})</label>
                             <div style="display: flex; gap: 0.5rem; align-items: start;">
                                 <div style="flex: 1; display: flex; flex-direction: column; gap: 0.5rem;">
                                     ${(state.data.familyMembers || []).filter(m => m.active !== false).map((member, idx) => {
@@ -9069,6 +9091,11 @@
                             amountInput.addEventListener('change', updateContributionUI);
                         }
                         
+                        const expenseForSelect = document.getElementById('inp-expense-for');
+                        if (expenseForSelect) {
+                            expenseForSelect.addEventListener('change', updateContributionUI);
+                        }
+                        
                         document.querySelectorAll('input[id^="inp-family-member-"]').forEach(checkbox => {
                             checkbox.addEventListener('change', updateContributionUI);
                         });
@@ -9271,7 +9298,10 @@
                 if (!validateAmount(num('inp-amount'), 'Amount')) return;
                 if (!validateRequired(val('inp-date'), 'Date')) return;
                 if (!validateRequired(val('inp-account'), 'Account')) return;
-                // Get selected family members (only active ones)
+                // Get "Expense for / Given to" field
+                const expenseFor = val('inp-expense-for') || undefined;
+                
+                // Get selected family members (only active ones) - these are the contributors
                 const selectedFamilyMembers = [];
                 const contributionType = val('inp-contribution-type') || 'equal';
                 const contributions = {};
@@ -9297,7 +9327,8 @@
                     amount: num('inp-amount'),
                     date: val('inp-date'),
                     account: val('inp-account'),
-                    familyMembers: selectedFamilyMembers.length > 0 ? selectedFamilyMembers : undefined,
+                    expenseFor: expenseFor, // Person the expense is given to
+                    familyMembers: selectedFamilyMembers.length > 0 ? selectedFamilyMembers : undefined, // Contributors
                     contributionType: selectedFamilyMembers.length > 0 ? contributionType : undefined,
                     contributions: selectedFamilyMembers.length > 0 && contributionType === 'custom' && Object.keys(contributions).length > 0 ? contributions : undefined,
                     notes: val('inp-notes'),
@@ -10917,17 +10948,37 @@
             
             // Calculate expense shares
             (state.data.expenses || []).forEach(expense => {
+                const amount = Number(expense.amount || 0);
+                
+                // Handle "Expense for / Given to" - when expense is given to a specific person
+                if (expense.expenseFor && stats[expense.expenseFor]) {
+                    // Full amount goes to the person it's given to
+                    stats[expense.expenseFor].totalExpenses += amount;
+                    stats[expense.expenseFor].expenseCount++;
+                }
+                
+                // Handle contributors (family members who contributed)
                 if (expense.familyMembers && Array.isArray(expense.familyMembers)) {
-                    const amount = Number(expense.amount || 0);
-                    const shareCount = expense.familyMembers.length;
-                    const sharePerPerson = shareCount > 0 ? amount / shareCount : 0;
-                    
-                    expense.familyMembers.forEach(memberName => {
-                        if (stats[memberName]) {
-                            stats[memberName].totalExpenses += sharePerPerson;
-                            stats[memberName].expenseCount++;
-                        }
-                    });
+                    if (expense.expenseFor) {
+                        // If expenseFor is set, contributors also pay the full amount each
+                        expense.familyMembers.forEach(memberName => {
+                            if (stats[memberName]) {
+                                stats[memberName].totalExpenses += amount;
+                                stats[memberName].expenseCount++;
+                            }
+                        });
+                    } else {
+                        // Normal shared expense - divide equally
+                        const shareCount = expense.familyMembers.length;
+                        const sharePerPerson = shareCount > 0 ? amount / shareCount : 0;
+                        
+                        expense.familyMembers.forEach(memberName => {
+                            if (stats[memberName]) {
+                                stats[memberName].totalExpenses += sharePerPerson;
+                                stats[memberName].expenseCount++;
+                            }
+                        });
+                    }
                 }
             });
             
@@ -10951,7 +11002,8 @@
             // Get related transactions
             const relatedIncome = (state.data.income || []).filter(i => i.familyMember === member.name);
             const relatedExpenses = (state.data.expenses || []).filter(e => 
-                e.familyMembers && Array.isArray(e.familyMembers) && e.familyMembers.includes(member.name)
+                (e.familyMembers && Array.isArray(e.familyMembers) && e.familyMembers.includes(member.name)) ||
+                e.expenseFor === member.name
             );
             
             const overlay = document.getElementById('modal-overlay');
@@ -12198,36 +12250,51 @@
             const customInputs = document.getElementById('custom-contribution-inputs');
             const perPersonAmount = document.getElementById('per-person-amount');
             const expenseTotalAmount = document.getElementById('expense-total-amount');
+            const expenseForSelect = document.getElementById('inp-expense-for');
             
             if (!amountInput || !contributionTypeSection) return;
             
             const amount = parseFloat(amountInput.value) || 0;
             const selectedCount = document.querySelectorAll('input[id^="inp-family-member-"]:checked').length;
+            const expenseFor = expenseForSelect ? expenseForSelect.value : '';
             
             // Show/hide contribution section based on selected members
             if (selectedCount > 0) {
                 contributionTypeSection.style.display = 'block';
                 const contributionType = contributionTypeSelect ? contributionTypeSelect.value : 'equal';
                 
-                if (contributionType === 'equal') {
-                    if (equalDisplay) equalDisplay.style.display = 'block';
-                    if (customInputs) customInputs.style.display = 'none';
-                    if (perPersonAmount && amount > 0) {
-                        const perPerson = amount / selectedCount;
-                        perPersonAmount.textContent = formatCurrency(perPerson);
-                    }
-                } else {
-                    if (equalDisplay) equalDisplay.style.display = 'none';
-                    if (customInputs) customInputs.style.display = 'block';
-                    // Show/hide individual contribution inputs based on selection
-                    document.querySelectorAll('input[id^="inp-family-member-"]').forEach(checkbox => {
-                        const idx = checkbox.id.replace('inp-family-member-', '');
-                        const contributionDiv = document.getElementById(`contribution-${idx}`);
-                        if (contributionDiv) {
-                            contributionDiv.style.display = checkbox.checked ? 'block' : 'none';
+                // If expenseFor is set, show special message
+                if (expenseFor) {
+                    if (equalDisplay) {
+                        equalDisplay.style.display = 'block';
+                        equalDisplay.style.background = '#fff3cd';
+                        if (perPersonAmount) {
+                            perPersonAmount.textContent = `Full amount (${formatCurrency(amount)}) will be counted for "${expenseFor}" and each contributor`;
                         }
-                    });
-                    updateContributionTotal();
+                    }
+                    if (customInputs) customInputs.style.display = 'none';
+                } else {
+                    if (equalDisplay) equalDisplay.style.background = '#e6fffa';
+                    if (contributionType === 'equal') {
+                        if (equalDisplay) equalDisplay.style.display = 'block';
+                        if (customInputs) customInputs.style.display = 'none';
+                        if (perPersonAmount && amount > 0) {
+                            const perPerson = amount / selectedCount;
+                            perPersonAmount.textContent = formatCurrency(perPerson);
+                        }
+                    } else {
+                        if (equalDisplay) equalDisplay.style.display = 'none';
+                        if (customInputs) customInputs.style.display = 'block';
+                        // Show/hide individual contribution inputs based on selection
+                        document.querySelectorAll('input[id^="inp-family-member-"]').forEach(checkbox => {
+                            const idx = checkbox.id.replace('inp-family-member-', '');
+                            const contributionDiv = document.getElementById(`contribution-${idx}`);
+                            if (contributionDiv) {
+                                contributionDiv.style.display = checkbox.checked ? 'block' : 'none';
+                            }
+                        });
+                        updateContributionTotal();
+                    }
                 }
                 if (expenseTotalAmount) {
                     expenseTotalAmount.textContent = formatCurrency(amount);
