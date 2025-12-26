@@ -6224,15 +6224,54 @@
             }
         }
 
+        // Helper function to get setup instructions
+        function getGoogleSheetsSetupInstructions() {
+            const currentOrigin = window.location.origin;
+            const isLocalhost = currentOrigin.includes('localhost') || currentOrigin.includes('127.0.0.1') || currentOrigin.includes('file://');
+            
+            let instructions = 'Google Sheets Setup Instructions:\n\n';
+            instructions += '1. Go to: https://console.cloud.google.com/\n';
+            instructions += '2. Select your project (or create a new one)\n';
+            instructions += '3. Enable APIs:\n';
+            instructions += '   - Go to "APIs & Services" > "Library"\n';
+            instructions += '   - Search and enable "Google Sheets API"\n';
+            instructions += '   - Search and enable "Google Drive API"\n\n';
+            instructions += '4. Configure OAuth Consent Screen:\n';
+            instructions += '   - Go to "APIs & Services" > "OAuth consent screen"\n';
+            instructions += '   - Choose "External" (or "Internal" if using Google Workspace)\n';
+            instructions += '   - Fill in required fields (App name, User support email)\n';
+            instructions += '   - Add scopes: "https://www.googleapis.com/auth/spreadsheets" and "https://www.googleapis.com/auth/drive.file"\n';
+            instructions += '   - Save and continue\n\n';
+            instructions += '5. Create OAuth 2.0 Credentials:\n';
+            instructions += '   - Go to "APIs & Services" > "Credentials"\n';
+            instructions += '   - Click "Create Credentials" > "OAuth client ID"\n';
+            instructions += '   - Choose "Web application"\n';
+            instructions += '   - Add to "Authorized JavaScript origins":\n';
+            if (isLocalhost) {
+                instructions += '     * http://localhost\n';
+                instructions += '     * http://127.0.0.1\n';
+                if (currentOrigin.includes(':')) {
+                    instructions += `     * ${currentOrigin}\n`;
+                }
+            } else {
+                instructions += `     * ${currentOrigin}\n`;
+            }
+            instructions += '   - Save the Client ID\n\n';
+            instructions += '6. Configure API Key:\n';
+            instructions += '   - Go to "APIs & Services" > "Credentials"\n';
+            instructions += '   - Click on your API key\n';
+            instructions += '   - Under "API restrictions", select "Restrict key"\n';
+            instructions += '   - Check "Google Sheets API" and "Google Drive API"\n';
+            instructions += '   - Or set to "Don\'t restrict key" for testing\n';
+            instructions += '   - Save\n\n';
+            instructions += '7. Update the code with your Client ID and API Key\n';
+            instructions += '8. Wait 5-10 minutes for changes to propagate\n';
+            
+            return instructions;
+        }
+
         async function connectGoogleSheets() {
             try {
-                // NOTE: To use Google Sheets integration, you need to:
-                // 1. Create a project in Google Cloud Console (https://console.cloud.google.com/)
-                // 2. Enable Google Sheets API and Google Drive API in the API Library
-                // 3. Create OAuth 2.0 credentials (Web application type)
-                // 4. Add your domain to authorized JavaScript origins
-                // 5. Make sure API key restrictions allow Google Sheets API
-                
                 showToast('Initializing Google API...', 'info');
                 
                 await ensureGoogleAPILoaded();
@@ -6255,13 +6294,22 @@
 
                 // Check if already initialized
                 if (!window.gapi.client.sheets) {
-                    // Initialize the client with proper discovery document
-                    await window.gapi.client.init({
-                        apiKey: 'AIzaSyAyyXvJtpYb_L4UZtztccDqHB_peGXUxXU',
-                        clientId: '415209089700-fp7cm5l9n53kkrfqkmhdo9k4f8n8omvt.apps.googleusercontent.com',
-                        discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
-                        scope: 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file'
-                    });
+                    // Try to initialize the client with discovery document
+                    // If this fails due to 403, we'll catch it and provide guidance
+                    try {
+                        await window.gapi.client.init({
+                            apiKey: 'AIzaSyAyyXvJtpYb_L4UZtztccDqHB_peGXUxXU',
+                            clientId: '415209089700-fp7cm5l9n53kkrfqkmhdo9k4f8n8omvt.apps.googleusercontent.com',
+                            discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
+                            scope: 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file'
+                        });
+                    } catch (initErr) {
+                        // If discovery document fails, provide specific guidance
+                        if (initErr.status === 403 || (initErr.result && initErr.result.error && initErr.result.error.code === 403)) {
+                            throw new Error('API Key Access Denied (403). Please check:\n\n1. Go to Google Cloud Console > APIs & Services > Credentials\n2. Click on your API key\n3. Under "API restrictions", ensure "Google Sheets API" is allowed\n4. Or temporarily set to "Don\'t restrict key" for testing\n5. Save and wait a few minutes');
+                        }
+                        throw initErr;
+                    }
                 }
 
                 // Load auth2 library
@@ -6278,20 +6326,44 @@
                     }
                 });
 
-                // Initialize auth2
-                await window.gapi.auth2.init({
-                    client_id: '415209089700-fp7cm5l9n53kkrfqkmhdo9k4f8n8omvt.apps.googleusercontent.com'
-                });
+                // Get current origin for validation
+                const currentOrigin = window.location.origin;
+                const isLocalhost = currentOrigin.includes('localhost') || currentOrigin.includes('127.0.0.1') || currentOrigin.includes('file://');
+
+                // Initialize auth2 with proper error handling
+                let authInstance;
+                try {
+                    await window.gapi.auth2.init({
+                        client_id: '415209089700-fp7cm5l9n53kkrfqkmhdo9k4f8n8omvt.apps.googleusercontent.com',
+                        scope: 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file'
+                    });
+                    authInstance = window.gapi.auth2.getAuthInstance();
+                } catch (initError) {
+                    // Handle idpiframe_initialization_failed error
+                    if (initError.error === 'idpiframe_initialization_failed' || 
+                        initError.details === 'idpiframe_initialization_failed' ||
+                        (initError.message && initError.message.includes('idpiframe_initialization_failed'))) {
+                        const setupInstructions = getGoogleSheetsSetupInstructions();
+                        throw new Error('OAuth initialization failed (idpiframe_initialization_failed).\n\n' + setupInstructions);
+                    }
+                    throw initError;
+                }
 
                 // Sign in
-                const authInstance = window.gapi.auth2.getAuthInstance();
                 const isSignedIn = authInstance.isSignedIn.get();
                 
                 if (!isSignedIn) {
                     showToast('Please sign in to Google...', 'info');
-                    await authInstance.signIn({
-                        scope: 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file'
-                    });
+                    try {
+                        await authInstance.signIn({
+                            scope: 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file'
+                        });
+                    } catch (signInError) {
+                        if (signInError.error === 'popup_closed_by_user') {
+                            throw new Error('Sign-in was cancelled. Please try again.');
+                        }
+                        throw signInError;
+                    }
                 }
 
                 // Prompt for Google Sheets URL or ID
@@ -6323,24 +6395,34 @@
 
             } catch (err) {
                 console.error('Error connecting to Google Sheets:', err);
-                let errorMessage = 'Error connecting to Google Sheets: ';
+                let errorMessage = 'Error connecting to Google Sheets:\n\n';
                 
+                // Handle specific error types
                 if (err.error) {
-                    if (err.error.code === 403) {
-                        errorMessage += 'Access denied. Please check:\n1. Google Sheets API is enabled in Google Cloud Console\n2. API key has proper permissions\n3. OAuth consent screen is configured';
+                    if (err.error.code === 403 || err.error.status === 'PERMISSION_DENIED') {
+                        errorMessage += 'Access denied (403). Please check:\n';
+                        errorMessage += '1. Google Sheets API is enabled in Google Cloud Console\n';
+                        errorMessage += '2. API key has proper permissions (no restrictions blocking Sheets API)\n';
+                        errorMessage += '3. OAuth consent screen is configured\n';
+                        errorMessage += '4. Your domain/origin is added to authorized JavaScript origins';
                     } else if (err.error.message) {
                         errorMessage += err.error.message;
+                    } else if (err.error.error_description) {
+                        errorMessage += err.error.error_description;
                     } else {
                         errorMessage += JSON.stringify(err.error);
                     }
+                } else if (err.details) {
+                    errorMessage += err.details;
                 } else if (err.message) {
                     errorMessage += err.message;
                 } else {
-                    errorMessage += 'Unknown error occurred';
+                    errorMessage += 'Unknown error occurred. Check browser console for details.';
                 }
                 
-                showToast(errorMessage, 'error');
+                // Show detailed error in alert for better visibility
                 alert(errorMessage);
+                showToast('Connection failed. See alert for details.', 'error');
             }
         }
 
