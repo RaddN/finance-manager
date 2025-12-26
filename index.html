@@ -6230,42 +6230,64 @@
             const isLocalhost = currentOrigin.includes('localhost') || currentOrigin.includes('127.0.0.1') || currentOrigin.includes('file://');
             
             let instructions = 'Google Sheets Setup Instructions:\n\n';
+            instructions += 'IMPORTANT: Copy the EXACT origin below to avoid errors!\n';
+            instructions += `Your current origin: "${currentOrigin}"\n\n`;
+            
             instructions += '1. Go to: https://console.cloud.google.com/\n';
             instructions += '2. Select your project (or create a new one)\n';
             instructions += '3. Enable APIs:\n';
             instructions += '   - Go to "APIs & Services" > "Library"\n';
             instructions += '   - Search and enable "Google Sheets API"\n';
             instructions += '   - Search and enable "Google Drive API"\n\n';
-            instructions += '4. Configure OAuth Consent Screen:\n';
+            instructions += '4. Configure OAuth Consent Screen (REQUIRED):\n';
             instructions += '   - Go to "APIs & Services" > "OAuth consent screen"\n';
             instructions += '   - Choose "External" (or "Internal" if using Google Workspace)\n';
-            instructions += '   - Fill in required fields (App name, User support email)\n';
-            instructions += '   - Add scopes: "https://www.googleapis.com/auth/spreadsheets" and "https://www.googleapis.com/auth/drive.file"\n';
-            instructions += '   - Save and continue\n\n';
-            instructions += '5. Create OAuth 2.0 Credentials:\n';
+            instructions += '   - Fill in ALL required fields:\n';
+            instructions += '     * App name (required)\n';
+            instructions += '     * User support email (required)\n';
+            instructions += '     * Developer contact information (required)\n';
+            instructions += '   - Click "Save and Continue"\n';
+            instructions += '   - On "Scopes" page, click "Add or Remove Scopes"\n';
+            instructions += '   - Add these scopes:\n';
+            instructions += '     * https://www.googleapis.com/auth/spreadsheets\n';
+            instructions += '     * https://www.googleapis.com/auth/drive.file\n';
+            instructions += '   - Click "Update" then "Save and Continue"\n';
+            instructions += '   - On "Test users" (if External), add your Google account\n';
+            instructions += '   - Click "Save and Continue" through remaining steps\n\n';
+            instructions += '5. Configure OAuth 2.0 Client ID:\n';
             instructions += '   - Go to "APIs & Services" > "Credentials"\n';
-            instructions += '   - Click "Create Credentials" > "OAuth client ID"\n';
-            instructions += '   - Choose "Web application"\n';
-            instructions += '   - Add to "Authorized JavaScript origins":\n';
+            instructions += '   - Find your OAuth 2.0 Client ID (or create new one)\n';
+            instructions += '   - Click on the Client ID to edit\n';
+            instructions += '   - Under "Authorized JavaScript origins", click "ADD URI"\n';
+            instructions += '   - Add EXACTLY (copy-paste, no trailing slash):\n';
             if (isLocalhost) {
-                instructions += '     * http://localhost\n';
-                instructions += '     * http://127.0.0.1\n';
-                if (currentOrigin.includes(':')) {
-                    instructions += `     * ${currentOrigin}\n`;
-                }
+                instructions += `     * ${currentOrigin}\n`;
+                instructions += '     * http://localhost (if different port)\n';
+                instructions += '     * http://127.0.0.1 (if using IP)\n';
             } else {
                 instructions += `     * ${currentOrigin}\n`;
+                // Also suggest without www if applicable
+                if (currentOrigin.includes('www.')) {
+                    instructions += `     * ${currentOrigin.replace('www.', '')}\n`;
+                }
             }
-            instructions += '   - Save the Client ID\n\n';
+            instructions += '   - Click "SAVE"\n';
+            instructions += '   - Copy the Client ID and update it in the code\n\n';
             instructions += '6. Configure API Key:\n';
             instructions += '   - Go to "APIs & Services" > "Credentials"\n';
             instructions += '   - Click on your API key\n';
             instructions += '   - Under "API restrictions", select "Restrict key"\n';
             instructions += '   - Check "Google Sheets API" and "Google Drive API"\n';
             instructions += '   - Or set to "Don\'t restrict key" for testing\n';
-            instructions += '   - Save\n\n';
-            instructions += '7. Update the code with your Client ID and API Key\n';
-            instructions += '8. Wait 5-10 minutes for changes to propagate\n';
+            instructions += '   - Click "SAVE"\n';
+            instructions += '   - Copy the API Key and update it in the code\n\n';
+            instructions += '7. Wait 5-10 minutes for changes to propagate\n';
+            instructions += '8. Refresh this page and try again\n\n';
+            instructions += 'TROUBLESHOOTING:\n';
+            instructions += '- Make sure origin has NO trailing slash\n';
+            instructions += '- Origin must match EXACTLY (including http vs https)\n';
+            instructions += '- OAuth consent screen must be fully configured (all steps completed)\n';
+            instructions += '- If still failing, try creating a NEW OAuth client ID\n';
             
             return instructions;
         }
@@ -6333,20 +6355,69 @@
                 // Initialize auth2 with proper error handling
                 let authInstance;
                 try {
-                    await window.gapi.auth2.init({
-                        client_id: '415209089700-fp7cm5l9n53kkrfqkmhdo9k4f8n8omvt.apps.googleusercontent.com',
-                        scope: 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file'
-                    });
-                    authInstance = window.gapi.auth2.getAuthInstance();
-                } catch (initError) {
-                    // Handle idpiframe_initialization_failed error
-                    if (initError.error === 'idpiframe_initialization_failed' || 
-                        initError.details === 'idpiframe_initialization_failed' ||
-                        (initError.message && initError.message.includes('idpiframe_initialization_failed'))) {
-                        const setupInstructions = getGoogleSheetsSetupInstructions();
-                        throw new Error('OAuth initialization failed (idpiframe_initialization_failed).\n\n' + setupInstructions);
+                    // Check if already initialized
+                    try {
+                        authInstance = window.gapi.auth2.getAuthInstance();
+                        if (authInstance) {
+                            // Already initialized, use existing instance
+                            console.log('Auth2 already initialized');
+                        }
+                    } catch (e) {
+                        // Not initialized yet, proceed to initialize
+                        console.log('Initializing auth2...');
+                        console.log('Current origin:', currentOrigin);
+                        console.log('Client ID:', '415209089700-fp7cm5l9n53kkrfqkmhdo9k4f8n8omvt.apps.googleusercontent.com');
+                        
+                        // Initialize auth2 - returns a Thenable (promise-like)
+                        const initPromise = window.gapi.auth2.init({
+                            client_id: '415209089700-fp7cm5l9n53kkrfqkmhdo9k4f8n8omvt.apps.googleusercontent.com',
+                            scope: 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file',
+                            ux_mode: 'popup' // Use popup instead of redirect
+                        });
+                        
+                        // Wait for initialization to complete
+                        await new Promise((resolve, reject) => {
+                            initPromise.then(
+                                () => {
+                                    authInstance = window.gapi.auth2.getAuthInstance();
+                                    resolve();
+                                },
+                                (error) => {
+                                    reject(error);
+                                }
+                            );
+                        });
                     }
-                    throw initError;
+                } catch (initError) {
+                    console.error('Auth2 initialization error:', initError);
+                    console.error('Error details:', JSON.stringify(initError, null, 2));
+                    
+                    // Check for idpiframe_initialization_failed in various error formats
+                    const errorString = JSON.stringify(initError);
+                    const errorMessage = initError.message || initError.error || initError.details || errorString;
+                    
+                    if (errorString.includes('idpiframe_initialization_failed') || 
+                        errorMessage.includes('idpiframe_initialization_failed') ||
+                        (initError.error && initError.error === 'idpiframe_initialization_failed') ||
+                        (initError.details && initError.details === 'idpiframe_initialization_failed')) {
+                        
+                        const setupInstructions = getGoogleSheetsSetupInstructions();
+                        const detailedError = `OAuth initialization failed (idpiframe_initialization_failed).\n\n` +
+                            `Current origin: "${currentOrigin}"\n\n` +
+                            `CRITICAL: Make sure this EXACT origin is in "Authorized JavaScript origins":\n` +
+                            `  "${currentOrigin}"\n\n` +
+                            `Common issues:\n` +
+                            `- Origin has trailing slash (WRONG: "${currentOrigin}/")\n` +
+                            `- Origin doesn't match exactly\n` +
+                            `- OAuth consent screen not fully configured\n` +
+                            `- Changes not propagated yet (wait 5-10 minutes)\n\n` +
+                            `Full setup instructions:\n\n${setupInstructions}`;
+                        
+                        throw new Error(detailedError);
+                    }
+                    
+                    // For other errors, provide generic message
+                    throw new Error(`OAuth initialization failed: ${errorMessage}\n\n${getGoogleSheetsSetupInstructions()}`);
                 }
 
                 // Sign in
