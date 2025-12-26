@@ -1827,6 +1827,7 @@
         <div class="nav-tab" onclick="switchTab('analytics')" data-translate="analytics">Analytics</div>
         <div class="nav-tab" onclick="switchTab('templates')" data-translate="templates">📋 Templates</div>
         <div class="nav-tab" onclick="switchTab('accounts')" data-translate="accounts">💳 Accounts</div>
+        <div class="nav-tab" onclick="switchTab('family')" data-translate="family_members">👨‍👩‍👧‍👦 Family</div>
         <div class="nav-tab" onclick="switchTab('transfers')" data-translate="transfers">💸 Transfers</div>
         <div class="nav-tab" onclick="switchTab('debts')" data-translate="debts">💸 Debts</div>
         <div class="nav-tab" onclick="switchTab('recurring')" data-translate="recurring">🔄 Recurring</div>
@@ -2052,7 +2053,7 @@
         <!-- Plans View -->
         <div id="view-plans" class="hidden">
             <div class="card">
-                <h2>Future Plans & Goals</h2>
+                <h2 data-translate="plans">Future Plans & Goals</h2>
                 <div id="plans-container"></div>
             </div>
         </div>
@@ -2061,8 +2062,8 @@
         <div id="view-budgets" class="hidden">
             <div class="card">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                    <h2>Budget Tracking</h2>
-                    <button class="btn btn-primary" style="width: auto;" onclick="openModal('form', 'budget')">+ Add
+                    <h2 data-translate="budgets">Budget Tracking</h2>
+                    <button class="btn btn-primary" style="width: auto;" onclick="openModal('form', 'budget')" data-translate="add_budget">+ Add
                         Budget</button>
                 </div>
                 <div id="budgets-container"></div>
@@ -2074,9 +2075,9 @@
             <div class="card">
                 <div
                     style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
-                    <h2>Financial Reports</h2>
+                    <h2 data-translate="reports">Financial Reports</h2>
                     <div style="display: flex; gap: 0.5rem;">
-                        <button class="btn-icon" onclick="printReport()">🖨️ Print</button>
+                        <button class="btn-icon" onclick="printReport()" data-translate="print">🖨️ Print</button>
                     </div>
                 </div>
                 <div style="background: #f7fafc; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
@@ -2226,6 +2227,24 @@
             </div>
         </div>
 
+        <!-- Family Members View -->
+        <div id="view-family" class="hidden">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h2 data-translate="family_members">Family Members</h2>
+                    <button class="btn btn-primary" onclick="openFamilyMemberModal()" style="width: auto;">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        <span data-translate="add_family_member">Add Family Member</span>
+                    </button>
+                </div>
+                <div id="family-members-container"></div>
+            </div>
+        </div>
+
         <!-- Transfers View -->
         <div id="view-transfers" class="hidden">
             <div class="card">
@@ -2291,7 +2310,7 @@
         <!-- Calendar View -->
         <div id="view-calendar" class="hidden">
             <div class="card">
-                <h2>Financial Calendar</h2>
+                <h2 data-translate="calendar">Financial Calendar</h2>
                 <div id="calendar-container"></div>
             </div>
         </div>
@@ -2335,14 +2354,14 @@
         <!-- Settings View -->
         <div id="view-settings" class="hidden">
             <div class="card">
-                <h2>Settings & Preferences</h2>
+                <h2 data-translate="settings_preferences">Settings & Preferences</h2>
 
                 <div class="settings-section">
-                    <div class="settings-section-title">General Settings</div>
+                    <div class="settings-section-title" data-translate="general_settings">General Settings</div>
                     <div class="settings-row">
                         <div>
-                            <div class="settings-label">Currency Symbol</div>
-                            <div class="settings-description">Default currency symbol for all amounts</div>
+                            <div class="settings-label" data-translate="currency_symbol">Currency Symbol</div>
+                            <div class="settings-description" data-translate="currency_symbol_description">Default currency symbol for all amounts</div>
                         </div>
                         <select class="form-select" id="setting-currency" style="width: 200px;"
                             onchange="saveSettings()">
@@ -2356,8 +2375,8 @@
                     </div>
                     <div class="settings-row">
                         <div>
-                            <div class="settings-label">Date Format</div>
-                            <div class="settings-description">Preferred date display format</div>
+                            <div class="settings-label" data-translate="date_format">Date Format</div>
+                            <div class="settings-description" data-translate="date_format_description">Preferred date display format</div>
                         </div>
                         <select class="form-select" id="setting-date-format" style="width: 200px;"
                             onchange="saveSettings()">
@@ -2369,86 +2388,79 @@
                     </div>
                     <div class="settings-row">
                         <div>
-                            <div class="settings-label">Auto-save</div>
-                            <div class="settings-description">Automatically save changes to Excel file</div>
+                            <div class="settings-label" data-translate="auto_save">Auto-save</div>
+                            <div class="settings-description" data-translate="auto_save_description">Automatically save changes to Excel file</div>
                         </div>
                         <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
                             <input type="checkbox" id="setting-auto-save" onchange="saveSettings()">
-                            <span>Enable</span>
+                            <span data-translate="enable">Enable</span>
                         </label>
                     </div>
                 </div>
 
                 <div class="settings-section">
-                    <div class="settings-section-title">Data Management</div>
+                    <div class="settings-section-title" data-translate="data_management">Data Management</div>
                     <div class="settings-row">
                         <div>
-                            <div class="settings-label">Export Data</div>
-                            <div class="settings-description">Download all data as Excel file</div>
+                            <div class="settings-label" data-translate="export_data">Export Data</div>
+                            <div class="settings-description" data-translate="export_data_description">Download all data as Excel file</div>
                         </div>
                         <div style="display: flex; gap: 0.5rem;">
-                            <button class="btn btn-primary" onclick="exportData()">Export to Excel</button>
-                            <button class="btn btn-secondary" onclick="exportDataCSV()">Export to CSV</button>
+                            <button class="btn btn-primary" onclick="exportData()" data-translate="export_to_excel">Export to Excel</button>
+                            <button class="btn btn-secondary" onclick="exportDataCSV()" data-translate="export_to_csv">Export to CSV</button>
                         </div>
                     </div>
                     <div class="settings-row">
                         <div>
-                            <div class="settings-label">Import Data</div>
-                            <div class="settings-description">Import data from Excel file (will merge with existing
-                                data)</div>
+                            <div class="settings-label" data-translate="import_data">Import Data</div>
+                            <div class="settings-description" data-translate="import_data_description">Import data from Excel file (will merge with existing data)</div>
                         </div>
-                        <button class="btn btn-primary" onclick="importData()" style="width: auto;">Import from Excel</button>
+                        <button class="btn btn-primary" onclick="importData()" style="width: auto;" data-translate="import_from_excel">Import from Excel</button>
                     </div>
                     <div class="settings-row">
                         <div>
-                            <div class="settings-label">Backup Data</div>
-                            <div class="settings-description">Create a backup of all your data</div>
+                            <div class="settings-label" data-translate="backup_data">Backup Data</div>
+                            <div class="settings-description" data-translate="backup_data_description">Create a backup of all your data</div>
                         </div>
-                        <button class="btn btn-secondary" onclick="backupData()" style="width: auto;">Create Backup</button>
+                        <button class="btn btn-secondary" onclick="backupData()" style="width: auto;" data-translate="create_backup">Create Backup</button>
                     </div>
                     <div class="settings-row">
                         <div>
-                            <div class="settings-label">Restore Data</div>
-                            <div class="settings-description">Restore data from a backup file</div>
+                            <div class="settings-label" data-translate="restore_data">Restore Data</div>
+                            <div class="settings-description" data-translate="restore_data_description">Restore data from a backup file</div>
                         </div>
-                        <button class="btn btn-secondary" onclick="restoreData()" style="width: auto;">Restore Backup</button>
+                        <button class="btn btn-secondary" onclick="restoreData()" style="width: auto;" data-translate="restore_backup">Restore Backup</button>
                     </div>
                     <div class="settings-row">
                         <div>
-                            <div class="settings-label">Undo Last Action</div>
-                            <div class="settings-description">Undo the last transaction (add/edit/delete)</div>
+                            <div class="settings-label" data-translate="undo_last_action">Undo Last Action</div>
+                            <div class="settings-description" data-translate="undo_last_action_description">Undo the last transaction (add/edit/delete)</div>
                         </div>
-                        <button class="btn btn-secondary" onclick="undoLastAction()" id="undo-btn" style="width: auto;">Undo</button>
+                        <button class="btn btn-secondary" onclick="undoLastAction()" id="undo-btn" style="width: auto;" data-translate="undo">Undo</button>
                     </div>
                 </div>
 
                 <div class="settings-section">
-                    <div class="settings-section-title">Keyboard Shortcuts</div>
+                    <div class="settings-section-title" data-translate="keyboard_shortcuts">Keyboard Shortcuts</div>
                     <div style="padding: 1rem 0;">
                         <div
                             style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
                             <div>
-                                <div style="font-weight: 600; margin-bottom: 0.5rem;">Navigation</div>
+                                <div style="font-weight: 600; margin-bottom: 0.5rem;" data-translate="navigation">Navigation</div>
                                 <div style="font-size: 0.875rem; line-height: 2;">
-                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">1</span> -
-                                        Dashboard</div>
-                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">2</span> -
-                                        Income</div>
-                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">3</span> -
-                                        Expenses</div>
-                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">N</span> -
-                                        New Item</div>
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">1</span> - <span data-translate="dashboard">Dashboard</span></div>
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">2</span> - <span data-translate="income">Income</span></div>
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">3</span> - <span data-translate="expenses">Expenses</span></div>
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">N</span> - <span data-translate="add_new_item">New Item</span></div>
                                 </div>
                             </div>
                             <div>
-                                <div style="font-weight: 600; margin-bottom: 0.5rem;">Actions</div>
+                                <div style="font-weight: 600; margin-bottom: 0.5rem;" data-translate="actions">Actions</div>
                                 <div style="font-size: 0.875rem; line-height: 2;">
-                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">S</span> -
-                                        Save</div>
-                                    <div><span class="shortcut-key">Esc</span> - Close Modal</div>
-                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">F</span> -
-                                        Search</div>
-                                    <div><span class="shortcut-key">Del</span> - Delete Selected</div>
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">S</span> - <span data-translate="save">Save</span></div>
+                                    <div><span class="shortcut-key">Esc</span> - <span data-translate="close">Close Modal</span></div>
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">F</span> - <span data-translate="search">Search</span></div>
+                                    <div><span class="shortcut-key">Del</span> - <span data-translate="delete">Delete Selected</span></div>
                                 </div>
                             </div>
                         </div>
@@ -2715,6 +2727,51 @@
                 from_account: 'From Account',
                 to_account: 'To Account',
                 transfer_description_placeholder: 'e.g. Cash withdrawal, Account transfer',
+                print: 'Print',
+                no_accounts_found: 'No accounts found. Please add an account first.',
+                no_accounts_added: 'No accounts added. Add an account to track balances across different sources.',
+                no_transfers_recorded: 'No transfers recorded. Add a transfer to track money movement between accounts.',
+                no_debts_tracked: 'No debts tracked. Add a debt to start tracking.',
+                family_members: 'Family Members',
+                family_member: 'Family Member',
+                add_family_member: 'Add Family Member',
+                edit_family_member: 'Edit Family Member',
+                delete_family_member: 'Delete Family Member',
+                family_member_name: 'Family Member Name',
+                select_family_member: 'Select Family Member',
+                select_family_members: 'Select Family Members',
+                divide_equally: 'Divide Equally',
+                expense_per_person: 'Per Person',
+                no_family_members: 'No family members added. Add a family member to track shared expenses.',
+                are_you_sure_delete_family_member: 'Are you sure you want to delete this family member?',
+                settings_preferences: 'Settings & Preferences',
+                general_settings: 'General Settings',
+                currency_symbol: 'Currency Symbol',
+                currency_symbol_description: 'Default currency symbol for all amounts',
+                date_format: 'Date Format',
+                date_format_description: 'Preferred date display format',
+                auto_save: 'Auto-save',
+                auto_save_description: 'Automatically save changes to Excel file',
+                enable: 'Enable',
+                data_management: 'Data Management',
+                export_data: 'Export Data',
+                export_data_description: 'Download all data as Excel file',
+                export_to_excel: 'Export to Excel',
+                export_to_csv: 'Export to CSV',
+                import_data: 'Import Data',
+                import_data_description: 'Import data from Excel file (will merge with existing data)',
+                import_from_excel: 'Import from Excel',
+                backup_data: 'Backup Data',
+                backup_data_description: 'Create a backup of all your data',
+                create_backup: 'Create Backup',
+                restore_data: 'Restore Data',
+                restore_data_description: 'Restore data from a backup file',
+                restore_backup: 'Restore Backup',
+                undo_last_action: 'Undo Last Action',
+                undo_last_action_description: 'Undo the last transaction (add/edit/delete)',
+                undo: 'Undo',
+                keyboard_shortcuts: 'Keyboard Shortcuts',
+                navigation: 'Navigation',
                 all_status: 'All Status',
                 color: 'Color',
                 manage_categories: 'Manage Categories',
@@ -2957,7 +3014,191 @@
                 mortgage: 'বন্ধকী',
                 personal_loan: 'ব্যক্তিগত ঋণ',
                 savings: 'সঞ্চয়',
-                bank: 'ব্যাংক'
+                bank: 'ব্যাংক',
+                save: 'সংরক্ষণ',
+                update: 'আপডেট',
+                cancel: 'বাতিল',
+                add: 'যোগ',
+                save_item: 'আইটেম সংরক্ষণ',
+                update_item: 'আইটেম আপডেট',
+                add_income: 'আয় যোগ',
+                edit_income: 'আয় সম্পাদনা',
+                add_expense: 'ব্যয় যোগ',
+                edit_expense: 'ব্যয় সম্পাদনা',
+                add_receivable: 'প্রাপ্য যোগ',
+                edit_receivable: 'প্রাপ্য সম্পাদনা',
+                add_payable: 'দেয় যোগ',
+                edit_payable: 'দেয় সম্পাদনা',
+                add_plan: 'পরিকল্পনা যোগ',
+                edit_plan: 'পরিকল্পনা সম্পাদনা',
+                add_budget: 'বাজেট যোগ',
+                edit_budget: 'বাজেট সম্পাদনা',
+                create_template: 'টেমপ্লেট তৈরি',
+                edit_template: 'টেমপ্লেট সম্পাদনা',
+                add_account: 'অ্যাকাউন্ট যোগ',
+                update_account: 'অ্যাকাউন্ট আপডেট',
+                add_debt: 'ঋণ যোগ',
+                update_debt: 'ঋণ আপডেট',
+                add_goal: 'লক্ষ্য যোগ',
+                update_goal: 'লক্ষ্য আপডেট',
+                period: 'সময়কাল',
+                daily: 'দৈনিক',
+                weekly: 'সাপ্তাহিক',
+                monthly: 'মাসিক',
+                per_3_month: 'প্রতি ৩ মাস',
+                per_6_month: 'প্রতি ৬ মাস',
+                yearly: 'বার্ষিক',
+                active: 'সক্রিয়',
+                paused: 'বিরতি',
+                completed: 'সম্পন্ন',
+                in_progress: 'চলমান',
+                cancelled: 'বাতিল',
+                budget_tracks_info: 'বাজেট নির্বাচিত সময়কালের মধ্যে নির্বাচিত বিভাগের জন্য এই সীমার বিপরীতে প্রকৃত ব্যয় ট্র্যাক করে।',
+                notes_optional: 'নোট (ঐচ্ছিক)',
+                recurring_transaction: 'পুনরাবৃত্ত লেনদেন',
+                frequency: 'ফ্রিকোয়েন্সি',
+                next_occurrence_date: 'পরবর্তী তারিখ',
+                payment_method: 'পেমেন্ট পদ্ধতি',
+                select_method: 'পদ্ধতি নির্বাচন করুন',
+                cash: 'নগদ',
+                bank_transfer: 'ব্যাংক ট্রান্সফার',
+                card: 'কার্ড',
+                mobile_payment: 'মোবাইল পেমেন্ট',
+                other: 'অন্যান্য',
+                select_category: 'বিভাগ নির্বাচন করুন',
+                from_client: 'থেকে (ক্লায়েন্ট/ব্যক্তি)',
+                to_vendor: 'প্রতি (ভেন্ডর/ব্যক্তি)',
+                name_placeholder: 'নাম',
+                reason: 'কারণ',
+                reminder_days_before: 'রিমাইন্ডার (নির্ধারিত তারিখের কতদিন আগে)',
+                reminder_days_before_deadline: 'রিমাইন্ডার (নির্ধারিত সময়সীমার কতদিন আগে)',
+                plan_title: 'পরিকল্পনার শিরোনাম',
+                target_amount: 'লক্ষ্যমাত্রা পরিমাণ',
+                start_date: 'শুরুর তারিখ',
+                target_deadline: 'লক্ষ্যমাত্রা সময়সীমা',
+                notes: 'নোট',
+                additional_notes: 'অতিরিক্ত নোট...',
+                optional_description: 'ঐচ্ছিক বিবরণ',
+                progress_note: 'দ্রষ্টব্য: অগ্রগতি মোট সঞ্চয়ের উপর ভিত্তি করে গণনা করা হবে (আয় - ব্যয় + প্রাপ্য)',
+                reminder_help_text: 'নির্ধারিত তারিখের এতদিন আগে রিমাইন্ডার পান (0 = নির্ধারিত তারিখে)',
+                reminder_deadline_help: 'নির্ধারিত সময়সীমার এতদিন আগে রিমাইন্ডার পান (0 = নির্ধারিত সময়সীমায়)',
+                type_cannot_change: 'সৃষ্টির পরে ধরন পরিবর্তন করা যাবে না',
+                account: 'অ্যাকাউন্ট',
+                select_account: 'অ্যাকাউন্ট নির্বাচন করুন',
+                initial_balance: 'প্রাথমিক ব্যালেন্স',
+                transfers: 'ট্রান্সফার',
+                transfer: 'ট্রান্সফার',
+                add_transfer: 'ট্রান্সফার যোগ',
+                account_transfers: 'অ্যাকাউন্ট ট্রান্সফার',
+                from_account: 'থেকে অ্যাকাউন্ট',
+                to_account: 'প্রতি অ্যাকাউন্ট',
+                transfer_description_placeholder: 'যেমন: নগদ উত্তোলন, অ্যাকাউন্ট ট্রান্সফার',
+                print: 'প্রিন্ট',
+                no_accounts_found: 'কোন অ্যাকাউন্ট পাওয়া যায়নি। অনুগ্রহ করে প্রথমে একটি অ্যাকাউন্ট যোগ করুন।',
+                no_accounts_added: 'কোন অ্যাকাউন্ট যোগ করা হয়নি। বিভিন্ন উৎস জুড়ে ব্যালেন্স ট্র্যাক করতে একটি অ্যাকাউন্ট যোগ করুন।',
+                no_transfers_recorded: 'কোন ট্রান্সফার রেকর্ড করা হয়নি। অ্যাকাউন্টের মধ্যে অর্থ চলাচল ট্র্যাক করতে একটি ট্রান্সফার যোগ করুন।',
+                no_debts_tracked: 'কোন ঋণ ট্র্যাক করা হয়নি। ট্র্যাকিং শুরু করতে একটি ঋণ যোগ করুন।',
+                family_members: 'পরিবারের সদস্য',
+                family_member: 'পরিবারের সদস্য',
+                add_family_member: 'পরিবারের সদস্য যোগ',
+                edit_family_member: 'পরিবারের সদস্য সম্পাদনা',
+                delete_family_member: 'পরিবারের সদস্য মুছুন',
+                family_member_name: 'পরিবারের সদস্যের নাম',
+                select_family_member: 'পরিবারের সদস্য নির্বাচন করুন',
+                select_family_members: 'পরিবারের সদস্য নির্বাচন করুন',
+                divide_equally: 'সমানভাবে ভাগ করুন',
+                expense_per_person: 'প্রতি ব্যক্তি',
+                no_family_members: 'কোন পরিবারের সদস্য যোগ করা হয়নি। ভাগ করা ব্যয় ট্র্যাক করতে একটি পরিবারের সদস্য যোগ করুন।',
+                are_you_sure_delete_family_member: 'আপনি কি এই পরিবারের সদস্যটি মুছতে চান?',
+                settings_preferences: 'সেটিংস এবং পছন্দসমূহ',
+                general_settings: 'সাধারণ সেটিংস',
+                currency_symbol: 'মুদ্রা প্রতীক',
+                currency_symbol_description: 'সমস্ত পরিমাণের জন্য ডিফল্ট মুদ্রা প্রতীক',
+                date_format: 'তারিখ ফরম্যাট',
+                date_format_description: 'পছন্দসই তারিখ প্রদর্শন ফরম্যাট',
+                auto_save: 'স্বয়ংক্রিয় সংরক্ষণ',
+                auto_save_description: 'এক্সেল ফাইলে স্বয়ংক্রিয়ভাবে পরিবর্তন সংরক্ষণ করুন',
+                enable: 'সক্ষম করুন',
+                data_management: 'ডেটা ব্যবস্থাপনা',
+                export_data: 'ডেটা এক্সপোর্ট',
+                export_data_description: 'সমস্ত ডেটা এক্সেল ফাইল হিসাবে ডাউনলোড করুন',
+                export_to_excel: 'এক্সেলে এক্সপোর্ট',
+                export_to_csv: 'CSV তে এক্সপোর্ট',
+                import_data: 'ডেটা ইম্পোর্ট',
+                import_data_description: 'এক্সেল ফাইল থেকে ডেটা ইম্পোর্ট করুন (বিদ্যমান ডেটার সাথে মার্জ হবে)',
+                import_from_excel: 'এক্সেল থেকে ইম্পোর্ট',
+                backup_data: 'ডেটা ব্যাকআপ',
+                backup_data_description: 'আপনার সমস্ত ডেটার একটি ব্যাকআপ তৈরি করুন',
+                create_backup: 'ব্যাকআপ তৈরি করুন',
+                restore_data: 'ডেটা পুনরুদ্ধার',
+                restore_data_description: 'একটি ব্যাকআপ ফাইল থেকে ডেটা পুনরুদ্ধার করুন',
+                restore_backup: 'ব্যাকআপ পুনরুদ্ধার',
+                undo_last_action: 'শেষ ক্রিয়া পূর্বাবস্থায় ফেরান',
+                undo_last_action_description: 'শেষ লেনদেন পূর্বাবস্থায় ফেরান (যোগ/সম্পাদনা/মুছুন)',
+                undo: 'পূর্বাবস্থায় ফেরান',
+                keyboard_shortcuts: 'কীবোর্ড শর্টকাট',
+                navigation: 'নেভিগেশন',
+                all_status: 'সব অবস্থা',
+                color: 'রং',
+                manage_categories: 'বিভাগ পরিচালনা করুন',
+                recurring_transactions_manager: 'পুনরাবৃত্ত লেনদেন ম্যানেজার',
+                auto_generate_info: 'স্বয়ংক্রিয় পুনরাবৃত্ত লেনদেন তৈরি করুন',
+                auto_generate_desc: 'এটি ফ্রিকোয়েন্সি এবং তারিখের উপর ভিত্তি করে সমস্ত পুনরাবৃত্ত আইটেমের জন্য স্বয়ংক্রিয়ভাবে লেনদেন তৈরি করবে।',
+                generate_recurring: 'পুনরাবৃত্ত লেনদেন তৈরি করুন',
+                select_category_placeholder: 'বিভাগ নির্বাচন করুন',
+                add_new_item: 'নতুন আইটেম যোগ করুন',
+                new: 'নতুন',
+                is_required: 'প্রয়োজন!',
+                must_be_greater_than_zero: '0 এর চেয়ে বেশি হতে হবে!',
+                category_already_exists: 'এই বিভাগটি ইতিমধ্যে বিদ্যমান!',
+                category_name_required: 'বিভাগের নাম প্রয়োজন!',
+                are_you_sure_disconnect: 'আপনি কি এক্সেল ফাইল থেকে সংযোগ বিচ্ছিন্ন করতে চান? পরিবর্তন সংরক্ষণ করতে আপনাকে পুনরায় সংযুক্ত করতে হবে।',
+                failed_to_save: 'এক্সেল ফাইলে সংরক্ষণ করতে ব্যর্থ। অনুমতি পরীক্ষা করুন।',
+                are_you_sure_delete: 'আপনি কি মুছতে চান',
+                action_cannot_undo: 'এই ক্রিয়াটি পূর্বাবস্থায় ফেরানো যাবে না।',
+                are_you_sure_delete_template: 'আপনি কি এই টেমপ্লেটটি মুছতে চান?',
+                are_you_sure_delete_account: 'আপনি কি এই অ্যাকাউন্টটি মুছতে চান? এটি এর সাথে যুক্ত লেনদেন মুছে ফেলবে না।',
+                are_you_sure_delete_debt: 'আপনি কি এই ঋণটি মুছতে চান?',
+                are_you_sure_delete_goal: 'আপনি কি এই লক্ষ্যটি মুছতে চান?',
+                are_you_sure_delete_investment: 'আপনি কি এই বিনিয়োগটি মুছতে চান?',
+                category_used_in_transactions: 'এই বিভাগটি ব্যবহার করা হয়েছে',
+                deleting_will_set_to_other: 'লেনদেনে। এটি মুছে ফেললে সেই লেনদেনগুলি "অন্যান্য" এ সেট করা হবে। চালিয়ে যাবেন?',
+                cash_flow_analysis: 'নগদ প্রবাহ বিশ্লেষণ',
+                investment_portfolio: 'বিনিয়োগ পোর্টফোলিও',
+                add_investment: 'বিনিয়োগ যোগ',
+                edit_investment: 'বিনিয়োগ সম্পাদনা',
+                all_methods: 'সব পদ্ধতি',
+                placeholder_salary_freelance: 'যেমন: বেতন, ফ্রিল্যান্স',
+                placeholder_groceries: 'যেমন: মুদিখানা',
+                placeholder_new_laptop: 'যেমন: নতুন ল্যাপটপ',
+                placeholder_groceries_salary: 'যেমন: মুদিখানা, বেতন',
+                placeholder_monthly_salary: 'যেমন: মাসিক বেতন',
+                placeholder_main_bank: 'যেমন: মূল ব্যাংক অ্যাকাউন্ট',
+                placeholder_home_loan: 'যেমন: বাড়ির ঋণ',
+                placeholder_bank_name: 'যেমন: ব্যাংকের নাম',
+                placeholder_emergency_fund: 'যেমন: জরুরি তহবিল',
+                placeholder_apple_inc: 'যেমন: Apple Inc.',
+                placeholder_aapl: 'যেমন: AAPL',
+                total_cost_basis: 'মোট খরচ ভিত্তি',
+                total_gain_loss: 'মোট লাভ/ক্ষতি',
+                total_return: 'মোট রিটার্ন',
+                placeholder_example_3: 'যেমন: 3',
+                placeholder_example_7: 'যেমন: 7',
+                optional_notes: 'ঐচ্ছিক নোট',
+                investment_name: 'বিনিয়োগের নাম',
+                symbol_ticker: 'প্রতীক/টিকার',
+                cost_basis: 'খরচ ভিত্তি',
+                current_value: 'বর্তমান মান',
+                purchase_date: 'ক্রয়ের তারিখ',
+                stock: 'স্টক',
+                bond: 'বন্ড',
+                mutual_fund: 'মিউচুয়াল ফান্ড',
+                etf: 'ETF',
+                cryptocurrency: 'ক্রিপ্টোকারেন্সি',
+                update_investment: 'বিনিয়োগ আপডেট',
+                delete_multiple_items: 'একাধিক আইটেম মুছুন',
+                delete_all: 'সব মুছুন',
+                confirm: 'নিশ্চিত করুন'
             },
             es: {
                 notifications: 'Notificaciones',
@@ -3082,7 +3323,216 @@
                 excellent_health: '¡Excelente - Gran salud financiera!',
                 good_health: 'Bueno - En el camino correcto',
                 fair_health: 'Regular - Hay margen de mejora',
-                needs_attention: 'Necesita Atención - Revise los hábitos de gasto'
+                needs_attention: 'Necesita Atención - Revise los hábitos de gasto',
+                save: 'Guardar',
+                update: 'Actualizar',
+                cancel: 'Cancelar',
+                add: 'Agregar',
+                save_item: 'Guardar Elemento',
+                update_item: 'Actualizar Elemento',
+                add_income: 'Agregar Ingreso',
+                edit_income: 'Editar Ingreso',
+                add_expense: 'Agregar Gasto',
+                edit_expense: 'Editar Gasto',
+                add_receivable: 'Agregar Por Cobrar',
+                edit_receivable: 'Editar Por Cobrar',
+                add_payable: 'Agregar Por Pagar',
+                edit_payable: 'Editar Por Pagar',
+                add_plan: 'Agregar Plan',
+                edit_plan: 'Editar Plan',
+                add_budget: 'Agregar Presupuesto',
+                edit_budget: 'Editar Presupuesto',
+                create_template: 'Crear Plantilla',
+                edit_template: 'Editar Plantilla',
+                add_account: 'Agregar Cuenta',
+                update_account: 'Actualizar Cuenta',
+                add_debt: 'Agregar Deuda',
+                update_debt: 'Actualizar Deuda',
+                add_goal: 'Agregar Objetivo',
+                update_goal: 'Actualizar Objetivo',
+                period: 'Período',
+                daily: 'Diario',
+                weekly: 'Semanal',
+                monthly: 'Mensual',
+                per_3_month: 'Cada 3 Meses',
+                per_6_month: 'Cada 6 Meses',
+                yearly: 'Anual',
+                active: 'Activo',
+                paused: 'Pausado',
+                completed: 'Completado',
+                in_progress: 'En Progreso',
+                cancelled: 'Cancelado',
+                budget_tracks_info: 'El presupuesto rastrea el gasto real contra este límite para la categoría seleccionada dentro del período seleccionado.',
+                notes_optional: 'Notas (Opcional)',
+                recurring_transaction: 'Transacción Recurrente',
+                frequency: 'Frecuencia',
+                next_occurrence_date: 'Fecha de Próxima Ocurrencia',
+                payment_method: 'Método de Pago',
+                select_method: 'Seleccionar Método',
+                cash: 'Efectivo',
+                bank_transfer: 'Transferencia Bancaria',
+                card: 'Tarjeta',
+                mobile_payment: 'Pago Móvil',
+                other: 'Otro',
+                select_category: 'Seleccionar Categoría',
+                from_client: 'De (Cliente/Persona)',
+                to_vendor: 'A (Proveedor/Persona)',
+                name_placeholder: 'Nombre',
+                reason: 'Razón',
+                reminder_days_before: 'Recordatorio (Días Antes del Vencimiento)',
+                reminder_days_before_deadline: 'Recordatorio (Días Antes de la Fecha Límite)',
+                plan_title: 'Título del Plan',
+                target_amount: 'Monto Objetivo',
+                start_date: 'Fecha de Inicio',
+                target_deadline: 'Fecha Límite Objetivo',
+                notes: 'Notas',
+                additional_notes: 'Notas adicionales...',
+                optional_description: 'Descripción opcional',
+                progress_note: 'Nota: El progreso se calculará basado en el Ahorro Total (Ingresos - Gastos + Por Cobrar).',
+                reminder_help_text: 'Recibir recordatorio esta cantidad de días antes de la fecha de vencimiento (0 = en la fecha de vencimiento)',
+                reminder_deadline_help: 'Recibir recordatorio esta cantidad de días antes de la fecha límite (0 = en la fecha límite)',
+                type_cannot_change: 'El tipo no puede cambiarse después de la creación',
+                account_management: 'Gestión de Cuentas',
+                debt_tracker: 'Seguimiento de Deudas',
+                financial_goals: 'Objetivos Financieros',
+                account: 'Cuenta',
+                account_name: 'Nombre de la Cuenta',
+                account_type: 'Tipo de Cuenta',
+                select_account: 'Seleccionar Cuenta',
+                initial_balance: 'Saldo Inicial',
+                transfers: 'Transferencias',
+                transfer: 'Transferencia',
+                add_transfer: 'Agregar Transferencia',
+                account_transfers: 'Transferencias de Cuenta',
+                from_account: 'Desde Cuenta',
+                to_account: 'A Cuenta',
+                transfer_description_placeholder: 'ej. Retiro de efectivo, Transferencia de cuenta',
+                debt_name: 'Nombre de la Deuda',
+                debt_type: 'Tipo de Deuda',
+                principal_amount: 'Monto Principal',
+                amount_paid: 'Monto Pagado',
+                creditor_lender: 'Acreedor/Prestamista',
+                goal_name: 'Nombre del Objetivo',
+                current_amount: 'Monto Actual',
+                deadline: 'Fecha Límite',
+                template_name: 'Nombre de la Plantilla',
+                transaction_type: 'Tipo de Transacción',
+                recurring_only: 'Solo Recurrentes',
+                non_recurring: 'No Recurrentes',
+                clear_filters: 'Limpiar Filtros',
+                all_types: 'Todos los Tipos',
+                all_accounts: 'Todas las Cuentas',
+                print: 'Imprimir',
+                no_accounts_found: 'No se encontraron cuentas. Por favor agregue una cuenta primero.',
+                no_accounts_added: 'No se agregaron cuentas. Agregue una cuenta para rastrear saldos en diferentes fuentes.',
+                no_transfers_recorded: 'No se registraron transferencias. Agregue una transferencia para rastrear el movimiento de dinero entre cuentas.',
+                no_debts_tracked: 'No se rastrean deudas. Agregue una deuda para comenzar el seguimiento.',
+                family_members: 'Miembros de la Familia',
+                family_member: 'Miembro de la Familia',
+                add_family_member: 'Agregar Miembro de la Familia',
+                edit_family_member: 'Editar Miembro de la Familia',
+                delete_family_member: 'Eliminar Miembro de la Familia',
+                family_member_name: 'Nombre del Miembro de la Familia',
+                select_family_member: 'Seleccionar Miembro de la Familia',
+                select_family_members: 'Seleccionar Miembros de la Familia',
+                divide_equally: 'Dividir Equitativamente',
+                expense_per_person: 'Por Persona',
+                no_family_members: 'No se agregaron miembros de la familia. Agregue un miembro de la familia para rastrear gastos compartidos.',
+                are_you_sure_delete_family_member: '¿Está seguro de que desea eliminar este miembro de la familia?',
+                settings_preferences: 'Configuración y Preferencias',
+                general_settings: 'Configuración General',
+                currency_symbol: 'Símbolo de Moneda',
+                currency_symbol_description: 'Símbolo de moneda predeterminado para todos los montos',
+                date_format: 'Formato de Fecha',
+                date_format_description: 'Formato de visualización de fecha preferido',
+                auto_save: 'Guardado Automático',
+                auto_save_description: 'Guardar automáticamente los cambios en el archivo Excel',
+                enable: 'Habilitar',
+                data_management: 'Gestión de Datos',
+                export_data: 'Exportar Datos',
+                export_data_description: 'Descargar todos los datos como archivo Excel',
+                export_to_excel: 'Exportar a Excel',
+                export_to_csv: 'Exportar a CSV',
+                import_data: 'Importar Datos',
+                import_data_description: 'Importar datos desde un archivo Excel (se fusionará con los datos existentes)',
+                import_from_excel: 'Importar desde Excel',
+                backup_data: 'Respaldar Datos',
+                backup_data_description: 'Crear una copia de seguridad de todos sus datos',
+                create_backup: 'Crear Copia de Seguridad',
+                restore_data: 'Restaurar Datos',
+                restore_data_description: 'Restaurar datos desde un archivo de copia de seguridad',
+                restore_backup: 'Restaurar Copia de Seguridad',
+                undo_last_action: 'Deshacer Última Acción',
+                undo_last_action_description: 'Deshacer la última transacción (agregar/editar/eliminar)',
+                undo: 'Deshacer',
+                keyboard_shortcuts: 'Atajos de Teclado',
+                navigation: 'Navegación',
+                all_status: 'Todos los Estados',
+                color: 'Color',
+                manage_categories: 'Gestionar Categorías',
+                recurring_transactions_manager: 'Gestor de Transacciones Recurrentes',
+                auto_generate_info: 'Generar Automáticamente Transacciones Recurrentes',
+                auto_generate_desc: 'Esto creará automáticamente transacciones para todos los elementos recurrentes basados en su frecuencia y fechas.',
+                generate_recurring: 'Generar Transacciones Recurrentes',
+                select_category_placeholder: 'Seleccionar Categoría',
+                add_new_item: 'Agregar Nuevo Elemento',
+                new: 'Nuevo',
+                loan: 'Préstamo',
+                mortgage: 'Hipoteca',
+                personal_loan: 'Préstamo Personal',
+                savings: 'Ahorros',
+                bank: 'Banco',
+                is_required: 'es requerido!',
+                must_be_greater_than_zero: 'debe ser mayor que 0!',
+                category_already_exists: '¡Esta categoría ya existe!',
+                category_name_required: '¡El nombre de la categoría es requerido!',
+                are_you_sure_disconnect: '¿Está seguro de que desea desconectarse del archivo Excel? Necesitará volver a conectarse para guardar cambios.',
+                failed_to_save: 'Error al guardar en el archivo Excel. Verifique los permisos.',
+                are_you_sure_delete: '¿Está seguro de que desea eliminar',
+                action_cannot_undo: 'Esta acción no se puede deshacer.',
+                are_you_sure_delete_template: '¿Está seguro de que desea eliminar esta plantilla?',
+                are_you_sure_delete_account: '¿Está seguro de que desea eliminar esta cuenta? Esto no eliminará las transacciones asociadas.',
+                are_you_sure_delete_debt: '¿Está seguro de que desea eliminar esta deuda?',
+                are_you_sure_delete_goal: '¿Está seguro de que desea eliminar este objetivo?',
+                are_you_sure_delete_investment: '¿Está seguro de que desea eliminar esta inversión?',
+                category_used_in_transactions: 'Esta categoría se usa en',
+                deleting_will_set_to_other: 'transacción(es). Eliminarla establecerá esas transacciones a "Otro". ¿Continuar?',
+                cash_flow_analysis: 'Análisis de Flujo de Caja',
+                investment_portfolio: 'Portafolio de Inversiones',
+                add_investment: 'Agregar Inversión',
+                edit_investment: 'Editar Inversión',
+                all_methods: 'Todos los Métodos',
+                placeholder_salary_freelance: 'ej. Salario, Freelance',
+                placeholder_groceries: 'ej. Comestibles',
+                placeholder_new_laptop: 'ej. Nueva Laptop',
+                placeholder_groceries_salary: 'ej. Comestibles, Salario',
+                placeholder_monthly_salary: 'ej. Salario Mensual',
+                placeholder_main_bank: 'ej. Cuenta Bancaria Principal',
+                placeholder_home_loan: 'ej. Préstamo Hipotecario',
+                placeholder_bank_name: 'ej. Nombre del Banco',
+                placeholder_emergency_fund: 'ej. Fondo de Emergencia',
+                placeholder_apple_inc: 'ej. Apple Inc.',
+                placeholder_aapl: 'ej. AAPL',
+                total_cost_basis: 'Base de Costo Total',
+                total_gain_loss: 'Ganancia/Pérdida Total',
+                total_return: 'Retorno Total',
+                placeholder_example_3: 'ej. 3',
+                placeholder_example_7: 'ej. 7',
+                optional_notes: 'Notas opcionales',
+                investment_name: 'Nombre de la Inversión',
+                symbol_ticker: 'Símbolo/Ticker',
+                cost_basis: 'Base de Costo',
+                current_value: 'Valor Actual',
+                purchase_date: 'Fecha de Compra',
+                stock: 'Acción',
+                bond: 'Bono',
+                mutual_fund: 'Fondo Mutuo',
+                etf: 'ETF',
+                cryptocurrency: 'Criptomoneda',
+                update_investment: 'Actualizar Inversión',
+                delete_multiple_items: 'Eliminar Múltiples Elementos',
+                delete_all: 'Eliminar Todo',
+                confirm: 'Confirmar'
             },
             fr: {
                 notifications: 'Notifications',
@@ -3191,6 +3641,45 @@
                 good_health: 'Bien - Sur la bonne voie',
                 fair_health: 'Moyen - Marge d\'amélioration',
                 needs_attention: 'Nécessite de l\'Attention - Examinez les habitudes de dépenses',
+                save: 'Enregistrer',
+                update: 'Mettre à jour',
+                cancel: 'Annuler',
+                add: 'Ajouter',
+                save_item: 'Enregistrer l\'Élément',
+                update_item: 'Mettre à jour l\'Élément',
+                add_income: 'Ajouter un Revenu',
+                edit_income: 'Modifier le Revenu',
+                add_expense: 'Ajouter une Dépense',
+                edit_expense: 'Modifier la Dépense',
+                add_receivable: 'Ajouter à Recevoir',
+                edit_receivable: 'Modifier à Recevoir',
+                add_payable: 'Ajouter à Payer',
+                edit_payable: 'Modifier à Payer',
+                add_plan: 'Ajouter un Plan',
+                edit_plan: 'Modifier le Plan',
+                add_budget: 'Ajouter un Budget',
+                edit_budget: 'Modifier le Budget',
+                create_template: 'Créer un Modèle',
+                edit_template: 'Modifier le Modèle',
+                add_account: 'Ajouter un Compte',
+                update_account: 'Mettre à jour le Compte',
+                add_debt: 'Ajouter une Dette',
+                update_debt: 'Mettre à jour la Dette',
+                add_goal: 'Ajouter un Objectif',
+                update_goal: 'Mettre à jour l\'Objectif',
+                period: 'Période',
+                daily: 'Quotidien',
+                weekly: 'Hebdomadaire',
+                monthly: 'Mensuel',
+                per_3_month: 'Tous les 3 Mois',
+                per_6_month: 'Tous les 6 Mois',
+                yearly: 'Annuel',
+                active: 'Actif',
+                paused: 'En Pause',
+                completed: 'Terminé',
+                in_progress: 'En Cours',
+                cancelled: 'Annulé',
+                budget_tracks_info: 'Le budget suit les dépenses réelles par rapport à cette limite pour la catégorie sélectionnée dans la période sélectionnée.',
                 source: 'Source',
                 notes_optional: 'Notes (Optionnel)',
                 recurring_transaction: 'Transaction Récurrente',
@@ -3256,7 +3745,123 @@
                 mortgage: 'Hypothèque',
                 personal_loan: 'Prêt Personnel',
                 savings: 'Épargne',
-                bank: 'Banque'
+                bank: 'Banque',
+                is_required: 'est requis!',
+                must_be_greater_than_zero: 'doit être supérieur à 0!',
+                category_already_exists: 'Cette catégorie existe déjà!',
+                category_name_required: 'Le nom de la catégorie est requis!',
+                are_you_sure_disconnect: 'Êtes-vous sûr de vouloir vous déconnecter du fichier Excel? Vous devrez vous reconnecter pour enregistrer les modifications.',
+                failed_to_save: 'Échec de l\'enregistrement dans le fichier Excel. Vérifiez les permissions.',
+                are_you_sure_delete: 'Êtes-vous sûr de vouloir supprimer',
+                action_cannot_undo: 'Cette action ne peut pas être annulée.',
+                are_you_sure_delete_template: 'Êtes-vous sûr de vouloir supprimer ce modèle?',
+                are_you_sure_delete_account: 'Êtes-vous sûr de vouloir supprimer ce compte? Cela ne supprimera pas les transactions associées.',
+                are_you_sure_delete_debt: 'Êtes-vous sûr de vouloir supprimer cette dette?',
+                are_you_sure_delete_goal: 'Êtes-vous sûr de vouloir supprimer cet objectif?',
+                are_you_sure_delete_investment: 'Êtes-vous sûr de vouloir supprimer cet investissement?',
+                category_used_in_transactions: 'Cette catégorie est utilisée dans',
+                deleting_will_set_to_other: 'transaction(s). La supprimer définira ces transactions à "Autre". Continuer?',
+                cash_flow_analysis: 'Analyse du Flux de Trésorerie',
+                investment_portfolio: 'Portefeuille d\'Investissements',
+                add_investment: 'Ajouter un Investissement',
+                edit_investment: 'Modifier l\'Investissement',
+                all_methods: 'Toutes les Méthodes',
+                placeholder_salary_freelance: 'ex. Salaire, Freelance',
+                placeholder_groceries: 'ex. Épicerie',
+                placeholder_new_laptop: 'ex. Nouvel Ordinateur Portable',
+                placeholder_groceries_salary: 'ex. Épicerie, Salaire',
+                placeholder_monthly_salary: 'ex. Salaire Mensuel',
+                placeholder_main_bank: 'ex. Compte Bancaire Principal',
+                placeholder_home_loan: 'ex. Prêt Immobilier',
+                placeholder_bank_name: 'ex. Nom de la Banque',
+                placeholder_emergency_fund: 'ex. Fonds d\'Urgence',
+                placeholder_apple_inc: 'ex. Apple Inc.',
+                placeholder_aapl: 'ex. AAPL',
+                total_cost_basis: 'Base de Coût Totale',
+                total_gain_loss: 'Gain/Perte Total',
+                total_return: 'Rendement Total',
+                placeholder_example_3: 'ex. 3',
+                placeholder_example_7: 'ex. 7',
+                optional_notes: 'Notes optionnelles',
+                investment_name: 'Nom de l\'Investissement',
+                symbol_ticker: 'Symbole/Ticker',
+                cost_basis: 'Base de Coût',
+                current_value: 'Valeur Actuelle',
+                purchase_date: 'Date d\'Achat',
+                stock: 'Action',
+                bond: 'Obligation',
+                mutual_fund: 'Fonds Mutuel',
+                etf: 'ETF',
+                cryptocurrency: 'Cryptomonnaie',
+                update_investment: 'Mettre à jour l\'Investissement',
+                delete_multiple_items: 'Supprimer Plusieurs Éléments',
+                delete_all: 'Tout Supprimer',
+                confirm: 'Confirmer',
+                print: 'Imprimer',
+                no_accounts_found: 'Aucun compte trouvé. Veuillez ajouter un compte d\'abord.',
+                no_accounts_added: 'Aucun compte ajouté. Ajoutez un compte pour suivre les soldes dans différentes sources.',
+                no_transfers_recorded: 'Aucun transfert enregistré. Ajoutez un transfert pour suivre le mouvement d\'argent entre les comptes.',
+                no_debts_tracked: 'Aucune dette suivie. Ajoutez une dette pour commencer le suivi.',
+                family_members: 'Membres de la Famille',
+                family_member: 'Membre de la Famille',
+                add_family_member: 'Ajouter un Membre de la Famille',
+                edit_family_member: 'Modifier le Membre de la Famille',
+                delete_family_member: 'Supprimer le Membre de la Famille',
+                family_member_name: 'Nom du Membre de la Famille',
+                select_family_member: 'Sélectionner un Membre de la Famille',
+                select_family_members: 'Sélectionner les Membres de la Famille',
+                divide_equally: 'Diviser Équitablement',
+                expense_per_person: 'Par Personne',
+                no_family_members: 'Aucun membre de la famille ajouté. Ajoutez un membre de la famille pour suivre les dépenses partagées.',
+                are_you_sure_delete_family_member: 'Êtes-vous sûr de vouloir supprimer ce membre de la famille?',
+                settings_preferences: 'Paramètres et Préférences',
+                general_settings: 'Paramètres Généraux',
+                currency_symbol: 'Symbole de la Devise',
+                currency_symbol_description: 'Symbole de devise par défaut pour tous les montants',
+                date_format: 'Format de Date',
+                date_format_description: 'Format d\'affichage de date préféré',
+                auto_save: 'Enregistrement Automatique',
+                auto_save_description: 'Enregistrer automatiquement les modifications dans le fichier Excel',
+                enable: 'Activer',
+                data_management: 'Gestion des Données',
+                export_data: 'Exporter les Données',
+                export_data_description: 'Télécharger toutes les données en tant que fichier Excel',
+                export_to_excel: 'Exporter vers Excel',
+                export_to_csv: 'Exporter vers CSV',
+                import_data: 'Importer les Données',
+                import_data_description: 'Importer des données depuis un fichier Excel (fusionnera avec les données existantes)',
+                import_from_excel: 'Importer depuis Excel',
+                backup_data: 'Sauvegarder les Données',
+                backup_data_description: 'Créer une sauvegarde de toutes vos données',
+                create_backup: 'Créer une Sauvegarde',
+                restore_data: 'Restaurer les Données',
+                restore_data_description: 'Restaurer les données depuis un fichier de sauvegarde',
+                restore_backup: 'Restaurer la Sauvegarde',
+                undo_last_action: 'Annuler la Dernière Action',
+                undo_last_action_description: 'Annuler la dernière transaction (ajouter/modifier/supprimer)',
+                undo: 'Annuler',
+                keyboard_shortcuts: 'Raccourcis Clavier',
+                navigation: 'Navigation',
+                all_status: 'Tous les Statuts',
+                color: 'Couleur',
+                manage_categories: 'Gérer les Catégories',
+                recurring_transactions_manager: 'Gestionnaire de Transactions Récurrentes',
+                auto_generate_info: 'Générer Automatiquement les Transactions Récurrentes',
+                auto_generate_desc: 'Cela créera automatiquement des transactions pour tous les éléments récurrents basés sur leur fréquence et leurs dates.',
+                generate_recurring: 'Générer les Transactions Récurrentes',
+                select_category_placeholder: 'Sélectionner la Catégorie',
+                add_new_item: 'Ajouter un Nouvel Élément',
+                new: 'Nouveau',
+                loan: 'Prêt',
+                mortgage: 'Hypothèque',
+                personal_loan: 'Prêt Personnel',
+                transfers: 'Transferts',
+                transfer: 'Transfert',
+                add_transfer: 'Ajouter un Transfert',
+                account_transfers: 'Transferts de Compte',
+                from_account: 'Du Compte',
+                to_account: 'Au Compte',
+                transfer_description_placeholder: 'ex. Retrait d\'espèces, Transfert de compte'
             },
             de: {
                 notifications: 'Benachrichtigungen',
@@ -3364,7 +3969,216 @@
                 excellent_health: 'Ausgezeichnet - Große finanzielle Gesundheit!',
                 good_health: 'Gut - Auf dem richtigen Weg',
                 fair_health: 'Ausreichend - Verbesserungspotenzial',
-                needs_attention: 'Benötigt Aufmerksamkeit - Überprüfen Sie die Ausgabengewohnheiten'
+                needs_attention: 'Benötigt Aufmerksamkeit - Überprüfen Sie die Ausgabengewohnheiten',
+                save: 'Speichern',
+                update: 'Aktualisieren',
+                cancel: 'Abbrechen',
+                add: 'Hinzufügen',
+                save_item: 'Element Speichern',
+                update_item: 'Element Aktualisieren',
+                add_income: 'Einkommen Hinzufügen',
+                edit_income: 'Einkommen Bearbeiten',
+                add_expense: 'Ausgabe Hinzufügen',
+                edit_expense: 'Ausgabe Bearbeiten',
+                add_receivable: 'Forderung Hinzufügen',
+                edit_receivable: 'Forderung Bearbeiten',
+                add_payable: 'Verbindlichkeit Hinzufügen',
+                edit_payable: 'Verbindlichkeit Bearbeiten',
+                add_plan: 'Plan Hinzufügen',
+                edit_plan: 'Plan Bearbeiten',
+                add_budget: 'Budget Hinzufügen',
+                edit_budget: 'Budget Bearbeiten',
+                create_template: 'Vorlage Erstellen',
+                edit_template: 'Vorlage Bearbeiten',
+                add_account: 'Konto Hinzufügen',
+                update_account: 'Konto Aktualisieren',
+                add_debt: 'Schuld Hinzufügen',
+                update_debt: 'Schuld Aktualisieren',
+                add_goal: 'Ziel Hinzufügen',
+                update_goal: 'Ziel Aktualisieren',
+                period: 'Zeitraum',
+                daily: 'Täglich',
+                weekly: 'Wöchentlich',
+                monthly: 'Monatlich',
+                per_3_month: 'Alle 3 Monate',
+                per_6_month: 'Alle 6 Monate',
+                yearly: 'Jährlich',
+                active: 'Aktiv',
+                paused: 'Pausiert',
+                completed: 'Abgeschlossen',
+                in_progress: 'In Bearbeitung',
+                cancelled: 'Abgebrochen',
+                budget_tracks_info: 'Das Budget verfolgt die tatsächlichen Ausgaben gegen diese Grenze für die ausgewählte Kategorie innerhalb des ausgewählten Zeitraums.',
+                notes_optional: 'Notizen (Optional)',
+                recurring_transaction: 'Wiederkehrende Transaktion',
+                frequency: 'Häufigkeit',
+                next_occurrence_date: 'Nächstes Vorkommen Datum',
+                payment_method: 'Zahlungsmethode',
+                select_method: 'Methode Auswählen',
+                cash: 'Bargeld',
+                bank_transfer: 'Banküberweisung',
+                card: 'Karte',
+                mobile_payment: 'Mobile Zahlung',
+                other: 'Andere',
+                select_category: 'Kategorie Auswählen',
+                from_client: 'Von (Kunde/Person)',
+                to_vendor: 'An (Anbieter/Person)',
+                name_placeholder: 'Name',
+                reason: 'Grund',
+                reminder_days_before: 'Erinnerung (Tage Vor Fälligkeit)',
+                reminder_days_before_deadline: 'Erinnerung (Tage Vor Frist)',
+                plan_title: 'Plan Titel',
+                target_amount: 'Zielbetrag',
+                start_date: 'Startdatum',
+                target_deadline: 'Ziel Frist',
+                notes: 'Notizen',
+                additional_notes: 'Zusätzliche Notizen...',
+                optional_description: 'Optionale Beschreibung',
+                progress_note: 'Hinweis: Der Fortschritt wird basierend auf Gesamtersparnissen (Einkommen - Ausgaben + Forderungen) berechnet.',
+                reminder_help_text: 'Erinnerung erhalten diese Anzahl von Tagen vor Fälligkeitsdatum (0 = am Fälligkeitsdatum)',
+                reminder_deadline_help: 'Erinnerung erhalten diese Anzahl von Tagen vor Frist (0 = an der Frist)',
+                type_cannot_change: 'Typ kann nach der Erstellung nicht geändert werden',
+                account_management: 'Kontoverwaltung',
+                debt_tracker: 'Schuldenverfolgung',
+                financial_goals: 'Finanzielle Ziele',
+                account: 'Konto',
+                account_name: 'Kontoname',
+                account_type: 'Kontotyp',
+                select_account: 'Konto Auswählen',
+                initial_balance: 'Anfangsguthaben',
+                transfers: 'Überweisungen',
+                transfer: 'Überweisung',
+                add_transfer: 'Überweisung Hinzufügen',
+                account_transfers: 'Kontoüberweisungen',
+                from_account: 'Von Konto',
+                to_account: 'An Konto',
+                transfer_description_placeholder: 'z.B. Bargeldabhebung, Kontotransfer',
+                debt_name: 'Schuldenname',
+                debt_type: 'Schuldentyp',
+                principal_amount: 'Hauptbetrag',
+                amount_paid: 'Gezahlter Betrag',
+                creditor_lender: 'Gläubiger/Kreditgeber',
+                goal_name: 'Zielname',
+                current_amount: 'Aktueller Betrag',
+                deadline: 'Frist',
+                template_name: 'Vorlagenname',
+                transaction_type: 'Transaktionstyp',
+                recurring_only: 'Nur Wiederkehrend',
+                non_recurring: 'Nicht Wiederkehrend',
+                clear_filters: 'Filter Löschen',
+                all_types: 'Alle Typen',
+                all_accounts: 'Alle Konten',
+                print: 'Drucken',
+                no_accounts_found: 'Keine Konten gefunden. Bitte fügen Sie zuerst ein Konto hinzu.',
+                no_accounts_added: 'Keine Konten hinzugefügt. Fügen Sie ein Konto hinzu, um Guthaben über verschiedene Quellen zu verfolgen.',
+                no_transfers_recorded: 'Keine Überweisungen aufgezeichnet. Fügen Sie eine Überweisung hinzu, um Geldbewegungen zwischen Konten zu verfolgen.',
+                no_debts_tracked: 'Keine Schulden verfolgt. Fügen Sie eine Schuld hinzu, um mit der Verfolgung zu beginnen.',
+                family_members: 'Familienmitglieder',
+                family_member: 'Familienmitglied',
+                add_family_member: 'Familienmitglied Hinzufügen',
+                edit_family_member: 'Familienmitglied Bearbeiten',
+                delete_family_member: 'Familienmitglied Löschen',
+                family_member_name: 'Name des Familienmitglieds',
+                select_family_member: 'Familienmitglied Auswählen',
+                select_family_members: 'Familienmitglieder Auswählen',
+                divide_equally: 'Gleichmäßig Aufteilen',
+                expense_per_person: 'Pro Person',
+                no_family_members: 'Keine Familienmitglieder hinzugefügt. Fügen Sie ein Familienmitglied hinzu, um gemeinsame Ausgaben zu verfolgen.',
+                are_you_sure_delete_family_member: 'Sind Sie sicher, dass Sie dieses Familienmitglied löschen möchten?',
+                settings_preferences: 'Einstellungen & Präferenzen',
+                general_settings: 'Allgemeine Einstellungen',
+                currency_symbol: 'Währungssymbol',
+                currency_symbol_description: 'Standard-Währungssymbol für alle Beträge',
+                date_format: 'Datumsformat',
+                date_format_description: 'Bevorzugtes Datumsanzeigeformat',
+                auto_save: 'Automatisches Speichern',
+                auto_save_description: 'Änderungen automatisch in Excel-Datei speichern',
+                enable: 'Aktivieren',
+                data_management: 'Datenverwaltung',
+                export_data: 'Daten Exportieren',
+                export_data_description: 'Alle Daten als Excel-Datei herunterladen',
+                export_to_excel: 'Nach Excel Exportieren',
+                export_to_csv: 'Nach CSV Exportieren',
+                import_data: 'Daten Importieren',
+                import_data_description: 'Daten aus Excel-Datei importieren (wird mit vorhandenen Daten zusammengeführt)',
+                import_from_excel: 'Von Excel Importieren',
+                backup_data: 'Daten Sichern',
+                backup_data_description: 'Sicherungskopie aller Daten erstellen',
+                create_backup: 'Sicherung Erstellen',
+                restore_data: 'Daten Wiederherstellen',
+                restore_data_description: 'Daten aus einer Sicherungsdatei wiederherstellen',
+                restore_backup: 'Sicherung Wiederherstellen',
+                undo_last_action: 'Letzte Aktion Rückgängig',
+                undo_last_action_description: 'Letzte Transaktion rückgängig machen (hinzufügen/bearbeiten/löschen)',
+                undo: 'Rückgängig',
+                keyboard_shortcuts: 'Tastenkürzel',
+                navigation: 'Navigation',
+                all_status: 'Alle Status',
+                color: 'Farbe',
+                manage_categories: 'Kategorien Verwalten',
+                recurring_transactions_manager: 'Wiederkehrende Transaktionen Manager',
+                auto_generate_info: 'Wiederkehrende Transaktionen Automatisch Generieren',
+                auto_generate_desc: 'Dies erstellt automatisch Transaktionen für alle wiederkehrenden Elemente basierend auf ihrer Häufigkeit und Daten.',
+                generate_recurring: 'Wiederkehrende Transaktionen Generieren',
+                select_category_placeholder: 'Kategorie Auswählen',
+                add_new_item: 'Neues Element Hinzufügen',
+                new: 'Neu',
+                loan: 'Darlehen',
+                mortgage: 'Hypothek',
+                personal_loan: 'Persönliches Darlehen',
+                savings: 'Ersparnisse',
+                bank: 'Bank',
+                is_required: 'ist erforderlich!',
+                must_be_greater_than_zero: 'muss größer als 0 sein!',
+                category_already_exists: 'Diese Kategorie existiert bereits!',
+                category_name_required: 'Kategoriename ist erforderlich!',
+                are_you_sure_disconnect: 'Sind Sie sicher, dass Sie sich von der Excel-Datei trennen möchten? Sie müssen sich erneut verbinden, um Änderungen zu speichern.',
+                failed_to_save: 'Fehler beim Speichern in Excel-Datei. Berechtigungen überprüfen.',
+                are_you_sure_delete: 'Sind Sie sicher, dass Sie löschen möchten',
+                action_cannot_undo: 'Diese Aktion kann nicht rückgängig gemacht werden.',
+                are_you_sure_delete_template: 'Sind Sie sicher, dass Sie diese Vorlage löschen möchten?',
+                are_you_sure_delete_account: 'Sind Sie sicher, dass Sie dieses Konto löschen möchten? Dies löscht keine zugehörigen Transaktionen.',
+                are_you_sure_delete_debt: 'Sind Sie sicher, dass Sie diese Schuld löschen möchten?',
+                are_you_sure_delete_goal: 'Sind Sie sicher, dass Sie dieses Ziel löschen möchten?',
+                are_you_sure_delete_investment: 'Sind Sie sicher, dass Sie diese Investition löschen möchten?',
+                category_used_in_transactions: 'Diese Kategorie wird in',
+                deleting_will_set_to_other: 'Transaktion(en) verwendet. Das Löschen setzt diese Transaktionen auf "Andere". Fortfahren?',
+                cash_flow_analysis: 'Cashflow-Analyse',
+                investment_portfolio: 'Anlageportfolio',
+                add_investment: 'Investition Hinzufügen',
+                edit_investment: 'Investition Bearbeiten',
+                all_methods: 'Alle Methoden',
+                placeholder_salary_freelance: 'z.B. Gehalt, Freelance',
+                placeholder_groceries: 'z.B. Lebensmittel',
+                placeholder_new_laptop: 'z.B. Neuer Laptop',
+                placeholder_groceries_salary: 'z.B. Lebensmittel, Gehalt',
+                placeholder_monthly_salary: 'z.B. Monatsgehalt',
+                placeholder_main_bank: 'z.B. Hauptbankkonto',
+                placeholder_home_loan: 'z.B. Wohnungsbaudarlehen',
+                placeholder_bank_name: 'z.B. Bankname',
+                placeholder_emergency_fund: 'z.B. Notfallfonds',
+                placeholder_apple_inc: 'z.B. Apple Inc.',
+                placeholder_aapl: 'z.B. AAPL',
+                total_cost_basis: 'Gesamtkostenbasis',
+                total_gain_loss: 'Gesamtgewinn/Verlust',
+                total_return: 'Gesamtrendite',
+                placeholder_example_3: 'z.B. 3',
+                placeholder_example_7: 'z.B. 7',
+                optional_notes: 'Optionale Notizen',
+                investment_name: 'Investitionsname',
+                symbol_ticker: 'Symbol/Ticker',
+                cost_basis: 'Kostenbasis',
+                current_value: 'Aktueller Wert',
+                purchase_date: 'Kaufdatum',
+                stock: 'Aktie',
+                bond: 'Anleihe',
+                mutual_fund: 'Investmentfonds',
+                etf: 'ETF',
+                cryptocurrency: 'Kryptowährung',
+                update_investment: 'Investition Aktualisieren',
+                delete_multiple_items: 'Mehrere Elemente Löschen',
+                delete_all: 'Alle Löschen',
+                confirm: 'Bestätigen'
             },
             hi: {
                 notifications: 'सूचनाएं',
@@ -3472,7 +4286,216 @@
                 excellent_health: 'उत्कृष्ट - महान वित्तीय स्वास्थ्य!',
                 good_health: 'अच्छा - सही रास्ते पर',
                 fair_health: 'निष्पक्ष - सुधार के लिए जगह',
-                needs_attention: 'ध्यान की आवश्यकता - खर्च की आदतों की समीक्षा करें'
+                needs_attention: 'ध्यान की आवश्यकता - खर्च की आदतों की समीक्षा करें',
+                save: 'सहेजें',
+                update: 'अपडेट करें',
+                cancel: 'रद्द करें',
+                add: 'जोड़ें',
+                save_item: 'आइटम सहेजें',
+                update_item: 'आइटम अपडेट करें',
+                add_income: 'आय जोड़ें',
+                edit_income: 'आय संपादित करें',
+                add_expense: 'व्यय जोड़ें',
+                edit_expense: 'व्यय संपादित करें',
+                add_receivable: 'प्राप्य जोड़ें',
+                edit_receivable: 'प्राप्य संपादित करें',
+                add_payable: 'देय जोड़ें',
+                edit_payable: 'देय संपादित करें',
+                add_plan: 'योजना जोड़ें',
+                edit_plan: 'योजना संपादित करें',
+                add_budget: 'बजट जोड़ें',
+                edit_budget: 'बजट संपादित करें',
+                create_template: 'टेम्प्लेट बनाएं',
+                edit_template: 'टेम्प्लेट संपादित करें',
+                add_account: 'खाता जोड़ें',
+                update_account: 'खाता अपडेट करें',
+                add_debt: 'ऋण जोड़ें',
+                update_debt: 'ऋण अपडेट करें',
+                add_goal: 'लक्ष्य जोड़ें',
+                update_goal: 'लक्ष्य अपडेट करें',
+                period: 'अवधि',
+                daily: 'दैनिक',
+                weekly: 'साप्ताहिक',
+                monthly: 'मासिक',
+                per_3_month: 'प्रति 3 महीने',
+                per_6_month: 'प्रति 6 महीने',
+                yearly: 'वार्षिक',
+                active: 'सक्रिय',
+                paused: 'रोका गया',
+                completed: 'पूर्ण',
+                in_progress: 'प्रगति में',
+                cancelled: 'रद्द',
+                budget_tracks_info: 'बजट चयनित अवधि के भीतर चयनित श्रेणी के लिए इस सीमा के खिलाफ वास्तविक खर्च को ट्रैक करता है।',
+                notes_optional: 'नोट्स (वैकल्पिक)',
+                recurring_transaction: 'आवर्ती लेनदेन',
+                frequency: 'आवृत्ति',
+                next_occurrence_date: 'अगली घटना की तारीख',
+                payment_method: 'भुगतान विधि',
+                select_method: 'विधि चुनें',
+                cash: 'नकद',
+                bank_transfer: 'बैंक ट्रांसफर',
+                card: 'कार्ड',
+                mobile_payment: 'मोबाइल भुगतान',
+                other: 'अन्य',
+                select_category: 'श्रेणी चुनें',
+                from_client: 'से (क्लाइंट/व्यक्ति)',
+                to_vendor: 'को (विक्रेता/व्यक्ति)',
+                name_placeholder: 'नाम',
+                reason: 'कारण',
+                reminder_days_before: 'रिमाइंडर (नियत तारीख से कितने दिन पहले)',
+                reminder_days_before_deadline: 'रिमाइंडर (समयसीमा से कितने दिन पहले)',
+                plan_title: 'योजना शीर्षक',
+                target_amount: 'लक्ष्य राशि',
+                start_date: 'शुरुआती तारीख',
+                target_deadline: 'लक्ष्य समयसीमा',
+                notes: 'नोट्स',
+                additional_notes: 'अतिरिक्त नोट्स...',
+                optional_description: 'वैकल्पिक विवरण',
+                progress_note: 'नोट: प्रगति कुल बचत (आय - व्यय + प्राप्य) के आधार पर गणना की जाएगी।',
+                reminder_help_text: 'नियत तारीख से इतने दिन पहले रिमाइंडर प्राप्त करें (0 = नियत तारीख पर)',
+                reminder_deadline_help: 'समयसीमा से इतने दिन पहले रिमाइंडर प्राप्त करें (0 = समयसीमा पर)',
+                type_cannot_change: 'सृजन के बाद प्रकार नहीं बदला जा सकता',
+                account_management: 'खाता प्रबंधन',
+                debt_tracker: 'ऋण ट्रैकर',
+                financial_goals: 'वित्तीय लक्ष्य',
+                account: 'खाता',
+                account_name: 'खाता नाम',
+                account_type: 'खाता प्रकार',
+                select_account: 'खाता चुनें',
+                initial_balance: 'प्रारंभिक शेष',
+                transfers: 'ट्रांसफर',
+                transfer: 'ट्रांसफर',
+                add_transfer: 'ट्रांसफर जोड़ें',
+                account_transfers: 'खाता ट्रांसफर',
+                from_account: 'से खाता',
+                to_account: 'को खाता',
+                transfer_description_placeholder: 'जैसे नकद निकासी, खाता ट्रांसफर',
+                debt_name: 'ऋण नाम',
+                debt_type: 'ऋण प्रकार',
+                principal_amount: 'मूल राशि',
+                amount_paid: 'भुगतान की गई राशि',
+                creditor_lender: 'ऋणदाता/उधारदाता',
+                goal_name: 'लक्ष्य नाम',
+                current_amount: 'वर्तमान राशि',
+                deadline: 'समयसीमा',
+                template_name: 'टेम्प्लेट नाम',
+                transaction_type: 'लेनदेन प्रकार',
+                recurring_only: 'केवल आवर्ती',
+                non_recurring: 'गैर-आवर्ती',
+                clear_filters: 'फ़िल्टर साफ करें',
+                all_types: 'सभी प्रकार',
+                all_accounts: 'सभी खाते',
+                print: 'प्रिंट',
+                no_accounts_found: 'कोई खाता नहीं मिला। कृपया पहले एक खाता जोड़ें।',
+                no_accounts_added: 'कोई खाता नहीं जोड़ा गया। विभिन्न स्रोतों में शेष ट्रैक करने के लिए एक खाता जोड़ें।',
+                no_transfers_recorded: 'कोई ट्रांसफर दर्ज नहीं किया गया। खातों के बीच धन आवाजाही ट्रैक करने के लिए एक ट्रांसफर जोड़ें।',
+                no_debts_tracked: 'कोई ऋण ट्रैक नहीं किया गया। ट्रैकिंग शुरू करने के लिए एक ऋण जोड़ें।',
+                family_members: 'परिवार के सदस्य',
+                family_member: 'परिवार का सदस्य',
+                add_family_member: 'परिवार का सदस्य जोड़ें',
+                edit_family_member: 'परिवार का सदस्य संपादित करें',
+                delete_family_member: 'परिवार का सदस्य हटाएं',
+                family_member_name: 'परिवार के सदस्य का नाम',
+                select_family_member: 'परिवार का सदस्य चुनें',
+                select_family_members: 'परिवार के सदस्य चुनें',
+                divide_equally: 'समान रूप से विभाजित करें',
+                expense_per_person: 'प्रति व्यक्ति',
+                no_family_members: 'कोई परिवार का सदस्य नहीं जोड़ा गया। साझा खर्च ट्रैक करने के लिए एक परिवार का सदस्य जोड़ें।',
+                are_you_sure_delete_family_member: 'क्या आप वाकई इस परिवार के सदस्य को हटाना चाहते हैं?',
+                settings_preferences: 'सेटिंग्स और प्राथमिकताएं',
+                general_settings: 'सामान्य सेटिंग्स',
+                currency_symbol: 'मुद्रा प्रतीक',
+                currency_symbol_description: 'सभी राशियों के लिए डिफ़ॉल्ट मुद्रा प्रतीक',
+                date_format: 'तारीख प्रारूप',
+                date_format_description: 'पसंदीदा तारीख प्रदर्शन प्रारूप',
+                auto_save: 'स्वचालित सहेजें',
+                auto_save_description: 'एक्सेल फ़ाइल में स्वचालित रूप से परिवर्तन सहेजें',
+                enable: 'सक्षम करें',
+                data_management: 'डेटा प्रबंधन',
+                export_data: 'डेटा निर्यात करें',
+                export_data_description: 'सभी डेटा को एक्सेल फ़ाइल के रूप में डाउनलोड करें',
+                export_to_excel: 'एक्सेल में निर्यात करें',
+                export_to_csv: 'CSV में निर्यात करें',
+                import_data: 'डेटा आयात करें',
+                import_data_description: 'एक्सेल फ़ाइल से डेटा आयात करें (मौजूदा डेटा के साथ मर्ज होगा)',
+                import_from_excel: 'एक्सेल से आयात करें',
+                backup_data: 'डेटा बैकअप',
+                backup_data_description: 'अपने सभी डेटा का बैकअप बनाएं',
+                create_backup: 'बैकअप बनाएं',
+                restore_data: 'डेटा पुनर्स्थापित करें',
+                restore_data_description: 'बैकअप फ़ाइल से डेटा पुनर्स्थापित करें',
+                restore_backup: 'बैकअप पुनर्स्थापित करें',
+                undo_last_action: 'अंतिम कार्रवाई पूर्ववत करें',
+                undo_last_action_description: 'अंतिम लेनदेन पूर्ववत करें (जोड़ें/संपादित करें/हटाएं)',
+                undo: 'पूर्ववत',
+                keyboard_shortcuts: 'कीबोर्ड शॉर्टकट',
+                navigation: 'नेविगेशन',
+                all_status: 'सभी स्थिति',
+                color: 'रंग',
+                manage_categories: 'श्रेणियां प्रबंधित करें',
+                recurring_transactions_manager: 'आवर्ती लेनदेन प्रबंधक',
+                auto_generate_info: 'आवर्ती लेनदेन स्वचालित रूप से उत्पन्न करें',
+                auto_generate_desc: 'यह उनकी आवृत्ति और तारीखों के आधार पर सभी आवर्ती आइटम के लिए स्वचालित रूप से लेनदेन बनाएगा।',
+                generate_recurring: 'आवर्ती लेनदेन उत्पन्न करें',
+                select_category_placeholder: 'श्रेणी चुनें',
+                add_new_item: 'नया आइटम जोड़ें',
+                new: 'नया',
+                loan: 'ऋण',
+                mortgage: 'बंधक',
+                personal_loan: 'व्यक्तिगत ऋण',
+                savings: 'बचत',
+                bank: 'बैंक',
+                is_required: 'आवश्यक है!',
+                must_be_greater_than_zero: '0 से अधिक होना चाहिए!',
+                category_already_exists: 'यह श्रेणी पहले से मौजूद है!',
+                category_name_required: 'श्रेणी नाम आवश्यक है!',
+                are_you_sure_disconnect: 'क्या आप वाकई एक्सेल फ़ाइल से डिस्कनेक्ट करना चाहते हैं? परिवर्तन सहेजने के लिए आपको फिर से कनेक्ट करना होगा।',
+                failed_to_save: 'एक्सेल फ़ाइल में सहेजने में विफल। अनुमतियां जांचें।',
+                are_you_sure_delete: 'क्या आप वाकई हटाना चाहते हैं',
+                action_cannot_undo: 'इस कार्रवाई को पूर्ववत नहीं किया जा सकता।',
+                are_you_sure_delete_template: 'क्या आप वाकई इस टेम्प्लेट को हटाना चाहते हैं?',
+                are_you_sure_delete_account: 'क्या आप वाकई इस खाते को हटाना चाहते हैं? यह इससे जुड़े लेनदेन को हटाएगा नहीं।',
+                are_you_sure_delete_debt: 'क्या आप वाकई इस ऋण को हटाना चाहते हैं?',
+                are_you_sure_delete_goal: 'क्या आप वाकई इस लक्ष्य को हटाना चाहते हैं?',
+                are_you_sure_delete_investment: 'क्या आप वाकई इस निवेश को हटाना चाहते हैं?',
+                category_used_in_transactions: 'यह श्रेणी में उपयोग की जाती है',
+                deleting_will_set_to_other: 'लेनदेन। इसे हटाने से उन लेनदेन को "अन्य" पर सेट कर दिया जाएगा। जारी रखें?',
+                cash_flow_analysis: 'नकदी प्रवाह विश्लेषण',
+                investment_portfolio: 'निवेश पोर्टफोलियो',
+                add_investment: 'निवेश जोड़ें',
+                edit_investment: 'निवेश संपादित करें',
+                all_methods: 'सभी विधियां',
+                placeholder_salary_freelance: 'जैसे वेतन, फ्रीलांस',
+                placeholder_groceries: 'जैसे किराना',
+                placeholder_new_laptop: 'जैसे नया लैपटॉप',
+                placeholder_groceries_salary: 'जैसे किराना, वेतन',
+                placeholder_monthly_salary: 'जैसे मासिक वेतन',
+                placeholder_main_bank: 'जैसे मुख्य बैंक खाता',
+                placeholder_home_loan: 'जैसे होम लोन',
+                placeholder_bank_name: 'जैसे बैंक का नाम',
+                placeholder_emergency_fund: 'जैसे आपातकालीन निधि',
+                placeholder_apple_inc: 'जैसे Apple Inc.',
+                placeholder_aapl: 'जैसे AAPL',
+                total_cost_basis: 'कुल लागत आधार',
+                total_gain_loss: 'कुल लाभ/हानि',
+                total_return: 'कुल रिटर्न',
+                placeholder_example_3: 'जैसे 3',
+                placeholder_example_7: 'जैसे 7',
+                optional_notes: 'वैकल्पिक नोट्स',
+                investment_name: 'निवेश नाम',
+                symbol_ticker: 'प्रतीक/टिकर',
+                cost_basis: 'लागत आधार',
+                current_value: 'वर्तमान मूल्य',
+                purchase_date: 'खरीद तारीख',
+                stock: 'स्टॉक',
+                bond: 'बॉन्ड',
+                mutual_fund: 'म्यूचुअल फंड',
+                etf: 'ETF',
+                cryptocurrency: 'क्रिप्टोकरेंसी',
+                update_investment: 'निवेश अपडेट करें',
+                delete_multiple_items: 'कई आइटम हटाएं',
+                delete_all: 'सभी हटाएं',
+                confirm: 'पुष्टि करें'
             },
             ar: {
                 notifications: 'الإشعارات',
@@ -3580,7 +4603,216 @@
                 excellent_health: 'ممتاز - صحة مالية رائعة!',
                 good_health: 'جيد - على الطريق الصحيح',
                 fair_health: 'عادل - مجال للتحسين',
-                needs_attention: 'يحتاج إلى الاهتمام - راجع عادات الإنفاق'
+                needs_attention: 'يحتاج إلى الاهتمام - راجع عادات الإنفاق',
+                save: 'حفظ',
+                update: 'تحديث',
+                cancel: 'إلغاء',
+                add: 'إضافة',
+                save_item: 'حفظ العنصر',
+                update_item: 'تحديث العنصر',
+                add_income: 'إضافة دخل',
+                edit_income: 'تعديل الدخل',
+                add_expense: 'إضافة مصروف',
+                edit_expense: 'تعديل المصروف',
+                add_receivable: 'إضافة مستحقات',
+                edit_receivable: 'تعديل المستحقات',
+                add_payable: 'إضافة ذمم دائنة',
+                edit_payable: 'تعديل الذمم الدائنة',
+                add_plan: 'إضافة خطة',
+                edit_plan: 'تعديل الخطة',
+                add_budget: 'إضافة ميزانية',
+                edit_budget: 'تعديل الميزانية',
+                create_template: 'إنشاء قالب',
+                edit_template: 'تعديل القالب',
+                add_account: 'إضافة حساب',
+                update_account: 'تحديث الحساب',
+                add_debt: 'إضافة دين',
+                update_debt: 'تحديث الدين',
+                add_goal: 'إضافة هدف',
+                update_goal: 'تحديث الهدف',
+                period: 'الفترة',
+                daily: 'يومي',
+                weekly: 'أسبوعي',
+                monthly: 'شهري',
+                per_3_month: 'كل 3 أشهر',
+                per_6_month: 'كل 6 أشهر',
+                yearly: 'سنوي',
+                active: 'نشط',
+                paused: 'متوقف',
+                completed: 'مكتمل',
+                in_progress: 'قيد التنفيذ',
+                cancelled: 'ملغى',
+                budget_tracks_info: 'تتبع الميزانية الإنفاق الفعلي مقابل هذا الحد للفئة المحددة ضمن الفترة المحددة.',
+                notes_optional: 'ملاحظات (اختياري)',
+                recurring_transaction: 'معاملة متكررة',
+                frequency: 'التكرار',
+                next_occurrence_date: 'تاريخ الحدث التالي',
+                payment_method: 'طريقة الدفع',
+                select_method: 'اختر الطريقة',
+                cash: 'نقد',
+                bank_transfer: 'تحويل بنكي',
+                card: 'بطاقة',
+                mobile_payment: 'دفع محمول',
+                other: 'أخرى',
+                select_category: 'اختر الفئة',
+                from_client: 'من (عميل/شخص)',
+                to_vendor: 'إلى (بائع/شخص)',
+                name_placeholder: 'الاسم',
+                reason: 'السبب',
+                reminder_days_before: 'تذكير (أيام قبل الاستحقاق)',
+                reminder_days_before_deadline: 'تذكير (أيام قبل الموعد النهائي)',
+                plan_title: 'عنوان الخطة',
+                target_amount: 'المبلغ المستهدف',
+                start_date: 'تاريخ البدء',
+                target_deadline: 'الموعد النهائي المستهدف',
+                notes: 'ملاحظات',
+                additional_notes: 'ملاحظات إضافية...',
+                optional_description: 'وصف اختياري',
+                progress_note: 'ملاحظة: سيتم حساب التقدم بناءً على إجمالي المدخرات (الدخل - المصروفات + المستحقات).',
+                reminder_help_text: 'احصل على تذكير قبل هذا العدد من الأيام من تاريخ الاستحقاق (0 = في تاريخ الاستحقاق)',
+                reminder_deadline_help: 'احصل على تذكير قبل هذا العدد من الأيام من الموعد النهائي (0 = في الموعد النهائي)',
+                type_cannot_change: 'لا يمكن تغيير النوع بعد الإنشاء',
+                account_management: 'إدارة الحسابات',
+                debt_tracker: 'متتبع الديون',
+                financial_goals: 'الأهداف المالية',
+                account: 'حساب',
+                account_name: 'اسم الحساب',
+                account_type: 'نوع الحساب',
+                select_account: 'اختر الحساب',
+                initial_balance: 'الرصيد الأولي',
+                transfers: 'التحويلات',
+                transfer: 'تحويل',
+                add_transfer: 'إضافة تحويل',
+                account_transfers: 'تحويلات الحساب',
+                from_account: 'من الحساب',
+                to_account: 'إلى الحساب',
+                transfer_description_placeholder: 'مثال: سحب نقدي، تحويل حساب',
+                debt_name: 'اسم الدين',
+                debt_type: 'نوع الدين',
+                principal_amount: 'المبلغ الأصلي',
+                amount_paid: 'المبلغ المدفوع',
+                creditor_lender: 'الدائن/المقرض',
+                goal_name: 'اسم الهدف',
+                current_amount: 'المبلغ الحالي',
+                deadline: 'الموعد النهائي',
+                template_name: 'اسم القالب',
+                transaction_type: 'نوع المعاملة',
+                recurring_only: 'متكررة فقط',
+                non_recurring: 'غير متكررة',
+                clear_filters: 'مسح المرشحات',
+                all_types: 'جميع الأنواع',
+                all_accounts: 'جميع الحسابات',
+                print: 'طباعة',
+                no_accounts_found: 'لم يتم العثور على حسابات. يرجى إضافة حساب أولاً.',
+                no_accounts_added: 'لم تتم إضافة حسابات. أضف حساباً لتتبع الأرصدة عبر مصادر مختلفة.',
+                no_transfers_recorded: 'لم يتم تسجيل تحويلات. أضف تحويلاً لتتبع حركة الأموال بين الحسابات.',
+                no_debts_tracked: 'لم يتم تتبع الديون. أضف ديناً لبدء التتبع.',
+                family_members: 'أفراد العائلة',
+                family_member: 'فرد العائلة',
+                add_family_member: 'إضافة فرد العائلة',
+                edit_family_member: 'تعديل فرد العائلة',
+                delete_family_member: 'حذف فرد العائلة',
+                family_member_name: 'اسم فرد العائلة',
+                select_family_member: 'اختر فرد العائلة',
+                select_family_members: 'اختر أفراد العائلة',
+                divide_equally: 'قسم بالتساوي',
+                expense_per_person: 'لكل شخص',
+                no_family_members: 'لم تتم إضافة أفراد العائلة. أضف فرداً من العائلة لتتبع المصروفات المشتركة.',
+                are_you_sure_delete_family_member: 'هل أنت متأكد من أنك تريد حذف هذا الفرد من العائلة؟',
+                settings_preferences: 'الإعدادات والتفضيلات',
+                general_settings: 'الإعدادات العامة',
+                currency_symbol: 'رمز العملة',
+                currency_symbol_description: 'رمز العملة الافتراضي لجميع المبالغ',
+                date_format: 'تنسيق التاريخ',
+                date_format_description: 'تنسيق عرض التاريخ المفضل',
+                auto_save: 'حفظ تلقائي',
+                auto_save_description: 'حفظ التغييرات تلقائياً في ملف Excel',
+                enable: 'تفعيل',
+                data_management: 'إدارة البيانات',
+                export_data: 'تصدير البيانات',
+                export_data_description: 'تنزيل جميع البيانات كملف Excel',
+                export_to_excel: 'تصدير إلى Excel',
+                export_to_csv: 'تصدير إلى CSV',
+                import_data: 'استيراد البيانات',
+                import_data_description: 'استيراد البيانات من ملف Excel (سيتم دمجها مع البيانات الموجودة)',
+                import_from_excel: 'استيراد من Excel',
+                backup_data: 'نسخ احتياطي للبيانات',
+                backup_data_description: 'إنشاء نسخة احتياطية من جميع بياناتك',
+                create_backup: 'إنشاء نسخة احتياطية',
+                restore_data: 'استعادة البيانات',
+                restore_data_description: 'استعادة البيانات من ملف النسخ الاحتياطي',
+                restore_backup: 'استعادة النسخة الاحتياطية',
+                undo_last_action: 'تراجع عن الإجراء الأخير',
+                undo_last_action_description: 'تراجع عن آخر معاملة (إضافة/تعديل/حذف)',
+                undo: 'تراجع',
+                keyboard_shortcuts: 'اختصارات لوحة المفاتيح',
+                navigation: 'التنقل',
+                all_status: 'جميع الحالات',
+                color: 'اللون',
+                manage_categories: 'إدارة الفئات',
+                recurring_transactions_manager: 'مدير المعاملات المتكررة',
+                auto_generate_info: 'إنشاء المعاملات المتكررة تلقائياً',
+                auto_generate_desc: 'سيؤدي هذا إلى إنشاء معاملات تلقائياً لجميع العناصر المتكررة بناءً على تكرارها وتواريخها.',
+                generate_recurring: 'إنشاء المعاملات المتكررة',
+                select_category_placeholder: 'اختر الفئة',
+                add_new_item: 'إضافة عنصر جديد',
+                new: 'جديد',
+                loan: 'قرض',
+                mortgage: 'رهن عقاري',
+                personal_loan: 'قرض شخصي',
+                savings: 'مدخرات',
+                bank: 'بنك',
+                is_required: 'مطلوب!',
+                must_be_greater_than_zero: 'يجب أن يكون أكبر من 0!',
+                category_already_exists: 'هذه الفئة موجودة بالفعل!',
+                category_name_required: 'اسم الفئة مطلوب!',
+                are_you_sure_disconnect: 'هل أنت متأكد من أنك تريد قطع الاتصال بملف Excel؟ ستحتاج إلى إعادة الاتصال لحفظ التغييرات.',
+                failed_to_save: 'فشل في الحفظ في ملف Excel. تحقق من الأذونات.',
+                are_you_sure_delete: 'هل أنت متأكد من أنك تريد حذف',
+                action_cannot_undo: 'لا يمكن التراجع عن هذا الإجراء.',
+                are_you_sure_delete_template: 'هل أنت متأكد من أنك تريد حذف هذا القالب؟',
+                are_you_sure_delete_account: 'هل أنت متأكد من أنك تريد حذف هذا الحساب؟ لن يؤدي هذا إلى حذف المعاملات المرتبطة به.',
+                are_you_sure_delete_debt: 'هل أنت متأكد من أنك تريد حذف هذا الدين؟',
+                are_you_sure_delete_goal: 'هل أنت متأكد من أنك تريد حذف هذا الهدف؟',
+                are_you_sure_delete_investment: 'هل أنت متأكد من أنك تريد حذف هذا الاستثمار؟',
+                category_used_in_transactions: 'هذه الفئة مستخدمة في',
+                deleting_will_set_to_other: 'معاملة(ات). حذفها سيضع تلك المعاملات على "أخرى". متابعة؟',
+                cash_flow_analysis: 'تحليل التدفق النقدي',
+                investment_portfolio: 'محفظة الاستثمارات',
+                add_investment: 'إضافة استثمار',
+                edit_investment: 'تعديل الاستثمار',
+                all_methods: 'جميع الطرق',
+                placeholder_salary_freelance: 'مثال: راتب، عمل حر',
+                placeholder_groceries: 'مثال: بقالة',
+                placeholder_new_laptop: 'مثال: كمبيوتر محمول جديد',
+                placeholder_groceries_salary: 'مثال: بقالة، راتب',
+                placeholder_monthly_salary: 'مثال: راتب شهري',
+                placeholder_main_bank: 'مثال: الحساب البنكي الرئيسي',
+                placeholder_home_loan: 'مثال: قرض منزل',
+                placeholder_bank_name: 'مثال: اسم البنك',
+                placeholder_emergency_fund: 'مثال: صندوق الطوارئ',
+                placeholder_apple_inc: 'مثال: Apple Inc.',
+                placeholder_aapl: 'مثال: AAPL',
+                total_cost_basis: 'إجمالي أساس التكلفة',
+                total_gain_loss: 'إجمالي الربح/الخسارة',
+                total_return: 'إجمالي العائد',
+                placeholder_example_3: 'مثال: 3',
+                placeholder_example_7: 'مثال: 7',
+                optional_notes: 'ملاحظات اختيارية',
+                investment_name: 'اسم الاستثمار',
+                symbol_ticker: 'الرمز/الرمز المميز',
+                cost_basis: 'أساس التكلفة',
+                current_value: 'القيمة الحالية',
+                purchase_date: 'تاريخ الشراء',
+                stock: 'سهم',
+                bond: 'سند',
+                mutual_fund: 'صندوق استثماري',
+                etf: 'ETF',
+                cryptocurrency: 'عملة مشفرة',
+                update_investment: 'تحديث الاستثمار',
+                delete_multiple_items: 'حذف عناصر متعددة',
+                delete_all: 'حذف الكل',
+                confirm: 'تأكيد'
             },
             zh: {
                 notifications: '通知',
@@ -3688,7 +4920,216 @@
                 excellent_health: '优秀 - 财务状况良好！',
                 good_health: '良好 - 步入正轨',
                 fair_health: '一般 - 有改进空间',
-                needs_attention: '需要注意 - 审查支出习惯'
+                needs_attention: '需要注意 - 审查支出习惯',
+                save: '保存',
+                update: '更新',
+                cancel: '取消',
+                add: '添加',
+                save_item: '保存项目',
+                update_item: '更新项目',
+                add_income: '添加收入',
+                edit_income: '编辑收入',
+                add_expense: '添加支出',
+                edit_expense: '编辑支出',
+                add_receivable: '添加应收',
+                edit_receivable: '编辑应收',
+                add_payable: '添加应付',
+                edit_payable: '编辑应付',
+                add_plan: '添加计划',
+                edit_plan: '编辑计划',
+                add_budget: '添加预算',
+                edit_budget: '编辑预算',
+                create_template: '创建模板',
+                edit_template: '编辑模板',
+                add_account: '添加账户',
+                update_account: '更新账户',
+                add_debt: '添加债务',
+                update_debt: '更新债务',
+                add_goal: '添加目标',
+                update_goal: '更新目标',
+                period: '期间',
+                daily: '每日',
+                weekly: '每周',
+                monthly: '每月',
+                per_3_month: '每3个月',
+                per_6_month: '每6个月',
+                yearly: '每年',
+                active: '活跃',
+                paused: '已暂停',
+                completed: '已完成',
+                in_progress: '进行中',
+                cancelled: '已取消',
+                budget_tracks_info: '预算跟踪所选期间内所选类别的实际支出与此限制的对比。',
+                notes_optional: '备注（可选）',
+                recurring_transaction: '定期交易',
+                frequency: '频率',
+                next_occurrence_date: '下次发生日期',
+                payment_method: '付款方式',
+                select_method: '选择方式',
+                cash: '现金',
+                bank_transfer: '银行转账',
+                card: '卡',
+                mobile_payment: '移动支付',
+                other: '其他',
+                select_category: '选择类别',
+                from_client: '来自（客户/人员）',
+                to_vendor: '至（供应商/人员）',
+                name_placeholder: '名称',
+                reason: '原因',
+                reminder_days_before: '提醒（到期前天数）',
+                reminder_days_before_deadline: '提醒（截止日期前天数）',
+                plan_title: '计划标题',
+                target_amount: '目标金额',
+                start_date: '开始日期',
+                target_deadline: '目标截止日期',
+                notes: '备注',
+                additional_notes: '附加备注...',
+                optional_description: '可选描述',
+                progress_note: '注意：进度将基于总储蓄（收入 - 支出 + 应收）计算。',
+                reminder_help_text: '在到期日期前这么多天收到提醒（0 = 在到期日期）',
+                reminder_deadline_help: '在截止日期前这么多天收到提醒（0 = 在截止日期）',
+                type_cannot_change: '创建后无法更改类型',
+                account_management: '账户管理',
+                debt_tracker: '债务跟踪',
+                financial_goals: '财务目标',
+                account: '账户',
+                account_name: '账户名称',
+                account_type: '账户类型',
+                select_account: '选择账户',
+                initial_balance: '初始余额',
+                transfers: '转账',
+                transfer: '转账',
+                add_transfer: '添加转账',
+                account_transfers: '账户转账',
+                from_account: '从账户',
+                to_account: '到账户',
+                transfer_description_placeholder: '例如：现金提取，账户转账',
+                debt_name: '债务名称',
+                debt_type: '债务类型',
+                principal_amount: '本金金额',
+                amount_paid: '已付金额',
+                creditor_lender: '债权人/贷款人',
+                goal_name: '目标名称',
+                current_amount: '当前金额',
+                deadline: '截止日期',
+                template_name: '模板名称',
+                transaction_type: '交易类型',
+                recurring_only: '仅定期',
+                non_recurring: '非定期',
+                clear_filters: '清除筛选',
+                all_types: '所有类型',
+                all_accounts: '所有账户',
+                print: '打印',
+                no_accounts_found: '未找到账户。请先添加账户。',
+                no_accounts_added: '未添加账户。添加账户以跟踪不同来源的余额。',
+                no_transfers_recorded: '未记录转账。添加转账以跟踪账户之间的资金流动。',
+                no_debts_tracked: '未跟踪债务。添加债务以开始跟踪。',
+                family_members: '家庭成员',
+                family_member: '家庭成员',
+                add_family_member: '添加家庭成员',
+                edit_family_member: '编辑家庭成员',
+                delete_family_member: '删除家庭成员',
+                family_member_name: '家庭成员姓名',
+                select_family_member: '选择家庭成员',
+                select_family_members: '选择家庭成员',
+                divide_equally: '平均分配',
+                expense_per_person: '每人',
+                no_family_members: '未添加家庭成员。添加家庭成员以跟踪共享支出。',
+                are_you_sure_delete_family_member: '您确定要删除此家庭成员吗？',
+                settings_preferences: '设置和偏好',
+                general_settings: '常规设置',
+                currency_symbol: '货币符号',
+                currency_symbol_description: '所有金额的默认货币符号',
+                date_format: '日期格式',
+                date_format_description: '首选的日期显示格式',
+                auto_save: '自动保存',
+                auto_save_description: '自动将更改保存到Excel文件',
+                enable: '启用',
+                data_management: '数据管理',
+                export_data: '导出数据',
+                export_data_description: '将所有数据下载为Excel文件',
+                export_to_excel: '导出到Excel',
+                export_to_csv: '导出到CSV',
+                import_data: '导入数据',
+                import_data_description: '从Excel文件导入数据（将与现有数据合并）',
+                import_from_excel: '从Excel导入',
+                backup_data: '备份数据',
+                backup_data_description: '创建所有数据的备份',
+                create_backup: '创建备份',
+                restore_data: '恢复数据',
+                restore_data_description: '从备份文件恢复数据',
+                restore_backup: '恢复备份',
+                undo_last_action: '撤销上次操作',
+                undo_last_action_description: '撤销上次交易（添加/编辑/删除）',
+                undo: '撤销',
+                keyboard_shortcuts: '键盘快捷键',
+                navigation: '导航',
+                all_status: '所有状态',
+                color: '颜色',
+                manage_categories: '管理类别',
+                recurring_transactions_manager: '定期交易管理器',
+                auto_generate_info: '自动生成定期交易',
+                auto_generate_desc: '这将根据频率和日期自动为所有定期项目创建交易。',
+                generate_recurring: '生成定期交易',
+                select_category_placeholder: '选择类别',
+                add_new_item: '添加新项目',
+                new: '新建',
+                loan: '贷款',
+                mortgage: '抵押贷款',
+                personal_loan: '个人贷款',
+                savings: '储蓄',
+                bank: '银行',
+                is_required: '是必需的！',
+                must_be_greater_than_zero: '必须大于0！',
+                category_already_exists: '此类别已存在！',
+                category_name_required: '类别名称是必需的！',
+                are_you_sure_disconnect: '您确定要断开Excel文件的连接吗？您需要重新连接以保存更改。',
+                failed_to_save: '保存到Excel文件失败。检查权限。',
+                are_you_sure_delete: '您确定要删除',
+                action_cannot_undo: '此操作无法撤销。',
+                are_you_sure_delete_template: '您确定要删除此模板吗？',
+                are_you_sure_delete_account: '您确定要删除此账户吗？这不会删除与其关联的交易。',
+                are_you_sure_delete_debt: '您确定要删除此债务吗？',
+                are_you_sure_delete_goal: '您确定要删除此目标吗？',
+                are_you_sure_delete_investment: '您确定要删除此投资吗？',
+                category_used_in_transactions: '此类别在',
+                deleting_will_set_to_other: '笔交易中使用。删除它将把这些交易设置为"其他"。继续？',
+                cash_flow_analysis: '现金流分析',
+                investment_portfolio: '投资组合',
+                add_investment: '添加投资',
+                edit_investment: '编辑投资',
+                all_methods: '所有方式',
+                placeholder_salary_freelance: '例如：工资，自由职业',
+                placeholder_groceries: '例如：杂货',
+                placeholder_new_laptop: '例如：新笔记本电脑',
+                placeholder_groceries_salary: '例如：杂货，工资',
+                placeholder_monthly_salary: '例如：月薪',
+                placeholder_main_bank: '例如：主要银行账户',
+                placeholder_home_loan: '例如：房屋贷款',
+                placeholder_bank_name: '例如：银行名称',
+                placeholder_emergency_fund: '例如：应急基金',
+                placeholder_apple_inc: '例如：Apple Inc.',
+                placeholder_aapl: '例如：AAPL',
+                total_cost_basis: '总成本基础',
+                total_gain_loss: '总收益/损失',
+                total_return: '总回报',
+                placeholder_example_3: '例如：3',
+                placeholder_example_7: '例如：7',
+                optional_notes: '可选备注',
+                investment_name: '投资名称',
+                symbol_ticker: '符号/代码',
+                cost_basis: '成本基础',
+                current_value: '当前价值',
+                purchase_date: '购买日期',
+                stock: '股票',
+                bond: '债券',
+                mutual_fund: '共同基金',
+                etf: 'ETF',
+                cryptocurrency: '加密货币',
+                update_investment: '更新投资',
+                delete_multiple_items: '删除多个项目',
+                delete_all: '删除全部',
+                confirm: '确认'
             }
         };
 
@@ -3853,10 +5294,53 @@
                 'Budget Tracking': 'budgets',
                 'Financial Reports': 'reports',
                 'Financial Calendar': 'calendar',
+                'Print': 'print',
+                'No accounts found. Please add an account first.': 'no_accounts_found',
+                'No accounts added. Add an account to track balances across different sources.': 'no_accounts_added',
+                'No transfers recorded. Add a transfer to track money movement between accounts.': 'no_transfers_recorded',
+                'No debts tracked. Add a debt to start tracking.': 'no_debts_tracked',
+                'Family Members': 'family_members',
+                'Family Member': 'family_member',
+                'Add Family Member': 'add_family_member',
+                'Edit Family Member': 'edit_family_member',
+                'Delete Family Member': 'delete_family_member',
+                'Select Family Member': 'select_family_member',
+                'Select Family Members': 'select_family_members',
+                'Divide Equally': 'divide_equally',
+                'Per Person': 'expense_per_person',
+                'Settings & Preferences': 'settings_preferences',
+                'General Settings': 'general_settings',
+                'Currency Symbol': 'currency_symbol',
+                'Default currency symbol for all amounts': 'currency_symbol_description',
+                'Date Format': 'date_format',
+                'Preferred date display format': 'date_format_description',
+                'Auto-save': 'auto_save',
+                'Automatically save changes to Excel file': 'auto_save_description',
+                'Enable': 'enable',
+                'Data Management': 'data_management',
+                'Export Data': 'export_data',
+                'Download all data as Excel file': 'export_data_description',
+                'Export to Excel': 'export_to_excel',
+                'Export to CSV': 'export_to_csv',
+                'Import Data': 'import_data',
+                'Import data from Excel file (will merge with existing data)': 'import_data_description',
+                'Import from Excel': 'import_from_excel',
+                'Backup Data': 'backup_data',
+                'Create a backup of all your data': 'backup_data_description',
+                'Create Backup': 'create_backup',
+                'Restore Data': 'restore_data',
+                'Restore data from a backup file': 'restore_data_description',
+                'Restore Backup': 'restore_backup',
+                'Undo Last Action': 'undo_last_action',
+                'Undo the last transaction (add/edit/delete)': 'undo_last_action_description',
+                'Undo': 'undo',
+                'Keyboard Shortcuts': 'keyboard_shortcuts',
+                'Navigation': 'navigation',
+                'Transfers': 'transfers',
+                'Family': 'family_members',
                 'Recurring Transactions Manager': 'recurring_transactions_manager',
-                'Generate Recurring Transactions': 'generate_recurring_transactions',
+                'Generate Recurring Transactions': 'generate_recurring',
                 'Next Occurrence Date': 'next_occurrence_date',
-                'Update Progress': 'update_progress',
                 'Payment': 'payment_method',
                 'From Account': 'from_account',
                 'To Account': 'to_account'
@@ -3936,6 +5420,16 @@
             
             // Translate .stat-label, .insight-title, .chart-title, .insight-trend elements
             document.querySelectorAll('.stat-label, .insight-title, .chart-title, .insight-trend').forEach(el => {
+                const text = el.textContent.trim();
+                if (text && textMappings[text] && translations[currentLanguage] && translations[currentLanguage][textMappings[text]]) {
+                    if (!el.hasAttribute('data-translate')) {
+                        el.textContent = translations[currentLanguage][textMappings[text]];
+                    }
+                }
+            });
+
+            // Translate settings elements
+            document.querySelectorAll('.settings-label, .settings-description, .settings-section-title').forEach(el => {
                 const text = el.textContent.trim();
                 if (text && textMappings[text] && translations[currentLanguage] && translations[currentLanguage][textMappings[text]]) {
                     if (!el.hasAttribute('data-translate')) {
@@ -4840,6 +6334,7 @@
                 state.data.accounts = parseSheet('Accounts', 'accounts') || [];
                 state.data.debts = parseSheet('Debts', 'debts') || [];
                 state.data.transfers = parseSheet('Transfers', 'transfers') || [];
+                state.data.familyMembers = parseSheet('FamilyMembers', 'familyMembers') || [];
 
                 // Ensure arrays exist
                 if (!Array.isArray(state.data.budgets)) state.data.budgets = [];
@@ -4848,6 +6343,7 @@
                 if (!Array.isArray(state.data.accounts)) state.data.accounts = [];
                 if (!Array.isArray(state.data.debts)) state.data.debts = [];
                 if (!Array.isArray(state.data.transfers)) state.data.transfers = [];
+                if (!Array.isArray(state.data.familyMembers)) state.data.familyMembers = [];
                 if (!Array.isArray(state.data.transactionHistory)) state.data.transactionHistory = [];
 
             } catch (err) {
@@ -4875,6 +6371,7 @@
                 const templatesSheet = XLSX.utils.json_to_sheet(state.data.templates || []);
                 const accountsSheet = XLSX.utils.json_to_sheet(state.data.accounts || []);
                 const transfersSheet = XLSX.utils.json_to_sheet(state.data.transfers || []);
+                const familyMembersSheet = XLSX.utils.json_to_sheet(state.data.familyMembers || []);
 
                 // Append sheets
                 XLSX.utils.book_append_sheet(wb, incomeSheet, "Income");
@@ -4887,6 +6384,7 @@
                 XLSX.utils.book_append_sheet(wb, templatesSheet, "Templates");
                 XLSX.utils.book_append_sheet(wb, accountsSheet, "Accounts");
                 XLSX.utils.book_append_sheet(wb, transfersSheet, "Transfers");
+                XLSX.utils.book_append_sheet(wb, familyMembersSheet, "FamilyMembers");
 
                 // Write to file
                 const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
@@ -5050,6 +6548,8 @@
             document.getElementById('view-categories')?.classList.add('hidden');
             document.getElementById('view-templates')?.classList.add('hidden');
             document.getElementById('view-accounts')?.classList.add('hidden');
+            document.getElementById('view-family')?.classList.add('hidden');
+            document.getElementById('view-family')?.classList.add('hidden');
             document.getElementById('view-transfers')?.classList.add('hidden');
             document.getElementById('view-debts')?.classList.add('hidden');
             document.getElementById('view-recurring')?.classList.add('hidden');
@@ -5086,6 +6586,9 @@
             } else if (tabId === 'accounts') {
                 document.getElementById('view-accounts').classList.remove('hidden');
                 renderAccountsList();
+            } else if (tabId === 'family') {
+                document.getElementById('view-family').classList.remove('hidden');
+                renderFamilyMembersList();
             } else if (tabId === 'transfers') {
                 document.getElementById('view-transfers').classList.remove('hidden');
                 renderTransfersList();
@@ -7921,6 +9424,16 @@
                             </div>
                         </div>
                         <div class="form-group">
+                            <label class="form-label">${t('family_member')} (${t('optional')})</label>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <select class="form-select" id="inp-family-member" style="flex: 1;">
+                                    <option value="">${t('select_family_member')}</option>
+                                    ${(state.data.familyMembers || []).map(member => `<option value="${member.name}" ${item?.familyMember === member.name ? 'selected' : ''}>${member.name}${member.relation ? ` (${member.relation})` : ''}</option>`).join('')}
+                                </select>
+                                <button type="button" class="btn-icon" onclick="closeModal(); setTimeout(() => switchTab('family'), 100);" title="Manage Family Members">⚙️</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
                             <label class="form-label">${t('notes_optional')}</label>
                             <textarea class="form-input" id="inp-notes" placeholder="${t('additional_notes')}" rows="2">${item?.notes || ''}</textarea>
                         </div>
@@ -7986,6 +9499,26 @@
                                     ${(state.data.accounts || []).map(acc => `<option value="${acc.name}" ${(item?.account === acc.name || (!item?.account && item?.paymentMethod && item.paymentMethod === acc.type)) ? 'selected' : ''}>${acc.name} (${acc.type})</option>`).join('')}
                                 </select>
                                 <button type="button" class="btn-icon" onclick="closeModal(); setTimeout(() => switchTab('accounts'), 100);" title="Manage Accounts">⚙️</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">${t('family_members')} (${t('optional')}) - ${t('divide_equally')}</label>
+                            <div style="display: flex; gap: 0.5rem; align-items: start;">
+                                <div style="flex: 1; display: flex; flex-direction: column; gap: 0.5rem;">
+                                    ${(state.data.familyMembers || []).map((member, idx) => `
+                                        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.5rem; background: #f7fafc; border-radius: 4px;">
+                                            <input type="checkbox" id="inp-family-member-${idx}" value="${member.name}" ${item?.familyMembers && Array.isArray(item.familyMembers) && item.familyMembers.includes(member.name) ? 'checked' : ''}>
+                                            <span>${member.name}${member.relation ? ` (${member.relation})` : ''}</span>
+                                        </label>
+                                    `).join('')}
+                                    ${(state.data.familyMembers || []).length === 0 ? `<div style="padding: 0.5rem; color: var(--text-light); font-size: 0.875rem;">No family members added. <a href="#" onclick="closeModal(); setTimeout(() => switchTab('family'), 100);" style="color: var(--primary);">Add family members</a> first.</div>` : ''}
+                                </div>
+                                <button type="button" class="btn-icon" onclick="closeModal(); setTimeout(() => switchTab('family'), 100);" title="Manage Family Members">⚙️</button>
+                            </div>
+                            <div id="expense-per-person" style="margin-top: 0.5rem; padding: 0.5rem; background: #e6fffa; border-radius: 4px; display: none;">
+                                <div style="font-size: 0.875rem; color: var(--text-main);">
+                                    <strong>${t('expense_per_person')}:</strong> <span id="per-person-amount">0</span>
+                                </div>
                             </div>
                         </div>
                         <div class="form-group">
@@ -8215,7 +9748,41 @@
                 `;
 
                 content.innerHTML = formHTML;
-            setTimeout(() => translatePage(), 50);
+                setTimeout(() => {
+                    translatePage();
+                    // Setup expense per-person calculation if it's an expense form
+                    if (type === 'expense') {
+                        const amountInput = document.getElementById('inp-amount');
+                        const perPersonDiv = document.getElementById('expense-per-person');
+                        const perPersonAmount = document.getElementById('per-person-amount');
+                        
+                        function updatePerPersonAmount() {
+                            if (!amountInput || !perPersonDiv || !perPersonAmount) return;
+                            const amount = parseFloat(amountInput.value) || 0;
+                            const selectedCount = document.querySelectorAll('input[id^="inp-family-member-"]:checked').length;
+                            
+                            if (selectedCount > 0 && amount > 0) {
+                                const perPerson = amount / selectedCount;
+                                perPersonAmount.textContent = formatCurrency(perPerson);
+                                perPersonDiv.style.display = 'block';
+                            } else {
+                                perPersonDiv.style.display = 'none';
+                            }
+                        }
+                        
+                        if (amountInput) {
+                            amountInput.addEventListener('input', updatePerPersonAmount);
+                            amountInput.addEventListener('change', updatePerPersonAmount);
+                        }
+                        
+                        document.querySelectorAll('input[id^="inp-family-member-"]').forEach(checkbox => {
+                            checkbox.addEventListener('change', updatePerPersonAmount);
+                        });
+                        
+                        // Initial calculation
+                        setTimeout(updatePerPersonAmount, 100);
+                    }
+                }, 50);
             }
         }
 
@@ -8387,12 +9954,14 @@
                 if (!validateAmount(num('inp-amount'), 'Amount')) return;
                 if (!validateRequired(val('inp-date'), 'Date')) return;
                 if (!validateRequired(val('inp-account'), 'Account')) return;
+                const familyMember = val('inp-family-member');
                 newItem = {
                     source: val('inp-source'),
                     category: val('inp-category') || 'Other',
                     amount: num('inp-amount'),
                     date: val('inp-date'),
                     account: val('inp-account'),
+                    familyMember: familyMember || undefined,
                     notes: val('inp-notes'),
                     recurring: document.getElementById('inp-recurring')?.checked || false,
                     recurringFrequency: document.getElementById('inp-recurring')?.checked ? (val('inp-recurring-frequency-income') || 'monthly') : '',
@@ -8408,12 +9977,21 @@
                 if (!validateAmount(num('inp-amount'), 'Amount')) return;
                 if (!validateRequired(val('inp-date'), 'Date')) return;
                 if (!validateRequired(val('inp-account'), 'Account')) return;
+                // Get selected family members
+                const selectedFamilyMembers = [];
+                (state.data.familyMembers || []).forEach((member, idx) => {
+                    const checkbox = document.getElementById(`inp-family-member-${idx}`);
+                    if (checkbox && checkbox.checked) {
+                        selectedFamilyMembers.push(member.name);
+                    }
+                });
                 newItem = {
                     description: val('inp-desc'),
                     category: val('inp-category') || 'Other',
                     amount: num('inp-amount'),
                     date: val('inp-date'),
                     account: val('inp-account'),
+                    familyMembers: selectedFamilyMembers.length > 0 ? selectedFamilyMembers : undefined,
                     notes: val('inp-notes'),
                     recurring: document.getElementById('inp-recurring')?.checked || false,
                     recurringFrequency: document.getElementById('inp-recurring')?.checked ? (val('inp-recurring-frequency-expense') || 'monthly') : '',
@@ -9446,6 +11024,133 @@
                     renderTransfersList();
                     renderAccountsList(); // Refresh account balances
                     showToast('Transfer deleted successfully', 'success');
+                });
+            });
+        }
+
+        // --- FAMILY MEMBERS MANAGEMENT ---
+        function renderFamilyMembersList() {
+            const container = document.getElementById('family-members-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const familyMembers = state.data.familyMembers || [];
+            if (familyMembers.length === 0) {
+                container.innerHTML = `<div class="text-center" style="padding: 2rem; color: var(--text-light);">${t('no_family_members')}</div>`;
+                return;
+            }
+
+            familyMembers.forEach((member, index) => {
+                const div = document.createElement('div');
+                div.className = 'card';
+                div.style.marginBottom = '1rem';
+                div.style.padding = '1.5rem';
+
+                div.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div style="flex: 1;">
+                            <h3 style="margin: 0; font-size: 1.2rem;">${member.name || 'Unnamed'}</h3>
+                            ${member.relation ? `<div style="color: var(--text-light); font-size: 0.875rem; margin-top: 0.25rem;">${member.relation}</div>` : ''}
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn-edit" onclick="editFamilyMember(${index})">
+                                <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                </svg>
+                            </button>
+                            <button class="btn-delete" onclick="deleteFamilyMember(${index})">
+                                <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function openFamilyMemberModal(memberIndex = null) {
+            const member = memberIndex !== null ? state.data.familyMembers[memberIndex] : null;
+            const overlay = document.getElementById('modal-overlay');
+            const content = document.getElementById('modal-content');
+
+            if (!overlay || !content) return;
+
+            overlay.classList.add('active');
+            content.innerHTML = `
+                <div class="modal-header">
+                    <h2>${member ? t('edit_family_member') : t('add_family_member')}</h2>
+                    <button class="modal-close" onclick="closeModal()">×</button>
+                </div>
+                <form onsubmit="saveFamilyMember(event, ${memberIndex !== null ? memberIndex : 'null'}); return false;">
+                    <div class="form-group">
+                        <label class="form-label">${t('family_member_name')} *</label>
+                        <input type="text" class="form-input" id="family-member-name" required value="${member?.name || ''}" placeholder="e.g. John Doe">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Relation (Optional)</label>
+                        <input type="text" class="form-input" id="family-member-relation" value="${member?.relation || ''}" placeholder="e.g. Spouse, Child, Parent">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal()">${t('cancel')}</button>
+                        <button type="submit" class="btn btn-primary">${member ? t('update') : t('save')}</button>
+                    </div>
+                </form>
+            `;
+        }
+
+        function saveFamilyMember(event, memberIndex) {
+            if (event) event.preventDefault();
+            if (!state.data.familyMembers) state.data.familyMembers = [];
+
+            const member = {
+                name: document.getElementById('family-member-name').value.trim(),
+                relation: document.getElementById('family-member-relation').value.trim() || ''
+            };
+
+            if (!member.name) {
+                showToast('Family member name is required', 'error');
+                return;
+            }
+
+            const index = memberIndex === 'null' || memberIndex === null ? null : parseInt(memberIndex);
+            if (index !== null && index >= 0) {
+                state.data.familyMembers[index] = member;
+            } else {
+                // Check if name already exists
+                const exists = state.data.familyMembers.find(m => m.name.toLowerCase() === member.name.toLowerCase());
+                if (exists) {
+                    showToast('Family member with this name already exists', 'error');
+                    return;
+                }
+                state.data.familyMembers.push(member);
+            }
+
+            writeExcelFile().then(() => {
+                renderFamilyMembersList();
+                closeModal();
+                showToast(`Family member ${index !== null ? 'updated' : 'added'} successfully`, 'success');
+            });
+        }
+
+        function editFamilyMember(memberIndex) {
+            openFamilyMemberModal(memberIndex);
+        }
+
+        function deleteFamilyMember(memberIndex) {
+            showConfirmModal({
+                title: t('delete_family_member'),
+                message: t('are_you_sure_delete_family_member'),
+                type: 'danger'
+            }).then(confirmed => {
+                if (!confirmed) return;
+                state.data.familyMembers.splice(memberIndex, 1);
+                writeExcelFile().then(() => {
+                    renderFamilyMembersList();
+                    showToast('Family member deleted successfully', 'success');
                 });
             });
         }
