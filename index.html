@@ -6210,36 +6210,77 @@
             }
         }
 
+        // Helper function to ensure Google API is loaded
+        async function ensureGoogleAPILoaded() {
+            // Wait for gapi to be available
+            let retries = 0;
+            while (!window.gapi && retries < 20) {
+                await new Promise(resolve => setTimeout(resolve, 500));
+                retries++;
+            }
+            
+            if (!window.gapi) {
+                throw new Error('Google API failed to load. Please refresh the page and ensure you have internet connection.');
+            }
+        }
+
         async function connectGoogleSheets() {
             try {
                 // NOTE: To use Google Sheets integration, you need to:
-                // 1. Create a project in Google Cloud Console
-                // 2. Enable Google Sheets API and Google Drive API
-                // 3. Create OAuth 2.0 credentials
-                // 4. Replace 'YOUR_API_KEY' and 'YOUR_CLIENT_ID' below with your actual credentials
+                // 1. Create a project in Google Cloud Console (https://console.cloud.google.com/)
+                // 2. Enable Google Sheets API and Google Drive API in the API Library
+                // 3. Create OAuth 2.0 credentials (Web application type)
+                // 4. Add your domain to authorized JavaScript origins
+                // 5. Make sure API key restrictions allow Google Sheets API
                 
-                // Initialize Google API
-                await new Promise((resolve) => {
-                    if (window.gapi && window.gapi.load) {
-                        window.gapi.load('client:auth2', resolve);
+                showToast('Initializing Google API...', 'info');
+                
+                await ensureGoogleAPILoaded();
+                
+
+                // Load client library
+                await new Promise((resolve, reject) => {
+                    if (window.gapi.client && window.gapi.client.sheets) {
+                        // Already loaded
+                        resolve();
                     } else {
-                        setTimeout(() => {
-                            if (window.gapi && window.gapi.load) {
-                                window.gapi.load('client:auth2', resolve);
-                            } else {
-                                showToast('Google API not loaded. Please refresh the page.', 'error');
-                                return;
-                            }
-                        }, 1000);
+                        window.gapi.load('client', {
+                            callback: resolve,
+                            onerror: reject,
+                            timeout: 10000,
+                            ontimeout: () => reject(new Error('Google API load timeout'))
+                        });
                     }
                 });
 
-                // Initialize the client
-                await window.gapi.client.init({
-                    apiKey: 'AIzaSyAyyXvJtpYb_L4UZtztccDqHB_peGXUxXU', // Replace with your Google API key
-                    clientId: '415209089700-fp7cm5l9n53kkrfqkmhdo9k4f8n8omvt.apps.googleusercontent.com', // Replace with your Google OAuth Client ID
-                    discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
-                    scope: 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file'
+                // Check if already initialized
+                if (!window.gapi.client.sheets) {
+                    // Initialize the client with proper discovery document
+                    await window.gapi.client.init({
+                        apiKey: 'AIzaSyAyyXvJtpYb_L4UZtztccDqHB_peGXUxXU',
+                        clientId: '415209089700-fp7cm5l9n53kkrfqkmhdo9k4f8n8omvt.apps.googleusercontent.com',
+                        discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
+                        scope: 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file'
+                    });
+                }
+
+                // Load auth2 library
+                await new Promise((resolve, reject) => {
+                    if (window.gapi.auth2) {
+                        resolve();
+                    } else {
+                        window.gapi.load('auth2', {
+                            callback: resolve,
+                            onerror: reject,
+                            timeout: 10000,
+                            ontimeout: () => reject(new Error('Google Auth2 load timeout'))
+                        });
+                    }
+                });
+
+                // Initialize auth2
+                await window.gapi.auth2.init({
+                    client_id: '415209089700-fp7cm5l9n53kkrfqkmhdo9k4f8n8omvt.apps.googleusercontent.com'
                 });
 
                 // Sign in
@@ -6247,7 +6288,10 @@
                 const isSignedIn = authInstance.isSignedIn.get();
                 
                 if (!isSignedIn) {
-                    await authInstance.signIn();
+                    showToast('Please sign in to Google...', 'info');
+                    await authInstance.signIn({
+                        scope: 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file'
+                    });
                 }
 
                 // Prompt for Google Sheets URL or ID
@@ -6255,10 +6299,15 @@
                 if (!sheetUrl) return;
 
                 // Extract sheet ID from URL
-                let sheetId = sheetUrl;
+                let sheetId = sheetUrl.trim();
                 const match = sheetUrl.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
                 if (match) {
                     sheetId = match[1];
+                }
+
+                // Validate sheet ID format
+                if (!/^[a-zA-Z0-9-_]+$/.test(sheetId)) {
+                    throw new Error('Invalid Google Sheets ID format');
                 }
 
                 state.googleSheetsId = sheetId;
@@ -6266,6 +6315,7 @@
                 updateStatus(true);
 
                 // Load data from Google Sheets
+                showToast('Loading data from Google Sheets...', 'info');
                 await readGoogleSheets();
                 renderAll();
 
@@ -6273,16 +6323,41 @@
 
             } catch (err) {
                 console.error('Error connecting to Google Sheets:', err);
-                showToast('Error connecting to Google Sheets: ' + err.message, 'error');
+                let errorMessage = 'Error connecting to Google Sheets: ';
+                
+                if (err.error) {
+                    if (err.error.code === 403) {
+                        errorMessage += 'Access denied. Please check:\n1. Google Sheets API is enabled in Google Cloud Console\n2. API key has proper permissions\n3. OAuth consent screen is configured';
+                    } else if (err.error.message) {
+                        errorMessage += err.error.message;
+                    } else {
+                        errorMessage += JSON.stringify(err.error);
+                    }
+                } else if (err.message) {
+                    errorMessage += err.message;
+                } else {
+                    errorMessage += 'Unknown error occurred';
+                }
+                
+                showToast(errorMessage, 'error');
+                alert(errorMessage);
             }
         }
 
         async function readGoogleSheets() {
             try {
-                const response = await window.gapi.client.sheets.spreadsheets.get({
-                    spreadsheetId: state.googleSheetsId,
-                    includeGridData: false
+                if (!window.gapi.client.sheets) {
+                    throw new Error('Google Sheets API not initialized');
+                }
+
+                // First, get spreadsheet metadata to verify access
+                const spreadsheetResponse = await window.gapi.client.sheets.spreadsheets.get({
+                    spreadsheetId: state.googleSheetsId
                 });
+
+                if (!spreadsheetResponse.result) {
+                    throw new Error('Unable to access spreadsheet. Please check permissions.');
+                }
 
                 const sheetNames = ['Income', 'Expenses', 'Receivables', 'Payables', 'Plans', 'Budgets', 'Categories', 'Templates', 'Accounts', 'Transfers', 'FamilyMembers', 'Debts'];
                 
@@ -6294,7 +6369,7 @@
                             range: range
                         });
 
-                        if (result.result.values && result.result.values.length > 0) {
+                        if (result.result && result.result.values && result.result.values.length > 0) {
                             const headers = result.result.values[0];
                             const rows = result.result.values.slice(1);
                             const data = rows.map(row => {
@@ -6311,12 +6386,21 @@
                             }
                         }
                     } catch (err) {
-                        console.log(`Sheet ${sheetName} not found or empty`);
+                        // Sheet doesn't exist or is empty - this is OK, just skip it
+                        console.log(`Sheet ${sheetName} not found or empty:`, err.message || err);
                     }
                 }
             } catch (err) {
                 console.error('Error reading Google Sheets:', err);
-                throw err;
+                let errorMsg = 'Error reading Google Sheets: ';
+                if (err.result && err.result.error) {
+                    errorMsg += err.result.error.message || JSON.stringify(err.result.error);
+                } else if (err.message) {
+                    errorMsg += err.message;
+                } else {
+                    errorMsg += 'Unknown error';
+                }
+                throw new Error(errorMsg);
             }
         }
 
@@ -6324,6 +6408,10 @@
             if (!state.isConnected || !state.googleSheetsId) return;
 
             try {
+                if (!window.gapi || !window.gapi.client || !window.gapi.client.sheets) {
+                    throw new Error('Google Sheets API not initialized');
+                }
+
                 showToast('Saving to Google Sheets...', 'info');
 
                 const sheetMappings = [
@@ -6341,11 +6429,18 @@
                     { name: 'Debts', data: state.data.debts || [] }
                 ];
 
-                // Batch update all sheets
-                const requests = [];
+                // Prepare batch update requests
+                const valueRanges = [];
                 
                 for (const mapping of sheetMappings) {
-                    if (mapping.data.length === 0) continue;
+                    if (mapping.data.length === 0) {
+                        // Clear sheet if no data
+                        valueRanges.push({
+                            range: `${mapping.name}!A:Z`,
+                            values: [[]]
+                        });
+                        continue;
+                    }
 
                     // Get headers from first object
                     const headers = Object.keys(mapping.data[0]);
@@ -6353,27 +6448,31 @@
                     // Convert data to 2D array
                     const values = [
                         headers, // Header row
-                        ...mapping.data.map(row => headers.map(header => row[header] || ''))
+                        ...mapping.data.map(row => headers.map(header => {
+                            const value = row[header];
+                            // Handle null/undefined
+                            if (value === null || value === undefined) return '';
+                            return String(value);
+                        }))
                     ];
 
-                    requests.push({
+                    valueRanges.push({
                         range: `${mapping.name}!A1`,
                         values: values
                     });
                 }
 
-                // Clear existing data and write new data
-                for (const request of requests) {
-                    try {
-                        await window.gapi.client.sheets.spreadsheets.values.update({
-                            spreadsheetId: state.googleSheetsId,
-                            range: request.range,
-                            valueInputOption: 'RAW',
-                            resource: { values: request.values }
-                        });
-                    } catch (err) {
-                        console.error(`Error updating sheet ${request.range}:`, err);
-                    }
+                // Use batchUpdate for better performance
+                if (valueRanges.length > 0) {
+                    const body = {
+                        valueInputOption: 'RAW',
+                        data: valueRanges
+                    };
+
+                    await window.gapi.client.sheets.spreadsheets.values.batchUpdate({
+                        spreadsheetId: state.googleSheetsId,
+                        resource: body
+                    });
                 }
 
                 // Visual feedback
@@ -6384,7 +6483,15 @@
                 showToast('Saved to Google Sheets successfully!', 'success');
             } catch (err) {
                 console.error('Error writing to Google Sheets:', err);
-                showToast('Error saving to Google Sheets: ' + err.message, 'error');
+                let errorMsg = 'Error saving to Google Sheets: ';
+                if (err.result && err.result.error) {
+                    errorMsg += err.result.error.message || JSON.stringify(err.result.error);
+                } else if (err.message) {
+                    errorMsg += err.message;
+                } else {
+                    errorMsg += 'Unknown error';
+                }
+                showToast(errorMsg, 'error');
             }
         }
 
