@@ -6442,7 +6442,10 @@
             
             const familyMembers = state.data.familyMembers || [];
             
-            if (familyMembers.length === 0) {
+            // Filter only active members for dashboard overview
+            const activeMembers = familyMembers.filter(m => m.active !== false);
+            
+            if (activeMembers.length === 0) {
                 card.style.display = 'none';
                 return;
             }
@@ -6451,7 +6454,7 @@
             const memberStats = calculateFamilyMemberStats();
             
             // Sort members by net contribution (top contributors first)
-            const sortedMembers = [...familyMembers].sort((a, b) => {
+            const sortedMembers = [...activeMembers].sort((a, b) => {
                 const statsA = memberStats[a.name] || { netContribution: 0 };
                 const statsB = memberStats[b.name] || { netContribution: 0 };
                 return statsB.netContribution - statsA.netContribution;
@@ -7191,6 +7194,7 @@
                                 <span class="mobile-details-label">Source:</span>
                                 <span class="mobile-details-value">${item.source || '-'} ${item.recurring ? '<span class="recurring-badge">🔄 Recurring</span>' : ''}</span>
                             </div>
+                            ${item.familyMember ? `<div class="mobile-details-row"><span class="mobile-details-label">Contributor:</span><span class="mobile-details-value">👤 ${item.familyMember}</span></div>` : ''}
                             <div class="mobile-details-row">
                                 <span class="mobile-details-label">Category:</span>
                                 <span class="mobile-details-value"><span class="tag tag-success">${item.category || 'Other'}</span></span>
@@ -7199,10 +7203,12 @@
                             ${item.notes ? `<div class="mobile-details-row"><span class="mobile-details-value transaction-note">${item.notes}</span></div>` : ''}
                         </div>
                     `;
+                    const contributorBadge = item.familyMember ? `<span style="background: #e6f3ff; color: #0066cc; padding: 0.125rem 0.5rem; border-radius: 12px; font-size: 0.75rem; margin-left: 0.5rem; font-weight: 500;">👤 ${item.familyMember}</span>` : '';
                     cols += `
                         <td>${item.date ? formatDate(item.date) : '-'}</td>
                         <td>
                             ${item.source || '-'}
+                            ${contributorBadge}
                             ${item.recurring ? '<span class="recurring-badge">🔄 Recurring</span>' : ''}
                             ${item.account ? `<div style="font-size: 0.75rem; color: var(--text-light); margin-top: 0.25rem;">🏦 ${item.account}</div>` : ''}
                             ${item.notes ? `<div class="transaction-note">${item.notes}</div>` : ''}
@@ -7221,6 +7227,17 @@
                                 <span class="mobile-details-label">Description:</span>
                                 <span class="mobile-details-value">${item.description || '-'} ${item.recurring ? '<span class="recurring-badge">🔄 Recurring</span>' : ''}</span>
                             </div>
+                            ${item.familyMembers && Array.isArray(item.familyMembers) && item.familyMembers.length > 0 ? `
+                            <div class="mobile-details-row">
+                                <span class="mobile-details-label">Contributors:</span>
+                                <span class="mobile-details-value">${item.familyMembers.map(name => {
+                                    if (item.contributionType === 'custom' && item.contributions && item.contributions[name]) {
+                                        return `👤 ${name} (${formatCurrency(item.contributions[name])})`;
+                                    }
+                                    return `👤 ${name}`;
+                                }).join(', ')}</span>
+                            </div>
+                            ` : ''}
                             <div class="mobile-details-row">
                                 <span class="mobile-details-label">Category:</span>
                                 <span class="mobile-details-value"><span class="tag tag-danger">${item.category || 'Other'}</span></span>
@@ -7229,10 +7246,28 @@
                             ${item.notes ? `<div class="mobile-details-row"><span class="mobile-details-value transaction-note">${item.notes}</span></div>` : ''}
                         </div>
                     `;
+                    // Build contributor badges for expenses
+                    let contributorBadges = '';
+                    if (item.familyMembers && Array.isArray(item.familyMembers) && item.familyMembers.length > 0) {
+                        if (item.contributionType === 'custom' && item.contributions) {
+                            // Show custom contributions
+                            contributorBadges = item.familyMembers.map(name => {
+                                const amount = item.contributions[name] || '';
+                                return `<span style="background: #e6f3ff; color: #0066cc; padding: 0.125rem 0.5rem; border-radius: 12px; font-size: 0.75rem; margin-left: 0.5rem; font-weight: 500;">👤 ${name}${amount ? ` (${formatCurrency(amount)})` : ''}</span>`;
+                            }).join('');
+                        } else {
+                            // Show equal contributions
+                            const perPerson = item.amount / item.familyMembers.length;
+                            contributorBadges = item.familyMembers.map(name => 
+                                `<span style="background: #e6f3ff; color: #0066cc; padding: 0.125rem 0.5rem; border-radius: 12px; font-size: 0.75rem; margin-left: 0.5rem; font-weight: 500;">👤 ${name}</span>`
+                            ).join('');
+                        }
+                    }
                     cols += `
                         <td>${item.date ? formatDate(item.date) : '-'}</td>
                         <td>
                             ${item.description || '-'}
+                            ${contributorBadges}
                             ${item.recurring ? '<span class="recurring-badge">🔄 Recurring</span>' : ''}
                             ${item.account ? `<div style="font-size: 0.75rem; color: var(--text-light); margin-top: 0.25rem;">🏦 ${item.account}</div>` : ''}
                             ${item.notes ? `<div class="transaction-note">${item.notes}</div>` : ''}
@@ -8675,7 +8710,7 @@
                             <div style="display: flex; gap: 0.5rem;">
                                 <select class="form-select" id="inp-family-member" style="flex: 1;">
                                     <option value="">${t('select_family_member')}</option>
-                                    ${(state.data.familyMembers || []).map(member => `<option value="${member.name}" ${item?.familyMember === member.name ? 'selected' : ''}>${member.name}${member.relation ? ` (${member.relation})` : ''}</option>`).join('')}
+                                    ${(state.data.familyMembers || []).filter(m => m.active !== false).map(member => `<option value="${member.name}" ${item?.familyMember === member.name ? 'selected' : ''}>${member.name}${member.relation ? ` (${member.relation})` : ''}</option>`).join('')}
                                 </select>
                                 <button type="button" class="btn-icon" onclick="closeModal(); setTimeout(() => switchTab('family'), 100);" title="Manage Family Members">⚙️</button>
                             </div>
@@ -10801,12 +10836,16 @@
                 div.style.cursor = 'pointer';
                 div.onclick = () => showFamilyMemberDetails(index);
 
+                const isActive = member.active !== false;
                 div.innerHTML = `
                     <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
                         <div style="flex: 1;">
-                            <h3 style="margin: 0; font-size: 1.2rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <h3 style="margin: 0; font-size: 1.2rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
                                 ${member.name || 'Unnamed'}
                                 ${stats.netContribution >= 0 ? '<span style="color: var(--success); font-size: 0.875rem;">✓</span>' : '<span style="color: var(--danger); font-size: 0.875rem;">!</span>'}
+                                <span style="background: ${isActive ? 'var(--success)' : 'var(--text-light)'}; color: white; padding: 0.125rem 0.5rem; border-radius: 12px; font-size: 0.75rem; font-weight: 500;">
+                                    ${isActive ? 'Active' : 'Inactive'}
+                                </span>
                             </h3>
                             ${member.relation ? `<div style="color: var(--text-light); font-size: 0.875rem; margin-top: 0.25rem;">${member.relation}</div>` : ''}
                             ${member.email ? `<div style="color: var(--text-light); font-size: 0.875rem; margin-top: 0.25rem;">📧 ${member.email}</div>` : ''}
