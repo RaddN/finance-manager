@@ -11713,12 +11713,18 @@
             if (event) event.preventDefault();
             if (!state.data.familyMembers) state.data.familyMembers = [];
 
+            const nameEl = document.getElementById('family-member-name');
+            const relationEl = document.getElementById('family-member-relation');
+            const emailEl = document.getElementById('family-member-email');
+            const phoneEl = document.getElementById('family-member-phone');
+            const notesEl = document.getElementById('family-member-notes');
+
             const member = {
-                name: document.getElementById('family-member-name').value.trim(),
-                relation: document.getElementById('family-member-relation').value.trim() || '',
-                email: document.getElementById('family-member-email').value.trim() || '',
-                phone: document.getElementById('family-member-phone').value.trim() || '',
-                notes: document.getElementById('family-member-notes').value.trim() || ''
+                name: nameEl ? nameEl.value.trim() : '',
+                relation: relationEl ? relationEl.value.trim() : '',
+                email: emailEl ? emailEl.value.trim() : '',
+                phone: phoneEl ? phoneEl.value.trim() : '',
+                notes: notesEl ? notesEl.value.trim() : ''
             };
 
             if (!member.name) {
