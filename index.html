@@ -1747,8 +1747,20 @@
                     </div>
                 </div>
 
+                <!-- Connect Excel Button (Mobile) -->
+                <button class="btn btn-secondary" style="width: auto; display: inline-flex; align-items: center; padding: 0.5rem;" onclick="connectExcelFile()" title="Connect Excel File" id="connect-btn-mobile">
+                    <svg width="16" height="16" viewBox="-0.08 0 1.28 1.28" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M.103 0a.1.1 0 0 0-.101.102v1.077a.1.1 0 0 0 .101.101h.915a.1.1 0 0 0 .101-.101V.406L.742 0z" fill-rule="evenodd" clip-rule="evenodd" fill="#0c8fe8"></path>
+                        <g fill-rule="evenodd" clip-rule="evenodd">
+                            <path d="M1.12.407v.02H.864S.738.402.741.293c0 0 .004.114.12.114z" fill="#0973e2"></path>
+                            <path d="M.741 0v.291c0 .033.022.116.122.116h.256z" opacity=".5" fill="#fff"></path>
+                        </g>
+                        <path d="M.565.712a.106.106 0 0 0-.151 0L.353.773a.11.11 0 0 0 0 .151.025.025 0 0 0 .035 0 .024.024 0 0 0 0-.035.06.06 0 0 1 0-.082L.45.746a.057.057 0 0 1 .081 0 .06.06 0 0 1 0 .081l-.029.03q.01.03.008.061L.566.862a.106.106 0 0 0 0-.151M.412.83a.025.025 0 0 0 0 .035.057.057 0 0 1 0 .081l-.061.061a.057.057 0 0 1-.081 0 .06.06 0 0 1 0-.081L.299.897A.14.14 0 0 1 .291.835L.235.891a.106.106 0 0 0 0 .151.11.11 0 0 0 .151 0L.448.98a.106.106 0 0 0 0-.151.025.025 0 0 0-.035 0" fill="#fff"></path>
+                    </svg>
+                </button>
+
                 <!-- 3-Dot Menu -->
-                <div style="position: relative;">
+                <div style="position: relative; display: none;" id="mobile-menu-container">
                     <button class="btn btn-secondary" style="width: auto; padding: 0.5rem;" onclick="toggleMobileMenu(event)" id="mobile-menu-btn" title="Menu">
                         <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
                             <circle cx="12" cy="12" r="1"></circle>
@@ -6557,6 +6569,8 @@
             const refreshBtn = document.getElementById('refresh-btn');
             const exportBtn = document.getElementById('export-btn');
             const disconnectBtn = document.getElementById('disconnect-btn');
+            const connectBtnMobile = document.getElementById('connect-btn-mobile');
+            const mobileMenuContainer = document.getElementById('mobile-menu-container');
 
             if (connected) {
                 el.className = 'status-bar status-connected';
@@ -6570,6 +6584,14 @@
                 `;
                 btn.disabled = true;
                 btn.style.display = 'none'; // Hide connect button when connected
+
+                // Hide mobile connect button, show mobile menu
+                if (connectBtnMobile) {
+                    connectBtnMobile.style.display = 'none';
+                }
+                if (mobileMenuContainer) {
+                    mobileMenuContainer.style.display = 'block';
+                }
 
                 // Show Refresh and Export buttons
                 if (refreshBtn) {
@@ -6594,6 +6616,14 @@
                 `;
                 btn.disabled = false;
                 btn.style.display = 'inline-flex'; // Show connect button when disconnected
+
+                // Show mobile connect button, hide mobile menu
+                if (connectBtnMobile) {
+                    connectBtnMobile.style.display = 'inline-flex';
+                }
+                if (mobileMenuContainer) {
+                    mobileMenuContainer.style.display = 'none';
+                }
 
                 // Hide Refresh and Export buttons
                 if (refreshBtn) {
