@@ -1882,6 +1882,14 @@
             </div>
 
 
+            <!-- Family Members Overview -->
+            <div class="card" id="family-members-overview-card" style="margin-bottom: 1.5rem; display: none;">
+                <h2>👨‍👩‍👧‍👦 <span data-translate="family_members">Family Members</span> <span data-translate="overview">Overview</span></h2>
+                <div id="family-members-overview-content" style="margin-top: 1rem;">
+                    <div class="text-center" style="padding: 1rem; color: var(--text-light);">Loading...</div>
+                </div>
+            </div>
+
             <!-- Bill Reminders Widget -->
             <div class="card" style="margin-bottom: 1.5rem;">
                 <h2>📅 <span data-translate="upcoming_bills">Upcoming Bills & Reminders</span></h2>
@@ -2443,25 +2451,51 @@
                 <div class="settings-section">
                     <div class="settings-section-title" data-translate="keyboard_shortcuts">Keyboard Shortcuts</div>
                     <div style="padding: 1rem 0;">
-                        <div
-                            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
                             <div>
-                                <div style="font-weight: 600; margin-bottom: 0.5rem;" data-translate="navigation">Navigation</div>
+                                <div style="font-weight: 600; margin-bottom: 0.75rem; color: var(--primary);" data-translate="navigation">Navigation</div>
                                 <div style="font-size: 0.875rem; line-height: 2;">
                                     <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">1</span> - <span data-translate="dashboard">Dashboard</span></div>
                                     <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">2</span> - <span data-translate="income">Income</span></div>
                                     <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">3</span> - <span data-translate="expenses">Expenses</span></div>
-                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">N</span> - <span data-translate="add_new_item">New Item</span></div>
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">4</span> - <span data-translate="receivables">Receivables</span></div>
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">5</span> - <span data-translate="payables">Payables</span></div>
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">6</span> - <span data-translate="plans">Plans</span></div>
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">7</span> - <span data-translate="budgets">Budgets</span></div>
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">8</span> - <span data-translate="categories">Categories</span></div>
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">9</span> - <span data-translate="reports">Reports</span></div>
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">0</span> - <span data-translate="settings">Settings</span></div>
+                                    <div><span class="shortcut-key">←</span> / <span class="shortcut-key">→</span> - Navigate Tabs</div>
                                 </div>
                             </div>
                             <div>
-                                <div style="font-weight: 600; margin-bottom: 0.5rem;" data-translate="actions">Actions</div>
+                                <div style="font-weight: 600; margin-bottom: 0.75rem; color: var(--primary);" data-translate="actions">Actions</div>
                                 <div style="font-size: 0.875rem; line-height: 2;">
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">N</span> - <span data-translate="add_new_item">Add New Item</span></div>
                                     <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">S</span> - <span data-translate="save">Save</span></div>
-                                    <div><span class="shortcut-key">Esc</span> - <span data-translate="close">Close Modal</span></div>
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">E</span> - <span data-translate="export_data">Export Data</span></div>
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">I</span> - <span data-translate="import_data">Import Data</span></div>
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">B</span> - <span data-translate="backup_data">Backup Data</span></div>
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">Z</span> - <span data-translate="undo">Undo</span></div>
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">R</span> - <span data-translate="refresh">Refresh</span></div>
                                     <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">F</span> - <span data-translate="search">Search</span></div>
                                     <div><span class="shortcut-key">Del</span> - <span data-translate="delete">Delete Selected</span></div>
                                 </div>
+                            </div>
+                            <div>
+                                <div style="font-weight: 600; margin-bottom: 0.75rem; color: var(--primary);" data-translate="quick_access">Quick Access</div>
+                                <div style="font-size: 0.875rem; line-height: 2;">
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">,</span> / <span class="shortcut-key">P</span> - <span data-translate="settings">Settings</span></div>
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">/</span> - <span data-translate="show_shortcuts">Show Shortcuts</span></div>
+                                    <div><span class="shortcut-key">F1</span> - <span data-translate="show_shortcuts">Show Shortcuts</span></div>
+                                    <div><span class="shortcut-key">Esc</span> - Close Modal / Clear Search</div>
+                                    <div><span class="shortcut-key">Enter</span> - Submit Form</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 1.5rem; padding: 1rem; background: var(--card-bg); border-radius: 8px; border: 1px solid var(--border);">
+                            <div style="font-size: 0.75rem; color: var(--text-light); line-height: 1.6;">
+                                <strong>💡 Tip:</strong> Keyboard shortcuts work globally except when typing in input fields. Use <span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">/</span> or <span class="shortcut-key">F1</span> to view this help anytime.
                             </div>
                         </div>
                     </div>
@@ -2773,6 +2807,17 @@
                 undo: 'Undo',
                 keyboard_shortcuts: 'Keyboard Shortcuts',
                 navigation: 'Navigation',
+                show_shortcuts: 'Show Shortcuts',
+                quick_access: 'Quick Access',
+                overview: 'Overview',
+                person: 'Person',
+                people: 'People',
+                net_contribution: 'Net Contribution',
+                contributor: 'Contributor',
+                owed: 'Owed',
+                net_contributor: 'Net Contributor',
+                net_owed: 'Net Owed',
+                member_information: 'Member Information',
                 all_status: 'All Status',
                 color: 'Color',
                 manage_categories: 'Manage Categories',
@@ -3139,6 +3184,17 @@
                 undo: 'পূর্বাবস্থায় ফেরান',
                 keyboard_shortcuts: 'কীবোর্ড শর্টকাট',
                 navigation: 'নেভিগেশন',
+                show_shortcuts: 'শর্টকাট দেখান',
+                quick_access: 'দ্রুত অ্যাক্সেস',
+                overview: 'ওভারভিউ',
+                person: 'ব্যক্তি',
+                people: 'মানুষ',
+                net_contribution: 'নেট অবদান',
+                contributor: 'অবদানকারী',
+                owed: 'ঋণী',
+                net_contributor: 'নেট অবদানকারী',
+                net_owed: 'নেট ঋণী',
+                member_information: 'সদস্যের তথ্য',
                 all_status: 'সব অবস্থা',
                 color: 'রং',
                 manage_categories: 'বিভাগ পরিচালনা করুন',
@@ -3468,6 +3524,17 @@
                 undo: 'Deshacer',
                 keyboard_shortcuts: 'Atajos de Teclado',
                 navigation: 'Navegación',
+                show_shortcuts: 'Mostrar Atajos',
+                quick_access: 'Acceso Rápido',
+                overview: 'Resumen',
+                person: 'Persona',
+                people: 'Personas',
+                net_contribution: 'Contribución Neta',
+                contributor: 'Contribuidor',
+                owed: 'Debe',
+                net_contributor: 'Contribuidor Neto',
+                net_owed: 'Debe Neto',
+                member_information: 'Información del Miembro',
                 all_status: 'Todos los Estados',
                 color: 'Color',
                 manage_categories: 'Gestionar Categorías',
@@ -3843,6 +3910,17 @@
                 undo: 'Annuler',
                 keyboard_shortcuts: 'Raccourcis Clavier',
                 navigation: 'Navigation',
+                show_shortcuts: 'Afficher les Raccourcis',
+                quick_access: 'Accès Rapide',
+                overview: 'Aperçu',
+                person: 'Personne',
+                people: 'Personnes',
+                net_contribution: 'Contribution Nette',
+                contributor: 'Contributeur',
+                owed: 'Dû',
+                net_contributor: 'Contributeur Net',
+                net_owed: 'Dû Net',
+                member_information: 'Informations du Membre',
                 all_status: 'Tous les Statuts',
                 color: 'Couleur',
                 manage_categories: 'Gérer les Catégories',
@@ -4114,6 +4192,17 @@
                 undo: 'Rückgängig',
                 keyboard_shortcuts: 'Tastenkürzel',
                 navigation: 'Navigation',
+                show_shortcuts: 'Tastenkürzel Anzeigen',
+                quick_access: 'Schnellzugriff',
+                overview: 'Übersicht',
+                person: 'Person',
+                people: 'Personen',
+                net_contribution: 'Netto-Beitrag',
+                contributor: 'Beitragender',
+                owed: 'Geschuldet',
+                net_contributor: 'Netto-Beitragender',
+                net_owed: 'Netto-Geschuldet',
+                member_information: 'Mitgliedsinformationen',
                 all_status: 'Alle Status',
                 color: 'Farbe',
                 manage_categories: 'Kategorien Verwalten',
@@ -4431,6 +4520,17 @@
                 undo: 'पूर्ववत',
                 keyboard_shortcuts: 'कीबोर्ड शॉर्टकट',
                 navigation: 'नेविगेशन',
+                show_shortcuts: 'शॉर्टकट दिखाएं',
+                quick_access: 'त्वरित पहुंच',
+                overview: 'अवलोकन',
+                person: 'व्यक्ति',
+                people: 'लोग',
+                net_contribution: 'शुद्ध योगदान',
+                contributor: 'योगदानकर्ता',
+                owed: 'देय',
+                net_contributor: 'शुद्ध योगदानकर्ता',
+                net_owed: 'शुद्ध देय',
+                member_information: 'सदस्य जानकारी',
                 all_status: 'सभी स्थिति',
                 color: 'रंग',
                 manage_categories: 'श्रेणियां प्रबंधित करें',
@@ -4748,6 +4848,17 @@
                 undo: 'تراجع',
                 keyboard_shortcuts: 'اختصارات لوحة المفاتيح',
                 navigation: 'التنقل',
+                show_shortcuts: 'إظهار الاختصارات',
+                quick_access: 'الوصول السريع',
+                overview: 'نظرة عامة',
+                person: 'شخص',
+                people: 'أشخاص',
+                net_contribution: 'المساهمة الصافية',
+                contributor: 'مساهم',
+                owed: 'مدين',
+                net_contributor: 'المساهم الصافي',
+                net_owed: 'المدين الصافي',
+                member_information: 'معلومات العضو',
                 all_status: 'جميع الحالات',
                 color: 'اللون',
                 manage_categories: 'إدارة الفئات',
@@ -5065,6 +5176,17 @@
                 undo: '撤销',
                 keyboard_shortcuts: '键盘快捷键',
                 navigation: '导航',
+                show_shortcuts: '显示快捷键',
+                quick_access: '快速访问',
+                overview: '概览',
+                person: '人',
+                people: '人',
+                net_contribution: '净贡献',
+                contributor: '贡献者',
+                owed: '欠款',
+                net_contributor: '净贡献者',
+                net_owed: '净欠款',
+                member_information: '成员信息',
                 all_status: '所有状态',
                 color: '颜色',
                 manage_categories: '管理类别',
@@ -6824,6 +6946,9 @@
             // Render Bill Reminders
             renderBillReminders();
             
+            // Render Family Members Overview
+            renderFamilyMembersOverview();
+            
             // Re-translate after rendering dashboard
             setTimeout(() => translatePage(), 50);
 
@@ -7316,6 +7441,89 @@
                     </div>
                 `;
             }).join('');
+        }
+
+        function renderFamilyMembersOverview() {
+            const card = document.getElementById('family-members-overview-card');
+            const container = document.getElementById('family-members-overview-content');
+            
+            if (!card || !container) return;
+            
+            const familyMembers = state.data.familyMembers || [];
+            
+            if (familyMembers.length === 0) {
+                card.style.display = 'none';
+                return;
+            }
+            
+            card.style.display = 'block';
+            const memberStats = calculateFamilyMemberStats();
+            
+            // Sort members by net contribution (top contributors first)
+            const sortedMembers = [...familyMembers].sort((a, b) => {
+                const statsA = memberStats[a.name] || { netContribution: 0 };
+                const statsB = memberStats[b.name] || { netContribution: 0 };
+                return statsB.netContribution - statsA.netContribution;
+            });
+            
+            // Show top 5 members
+            const topMembers = sortedMembers.slice(0, 5);
+            
+            if (topMembers.length === 0) {
+                container.innerHTML = `<div class="text-center" style="padding: 1rem; color: var(--text-light);">${t('no_family_members')}</div>`;
+                return;
+            }
+            
+            container.innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                    ${topMembers.map((member, idx) => {
+                        const stats = memberStats[member.name] || { totalIncome: 0, totalExpenses: 0, netContribution: 0 };
+                        const rank = idx + 1;
+                        const rankEmoji = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '📊';
+                        const memberIndex = familyMembers.indexOf(member);
+                        
+                        return `
+                            <div class="card" style="padding: 1rem; cursor: pointer; transition: transform 0.2s;" 
+                                 onclick="switchTab('family'); setTimeout(() => showFamilyMemberDetails(${memberIndex}), 100);"
+                                 onmouseover="this.style.transform='translateY(-2px)'" 
+                                 onmouseout="this.style.transform='translateY(0)'">
+                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
+                                    <div style="flex: 1;">
+                                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                                            <span style="font-size: 1.2rem;">${rankEmoji}</span>
+                                            <h3 style="margin: 0; font-size: 1rem; font-weight: 600;">${member.name}</h3>
+                                        </div>
+                                        ${member.relation ? `<div style="font-size: 0.75rem; color: var(--text-light);">${member.relation}</div>` : ''}
+                                    </div>
+                                </div>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border);">
+                                    <div>
+                                        <div style="font-size: 0.7rem; color: var(--text-light); margin-bottom: 0.25rem;" data-translate="income">Income</div>
+                                        <div style="font-size: 0.9rem; font-weight: 600; color: var(--success);">${formatCurrency(stats.totalIncome)}</div>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 0.7rem; color: var(--text-light); margin-bottom: 0.25rem;" data-translate="expenses">Expenses</div>
+                                        <div style="font-size: 0.9rem; font-weight: 600; color: var(--danger);">${formatCurrency(stats.totalExpenses)}</div>
+                                    </div>
+                                </div>
+                                <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border);">
+                                    <div style="font-size: 0.7rem; color: var(--text-light); margin-bottom: 0.25rem;" data-translate="net_contribution">Net Contribution</div>
+                                    <div style="font-size: 1.1rem; font-weight: 600; color: ${stats.netContribution >= 0 ? 'var(--success)' : 'var(--danger)'};">
+                                        ${stats.netContribution >= 0 ? '+' : ''}${formatCurrency(stats.netContribution)}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+                ${sortedMembers.length > 5 ? `
+                    <div style="margin-top: 1rem; text-align: center;">
+                        <button class="btn btn-secondary" onclick="switchTab('family')" style="width: auto;">
+                            View All ${sortedMembers.length} Members →
+                        </button>
+                    </div>
+                ` : ''}
+            `;
         }
 
         function showBillDetails(type, index) {
@@ -11206,26 +11414,37 @@
                 return;
             }
 
+            // Calculate statistics for each family member
+            const memberStats = calculateFamilyMemberStats();
+            
             familyMembers.forEach((member, index) => {
+                const stats = memberStats[member.name] || { totalIncome: 0, totalExpenses: 0, expenseCount: 0, incomeCount: 0, netContribution: 0 };
                 const div = document.createElement('div');
                 div.className = 'card';
                 div.style.marginBottom = '1rem';
                 div.style.padding = '1.5rem';
+                div.style.cursor = 'pointer';
+                div.onclick = () => showFamilyMemberDetails(index);
 
                 div.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
                         <div style="flex: 1;">
-                            <h3 style="margin: 0; font-size: 1.2rem;">${member.name || 'Unnamed'}</h3>
+                            <h3 style="margin: 0; font-size: 1.2rem; display: flex; align-items: center; gap: 0.5rem;">
+                                ${member.name || 'Unnamed'}
+                                ${stats.netContribution >= 0 ? '<span style="color: var(--success); font-size: 0.875rem;">✓</span>' : '<span style="color: var(--danger); font-size: 0.875rem;">!</span>'}
+                            </h3>
                             ${member.relation ? `<div style="color: var(--text-light); font-size: 0.875rem; margin-top: 0.25rem;">${member.relation}</div>` : ''}
+                            ${member.email ? `<div style="color: var(--text-light); font-size: 0.875rem; margin-top: 0.25rem;">📧 ${member.email}</div>` : ''}
+                            ${member.phone ? `<div style="color: var(--text-light); font-size: 0.875rem; margin-top: 0.25rem;">📱 ${member.phone}</div>` : ''}
                         </div>
                         <div style="display: flex; gap: 0.5rem;">
-                            <button class="btn-edit" onclick="editFamilyMember(${index})">
+                            <button class="btn-edit" onclick="event.stopPropagation(); editFamilyMember(${index})">
                                 <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                                 </svg>
                             </button>
-                            <button class="btn-delete" onclick="deleteFamilyMember(${index})">
+                            <button class="btn-delete" onclick="event.stopPropagation(); deleteFamilyMember(${index})">
                                 <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <polyline points="3 6 5 6 21 6"></polyline>
                                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -11233,9 +11452,201 @@
                             </button>
                         </div>
                     </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border);">
+                        <div>
+                            <div style="font-size: 0.75rem; color: var(--text-light); margin-bottom: 0.25rem;" data-translate="income">Income</div>
+                            <div style="font-size: 1.1rem; font-weight: 600; color: var(--success);">${formatCurrency(stats.totalIncome)}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-light);">${stats.incomeCount} ${stats.incomeCount === 1 ? t('item') : t('items')}</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.75rem; color: var(--text-light); margin-bottom: 0.25rem;" data-translate="expenses">Expenses</div>
+                            <div style="font-size: 1.1rem; font-weight: 600; color: var(--danger);">${formatCurrency(stats.totalExpenses)}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-light);">${stats.expenseCount} ${stats.expenseCount === 1 ? t('item') : t('items')}</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.75rem; color: var(--text-light); margin-bottom: 0.25rem;">Net Contribution</div>
+                            <div style="font-size: 1.1rem; font-weight: 600; color: ${stats.netContribution >= 0 ? 'var(--success)' : 'var(--danger)'};">
+                                ${stats.netContribution >= 0 ? '+' : ''}${formatCurrency(stats.netContribution)}
+                            </div>
+                            <div style="font-size: 0.75rem; color: var(--text-light);">${stats.netContribution >= 0 ? 'Contributor' : 'Owed'}</div>
+                        </div>
+                    </div>
                 `;
                 container.appendChild(div);
             });
+        }
+        
+        // Calculate statistics for all family members
+        function calculateFamilyMemberStats() {
+            const stats = {};
+            const familyMembers = state.data.familyMembers || [];
+            
+            // Initialize stats for each member
+            familyMembers.forEach(member => {
+                stats[member.name] = {
+                    totalIncome: 0,
+                    totalExpenses: 0,
+                    expenseCount: 0,
+                    incomeCount: 0,
+                    netContribution: 0
+                };
+            });
+            
+            // Calculate income contributions
+            (state.data.income || []).forEach(income => {
+                if (income.familyMember && stats[income.familyMember]) {
+                    const amount = Number(income.amount || 0);
+                    stats[income.familyMember].totalIncome += amount;
+                    stats[income.familyMember].incomeCount++;
+                }
+            });
+            
+            // Calculate expense shares
+            (state.data.expenses || []).forEach(expense => {
+                if (expense.familyMembers && Array.isArray(expense.familyMembers)) {
+                    const amount = Number(expense.amount || 0);
+                    const shareCount = expense.familyMembers.length;
+                    const sharePerPerson = shareCount > 0 ? amount / shareCount : 0;
+                    
+                    expense.familyMembers.forEach(memberName => {
+                        if (stats[memberName]) {
+                            stats[memberName].totalExpenses += sharePerPerson;
+                            stats[memberName].expenseCount++;
+                        }
+                    });
+                }
+            });
+            
+            // Calculate net contribution
+            familyMembers.forEach(member => {
+                if (stats[member.name]) {
+                    stats[member.name].netContribution = stats[member.name].totalIncome - stats[member.name].totalExpenses;
+                }
+            });
+            
+            return stats;
+        }
+        
+        // Show detailed view for a family member
+        function showFamilyMemberDetails(memberIndex) {
+            const member = state.data.familyMembers[memberIndex];
+            if (!member) return;
+            
+            const stats = calculateFamilyMemberStats()[member.name] || { totalIncome: 0, totalExpenses: 0, expenseCount: 0, incomeCount: 0, netContribution: 0 };
+            
+            // Get related transactions
+            const relatedIncome = (state.data.income || []).filter(i => i.familyMember === member.name);
+            const relatedExpenses = (state.data.expenses || []).filter(e => 
+                e.familyMembers && Array.isArray(e.familyMembers) && e.familyMembers.includes(member.name)
+            );
+            
+            const overlay = document.getElementById('modal-overlay');
+            const content = document.getElementById('modal-content');
+            
+            if (!overlay || !content) return;
+            
+            overlay.classList.add('active');
+            content.innerHTML = `
+                <div class="modal-header">
+                    <h2>${member.name} - ${t('details')}</h2>
+                    <button class="modal-close" onclick="closeModal()">×</button>
+                </div>
+                <div style="padding: 1.5rem; max-height: 80vh; overflow-y: auto;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                        <div class="card" style="border-color: var(--success);">
+                            <div style="font-size: 0.875rem; color: var(--text-light); margin-bottom: 0.5rem;" data-translate="total_income">Total Income</div>
+                            <div style="font-size: 1.5rem; font-weight: 600; color: var(--success);">${formatCurrency(stats.totalIncome)}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-light); margin-top: 0.25rem;">${stats.incomeCount} ${stats.incomeCount === 1 ? t('item') : t('items')}</div>
+                        </div>
+                        <div class="card" style="border-color: var(--danger);">
+                            <div style="font-size: 0.875rem; color: var(--text-light); margin-bottom: 0.5rem;" data-translate="total_expenses">Total Expenses</div>
+                            <div style="font-size: 1.5rem; font-weight: 600; color: var(--danger);">${formatCurrency(stats.totalExpenses)}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-light); margin-top: 0.25rem;">${stats.expenseCount} ${stats.expenseCount === 1 ? t('item') : t('items')}</div>
+                        </div>
+                        <div class="card" style="border-color: ${stats.netContribution >= 0 ? 'var(--success)' : 'var(--danger)'};">
+                            <div style="font-size: 0.875rem; color: var(--text-light); margin-bottom: 0.5rem;" data-translate="net_contribution">Net Contribution</div>
+                            <div style="font-size: 1.5rem; font-weight: 600; color: ${stats.netContribution >= 0 ? 'var(--success)' : 'var(--danger)'};">
+                                ${stats.netContribution >= 0 ? '+' : ''}${formatCurrency(stats.netContribution)}
+                            </div>
+                            <div style="font-size: 0.75rem; color: var(--text-light); margin-top: 0.25rem;">${stats.netContribution >= 0 ? t('net_contributor') : t('net_owed')}</div>
+                        </div>
+                    </div>
+                    
+                    ${member.relation || member.email || member.phone || member.notes ? `
+                    <div class="card" style="margin-bottom: 1.5rem;">
+                        <h3 style="margin: 0 0 1rem 0; font-size: 1.1rem;" data-translate="member_information">Member Information</h3>
+                        <div style="display: grid; gap: 0.75rem;">
+                            ${member.relation ? `<div><strong>Relation:</strong> ${member.relation}</div>` : ''}
+                            ${member.email ? `<div><strong>Email:</strong> <a href="mailto:${member.email}">${member.email}</a></div>` : ''}
+                            ${member.phone ? `<div><strong>Phone:</strong> <a href="tel:${member.phone}">${member.phone}</a></div>` : ''}
+                            ${member.notes ? `<div><strong>Notes:</strong> <div style="margin-top: 0.25rem; color: var(--text-light);">${member.notes}</div></div>` : ''}
+                        </div>
+                    </div>
+                    ` : ''}
+                    
+                    ${relatedIncome.length > 0 ? `
+                    <div class="card" style="margin-bottom: 1.5rem;">
+                        <h3 style="margin: 0 0 1rem 0; font-size: 1.1rem;" data-translate="income">Income</h3>
+                        <div style="overflow-x: auto;">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <thead>
+                                    <tr style="border-bottom: 1px solid var(--border);">
+                                        <th style="text-align: left; padding: 0.5rem;" data-translate="date">Date</th>
+                                        <th style="text-align: left; padding: 0.5rem;" data-translate="source">Source</th>
+                                        <th style="text-align: right; padding: 0.5rem;" data-translate="amount">Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${relatedIncome.map(income => `
+                                        <tr style="border-bottom: 1px solid var(--border);">
+                                            <td style="padding: 0.5rem;">${formatDate(income.date)}</td>
+                                            <td style="padding: 0.5rem;">${income.source || '-'}</td>
+                                            <td style="padding: 0.5rem; text-align: right; color: var(--success); font-weight: 600;">${formatCurrency(income.amount)}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    ` : ''}
+                    
+                    ${relatedExpenses.length > 0 ? `
+                    <div class="card">
+                        <h3 style="margin: 0 0 1rem 0; font-size: 1.1rem;" data-translate="expenses">Expenses</h3>
+                        <div style="overflow-x: auto;">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <thead>
+                                    <tr style="border-bottom: 1px solid var(--border);">
+                                        <th style="text-align: left; padding: 0.5rem;" data-translate="date">Date</th>
+                                        <th style="text-align: left; padding: 0.5rem;" data-translate="description">Description</th>
+                                        <th style="text-align: right; padding: 0.5rem;">Share</th>
+                                        <th style="text-align: right; padding: 0.5rem;" data-translate="amount">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${relatedExpenses.map(expense => {
+                                        const shareCount = expense.familyMembers ? expense.familyMembers.length : 1;
+                                        const share = Number(expense.amount || 0) / shareCount;
+                                        return `
+                                            <tr style="border-bottom: 1px solid var(--border);">
+                                                <td style="padding: 0.5rem;">${formatDate(expense.date)}</td>
+                                                <td style="padding: 0.5rem;">${expense.description || '-'}</td>
+                                                <td style="padding: 0.5rem; text-align: right; color: var(--danger);">${formatCurrency(share)}</td>
+                                                <td style="padding: 0.5rem; text-align: right; color: var(--text-light); font-size: 0.875rem;">${formatCurrency(expense.amount)} (${shareCount} ${shareCount === 1 ? t('person') : t('people')})</td>
+                                            </tr>
+                                        `;
+                                    }).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    ` : ''}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">${t('close')}</button>
+                    <button type="button" class="btn btn-primary" onclick="closeModal(); editFamilyMember(${memberIndex})">${t('edit')}</button>
+                </div>
+            `;
         }
 
         function openFamilyMemberModal(memberIndex = null) {
@@ -11274,7 +11685,10 @@
 
             const member = {
                 name: document.getElementById('family-member-name').value.trim(),
-                relation: document.getElementById('family-member-relation').value.trim() || ''
+                relation: document.getElementById('family-member-relation').value.trim() || '',
+                email: document.getElementById('family-member-email').value.trim() || '',
+                phone: document.getElementById('family-member-phone').value.trim() || '',
+                notes: document.getElementById('family-member-notes').value.trim() || ''
             };
 
             if (!member.name) {
@@ -12138,9 +12552,16 @@
 
         // --- KEYBOARD SHORTCUTS ---
         document.addEventListener('keydown', (e) => {
+            // Don't trigger shortcuts when typing in inputs, textareas, or contenteditable elements
+            const target = e.target;
+            const isInputFocused = target.tagName === 'INPUT' || 
+                                   target.tagName === 'TEXTAREA' || 
+                                   target.isContentEditable ||
+                                   (target.closest('.modal') && target.tagName !== 'BUTTON');
+            
             // Ctrl/Cmd combinations
             if (e.ctrlKey || e.metaKey) {
-                switch (e.key) {
+                switch (e.key.toLowerCase()) {
                     case '1':
                         e.preventDefault();
                         switchTab('dashboard');
@@ -12153,25 +12574,59 @@
                         e.preventDefault();
                         switchTab('expenses');
                         break;
+                    case '4':
+                        e.preventDefault();
+                        switchTab('receivables');
+                        break;
+                    case '5':
+                        e.preventDefault();
+                        switchTab('payables');
+                        break;
+                    case '6':
+                        e.preventDefault();
+                        switchTab('plans');
+                        break;
+                    case '7':
+                        e.preventDefault();
+                        switchTab('budgets');
+                        break;
+                    case '8':
+                        e.preventDefault();
+                        switchTab('categories');
+                        break;
+                    case '9':
+                        e.preventDefault();
+                        switchTab('reports');
+                        break;
+                    case '0':
+                        e.preventDefault();
+                        switchTab('settings');
+                        break;
                     case 'n':
                         e.preventDefault();
-                        const activeTab = document.querySelector('.nav-tab.active')?.getAttribute('onclick');
-                        if (activeTab) {
-                            const match = activeTab.match(/'([^']+)'/);
-                            if (match) {
-                                const tab = match[1];
-                                if (tab === 'income') openModal('form', 'income');
-                                else if (tab === 'expenses') openModal('form', 'expense');
-                                else if (tab === 'receivables') openModal('form', 'receivable');
-                                else if (tab === 'payables') openModal('form', 'payable');
-                                else if (tab === 'plans') openModal('form', 'plan');
-                                else if (tab === 'budgets') openModal('form', 'budget');
+                        if (!isInputFocused) {
+                            const activeTab = document.querySelector('.nav-tab.active')?.getAttribute('onclick');
+                            if (activeTab) {
+                                const match = activeTab.match(/'([^']+)'/);
+                                if (match) {
+                                    const tab = match[1];
+                                    if (tab === 'income') openModal('form', 'income');
+                                    else if (tab === 'expenses') openModal('form', 'expense');
+                                    else if (tab === 'receivables') openModal('form', 'receivable');
+                                    else if (tab === 'payables') openModal('form', 'payable');
+                                    else if (tab === 'plans') openModal('form', 'plan');
+                                    else if (tab === 'budgets') openModal('form', 'budget');
+                                    else if (tab === 'accounts') openModal('form', 'account');
+                                    else if (tab === 'debts') openModal('form', 'debt');
+                                    else if (tab === 'goals') openModal('form', 'goal');
+                                    else if (tab === 'investments') openModal('form', 'investment');
+                                }
                             }
                         }
                         break;
                     case 's':
                         e.preventDefault();
-                        if (state.isConnected) {
+                        if (!isInputFocused && state.isConnected) {
                             writeExcelFile().then(() => {
                                 showToast('Saved successfully', 'success');
                             });
@@ -12179,23 +12634,130 @@
                         break;
                     case 'f':
                         e.preventDefault();
-                        const searchInput = document.getElementById('search-input');
-                        if (searchInput) searchInput.focus();
+                        if (!isInputFocused) {
+                            const searchInput = document.getElementById('search-input');
+                            if (searchInput) searchInput.focus();
+                        }
+                        break;
+                    case 'e':
+                        e.preventDefault();
+                        if (!isInputFocused && state.isConnected) {
+                            exportData();
+                        }
+                        break;
+                    case 'i':
+                        e.preventDefault();
+                        if (!isInputFocused && state.isConnected) {
+                            importData();
+                        }
+                        break;
+                    case 'b':
+                        e.preventDefault();
+                        if (!isInputFocused) {
+                            backupData();
+                        }
+                        break;
+                    case 'z':
+                        e.preventDefault();
+                        if (!isInputFocused) {
+                            undoLastAction();
+                        }
+                        break;
+                    case 'r':
+                        e.preventDefault();
+                        if (!isInputFocused && state.isConnected) {
+                            refreshData();
+                        }
+                        break;
+                    case ',':
+                    case 'p':
+                        e.preventDefault();
+                        if (!isInputFocused) {
+                            switchTab('settings');
+                        }
+                        break;
+                    case '/':
+                        e.preventDefault();
+                        if (!isInputFocused) {
+                            // Scroll to keyboard shortcuts section in settings
+                            switchTab('settings');
+                            setTimeout(() => {
+                                const shortcutsSection = document.querySelector('[data-translate="keyboard_shortcuts"]');
+                                if (shortcutsSection) {
+                                    shortcutsSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                }
+                            }, 100);
+                        }
                         break;
                 }
             }
 
-            // Escape key
+            // Function keys
+            if (e.key === 'F1') {
+                e.preventDefault();
+                switchTab('settings');
+                setTimeout(() => {
+                    const shortcutsSection = document.querySelector('[data-translate="keyboard_shortcuts"]');
+                    if (shortcutsSection) {
+                        shortcutsSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }, 100);
+            }
+
+            // Escape key - close modal or clear search
             if (e.key === 'Escape') {
                 const overlay = document.getElementById('modal-overlay');
                 if (overlay && overlay.classList.contains('active')) {
+                    e.preventDefault();
                     closeModal();
+                } else {
+                    // Clear search if search input is focused
+                    const searchInput = document.getElementById('search-input');
+                    if (document.activeElement === searchInput && searchInput.value) {
+                        e.preventDefault();
+                        searchInput.value = '';
+                        searchInput.dispatchEvent(new Event('input'));
+                    }
+                }
+            }
+
+            // Enter key - submit form when modal is open
+            if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
+                const overlay = document.getElementById('modal-overlay');
+                const modalForm = overlay?.querySelector('form');
+                if (overlay?.classList.contains('active') && modalForm && !isInputFocused) {
+                    const submitButton = modalForm.querySelector('button[type="submit"], .btn-primary');
+                    if (submitButton && !submitButton.disabled) {
+                        e.preventDefault();
+                        submitButton.click();
+                    }
                 }
             }
 
             // Delete key for bulk delete
-            if (e.key === 'Delete' && selectedItems.size > 0) {
+            if (e.key === 'Delete' && selectedItems.size > 0 && !isInputFocused) {
+                e.preventDefault();
                 bulkDelete();
+            }
+
+            // Tab navigation with arrow keys (when not in input)
+            if (!isInputFocused && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+                const navTabs = Array.from(document.querySelectorAll('.nav-tab'));
+                const activeIndex = navTabs.findIndex(tab => tab.classList.contains('active'));
+                
+                if (activeIndex !== -1) {
+                    if (e.key === 'ArrowLeft' && activeIndex > 0) {
+                        e.preventDefault();
+                        const prevTab = navTabs[activeIndex - 1];
+                        const match = prevTab.getAttribute('onclick')?.match(/switchTab\('([^']+)'\)/);
+                        if (match) switchTab(match[1]);
+                    } else if (e.key === 'ArrowRight' && activeIndex < navTabs.length - 1) {
+                        e.preventDefault();
+                        const nextTab = navTabs[activeIndex + 1];
+                        const match = nextTab.getAttribute('onclick')?.match(/switchTab\('([^']+)'\)/);
+                        if (match) switchTab(match[1]);
+                    }
+                }
             }
         });
 
