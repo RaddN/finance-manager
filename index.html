@@ -9,6 +9,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <!-- Chart.js for visualizations -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- Google API for Sheets and Drive -->
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://accounts.google.com/gsi/client"></script>
     <style>
         :root {
             --primary: #3182ce;
@@ -2814,6 +2817,21 @@
                 restore_data: 'Restore Data',
                 restore_data_description: 'Restore data from a backup file',
                 restore_backup: 'Restore Backup',
+                connect_excel: 'Connect Excel',
+                local_excel: 'Local Excel File',
+                local_excel_desc: 'Connect to a local Excel file on your computer',
+                google_sheets: 'Google Sheets',
+                google_sheets_desc: 'Connect to a Google Sheets document',
+                other_options: 'Other Options',
+                coming_soon: 'Coming Soon (OneDrive, Dropbox, etc.)',
+                backup_storage: 'Backup Storage',
+                local_storage: 'Local Storage',
+                local_storage_desc: 'Save backup to your browser\'s local storage',
+                google_drive: 'Google Drive',
+                google_drive_desc: 'Save backup to your Google Drive',
+                cancel: 'Cancel',
+                local_storage_backups: 'Local Storage Backups:',
+                restore_from_file: 'Restore from File',
                 undo_last_action: 'Undo Last Action',
                 undo_last_action_description: 'Undo the last transaction (add/edit/delete)',
                 undo: 'Undo',
@@ -5817,6 +5835,10 @@
         let state = {
             fileHandle: null,
             isConnected: false,
+            connectionType: 'local', // 'local', 'google-sheets', 'onedrive', 'dropbox'
+            googleSheetsId: null,
+            googleDriveFileId: null,
+            backupStorageType: 'local', // 'local', 'google-drive'
             data: {
                 income: [],
                 expenses: [],
@@ -6090,6 +6112,22 @@
         }
 
         async function connectExcelFile() {
+            // Show connection options modal
+            const connectionType = await showExcelConnectionOptions();
+            if (!connectionType) return; // User cancelled
+
+            state.connectionType = connectionType;
+
+            if (connectionType === 'local') {
+                await connectLocalExcel();
+            } else if (connectionType === 'google-sheets') {
+                await connectGoogleSheets();
+            } else {
+                showToast('This option is coming soon!', 'info');
+            }
+        }
+
+        async function connectLocalExcel() {
             if (!window.showOpenFilePicker) {
                 alert("Your browser does not support the File System Access API. Please use Chrome, Edge, or Opera on HTTPS/Localhost.");
                 return;
@@ -6150,11 +6188,6 @@
                 // Try to get directory handle - use stored one or request new permission
                 let directoryHandleToSave = directoryHandle;
 
-                // If we don't have a directory handle, optionally request it
-                // This helps remember the file location for future connections
-                // Note: We'll skip this for now to avoid extra prompts, but the browser
-                // will remember the last directory used in the file picker
-
                 // Save file handle and metadata for next session
                 await saveFileHandle(state.fileHandle, directoryHandleToSave);
 
@@ -6174,6 +6207,184 @@
                     return;
                 }
                 alert('Error connecting to file: ' + err.message);
+            }
+        }
+
+        async function connectGoogleSheets() {
+            try {
+                // NOTE: To use Google Sheets integration, you need to:
+                // 1. Create a project in Google Cloud Console
+                // 2. Enable Google Sheets API and Google Drive API
+                // 3. Create OAuth 2.0 credentials
+                // 4. Replace 'YOUR_API_KEY' and 'YOUR_CLIENT_ID' below with your actual credentials
+                
+                // Initialize Google API
+                await new Promise((resolve) => {
+                    if (window.gapi && window.gapi.load) {
+                        window.gapi.load('client:auth2', resolve);
+                    } else {
+                        setTimeout(() => {
+                            if (window.gapi && window.gapi.load) {
+                                window.gapi.load('client:auth2', resolve);
+                            } else {
+                                showToast('Google API not loaded. Please refresh the page.', 'error');
+                                return;
+                            }
+                        }, 1000);
+                    }
+                });
+
+                // Initialize the client
+                await window.gapi.client.init({
+                    apiKey: 'AIzaSyAyyXvJtpYb_L4UZtztccDqHB_peGXUxXU', // Replace with your Google API key
+                    clientId: '415209089700-fp7cm5l9n53kkrfqkmhdo9k4f8n8omvt.apps.googleusercontent.com', // Replace with your Google OAuth Client ID
+                    discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
+                    scope: 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file'
+                });
+
+                // Sign in
+                const authInstance = window.gapi.auth2.getAuthInstance();
+                const isSignedIn = authInstance.isSignedIn.get();
+                
+                if (!isSignedIn) {
+                    await authInstance.signIn();
+                }
+
+                // Prompt for Google Sheets URL or ID
+                const sheetUrl = prompt('Enter your Google Sheets URL or Sheet ID:');
+                if (!sheetUrl) return;
+
+                // Extract sheet ID from URL
+                let sheetId = sheetUrl;
+                const match = sheetUrl.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+                if (match) {
+                    sheetId = match[1];
+                }
+
+                state.googleSheetsId = sheetId;
+                state.isConnected = true;
+                updateStatus(true);
+
+                // Load data from Google Sheets
+                await readGoogleSheets();
+                renderAll();
+
+                showToast('Connected to Google Sheets successfully!', 'success');
+
+            } catch (err) {
+                console.error('Error connecting to Google Sheets:', err);
+                showToast('Error connecting to Google Sheets: ' + err.message, 'error');
+            }
+        }
+
+        async function readGoogleSheets() {
+            try {
+                const response = await window.gapi.client.sheets.spreadsheets.get({
+                    spreadsheetId: state.googleSheetsId,
+                    includeGridData: false
+                });
+
+                const sheetNames = ['Income', 'Expenses', 'Receivables', 'Payables', 'Plans', 'Budgets', 'Categories', 'Templates', 'Accounts', 'Transfers', 'FamilyMembers', 'Debts'];
+                
+                for (const sheetName of sheetNames) {
+                    try {
+                        const range = `${sheetName}!A:Z`;
+                        const result = await window.gapi.client.sheets.spreadsheets.values.get({
+                            spreadsheetId: state.googleSheetsId,
+                            range: range
+                        });
+
+                        if (result.result.values && result.result.values.length > 0) {
+                            const headers = result.result.values[0];
+                            const rows = result.result.values.slice(1);
+                            const data = rows.map(row => {
+                                const obj = {};
+                                headers.forEach((header, index) => {
+                                    obj[header] = row[index] || '';
+                                });
+                                return obj;
+                            });
+                            
+                            const dataKey = sheetName.toLowerCase();
+                            if (state.data[dataKey]) {
+                                state.data[dataKey] = normalizeSheetData(data, dataKey);
+                            }
+                        }
+                    } catch (err) {
+                        console.log(`Sheet ${sheetName} not found or empty`);
+                    }
+                }
+            } catch (err) {
+                console.error('Error reading Google Sheets:', err);
+                throw err;
+            }
+        }
+
+        async function writeGoogleSheets() {
+            if (!state.isConnected || !state.googleSheetsId) return;
+
+            try {
+                showToast('Saving to Google Sheets...', 'info');
+
+                const sheetMappings = [
+                    { name: 'Income', data: state.data.income },
+                    { name: 'Expenses', data: state.data.expenses },
+                    { name: 'Receivables', data: state.data.receivables },
+                    { name: 'Payables', data: state.data.payables },
+                    { name: 'Plans', data: state.data.plans },
+                    { name: 'Budgets', data: state.data.budgets || [] },
+                    { name: 'Categories', data: state.data.categories || [] },
+                    { name: 'Templates', data: state.data.templates || [] },
+                    { name: 'Accounts', data: state.data.accounts || [] },
+                    { name: 'Transfers', data: state.data.transfers || [] },
+                    { name: 'FamilyMembers', data: state.data.familyMembers || [] },
+                    { name: 'Debts', data: state.data.debts || [] }
+                ];
+
+                // Batch update all sheets
+                const requests = [];
+                
+                for (const mapping of sheetMappings) {
+                    if (mapping.data.length === 0) continue;
+
+                    // Get headers from first object
+                    const headers = Object.keys(mapping.data[0]);
+                    
+                    // Convert data to 2D array
+                    const values = [
+                        headers, // Header row
+                        ...mapping.data.map(row => headers.map(header => row[header] || ''))
+                    ];
+
+                    requests.push({
+                        range: `${mapping.name}!A1`,
+                        values: values
+                    });
+                }
+
+                // Clear existing data and write new data
+                for (const request of requests) {
+                    try {
+                        await window.gapi.client.sheets.spreadsheets.values.update({
+                            spreadsheetId: state.googleSheetsId,
+                            range: request.range,
+                            valueInputOption: 'RAW',
+                            resource: { values: request.values }
+                        });
+                    } catch (err) {
+                        console.error(`Error updating sheet ${request.range}:`, err);
+                    }
+                }
+
+                // Visual feedback
+                const statusEl = document.getElementById('status-bar');
+                statusEl.textContent = t('saved_successfully');
+                setTimeout(() => updateStatus(true), 1500);
+
+                showToast('Saved to Google Sheets successfully!', 'success');
+            } catch (err) {
+                console.error('Error writing to Google Sheets:', err);
+                showToast('Error saving to Google Sheets: ' + err.message, 'error');
             }
         }
 
@@ -6437,6 +6648,13 @@
 
         async function readExcelFile() {
             try {
+                if (state.connectionType === 'google-sheets') {
+                    await readGoogleSheets();
+                    return;
+                }
+
+                if (!state.fileHandle) return;
+                
                 const file = await state.fileHandle.getFile();
                 const arrayBuffer = await file.arrayBuffer();
                 const workbook = XLSX.read(arrayBuffer, { type: 'array' });
@@ -6489,7 +6707,22 @@
         }
 
         async function writeExcelFile() {
-            if (!state.fileHandle || !state.isConnected) return;
+            if (!state.isConnected) return;
+
+            try {
+                if (state.connectionType === 'local') {
+                    await writeLocalExcel();
+                } else if (state.connectionType === 'google-sheets') {
+                    await writeGoogleSheets();
+                }
+            } catch (err) {
+                console.error('Save error:', err);
+                alert(t('failed_to_save'));
+            }
+        }
+
+        async function writeLocalExcel() {
+            if (!state.fileHandle) return;
 
             try {
                 // Create workbook
@@ -6535,7 +6768,7 @@
 
             } catch (err) {
                 console.error('Save error:', err);
-                alert(t('failed_to_save'));
+                throw err;
             }
         }
 
@@ -6574,7 +6807,11 @@
 
             if (connected) {
                 el.className = 'status-bar status-connected';
-                el.textContent = `${t('connected_to')} ${CONFIG.fileName}`;
+                if (state.connectionType === 'google-sheets') {
+                    el.textContent = `${t('connected_to')} Google Sheets`;
+                } else {
+                    el.textContent = `${t('connected_to')} ${CONFIG.fileName}`;
+                }
                 btn.innerHTML = `
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
@@ -10439,6 +10676,158 @@
             });
         }
 
+        // Show Excel connection options modal
+        function showExcelConnectionOptions() {
+            return new Promise((resolve) => {
+                const modalHTML = `
+                    <div class="confirm-modal" style="max-width: 500px;">
+                        <div class="confirm-header">
+                            <div class="confirm-icon info">📊</div>
+                            <h3 class="confirm-title" data-translate="connect_excel">Connect Excel</h3>
+                        </div>
+                        <div class="confirm-body" style="padding: 1.5rem;">
+                            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                <button class="btn btn-primary" style="width: 100%; justify-content: flex-start; text-align: left; padding: 1rem;" onclick="selectConnectionType('local')">
+                                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                            <polyline points="14 2 14 8 20 8"></polyline>
+                                        </svg>
+                                        <div>
+                                            <div style="font-weight: 600;" data-translate="local_excel">Local Excel File</div>
+                                            <div style="font-size: 0.875rem; opacity: 0.8;" data-translate="local_excel_desc">Connect to a local Excel file on your computer</div>
+                                        </div>
+                                    </div>
+                                </button>
+                                <button class="btn btn-secondary" style="width: 100%; justify-content: flex-start; text-align: left; padding: 1rem;" onclick="selectConnectionType('google-sheets')">
+                                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+                                            <line x1="9" y1="3" x2="9" y2="21"></line>
+                                            <line x1="3" y1="9" x2="21" y2="9"></line>
+                                        </svg>
+                                        <div>
+                                            <div style="font-weight: 600;" data-translate="google_sheets">Google Sheets</div>
+                                            <div style="font-size: 0.875rem; opacity: 0.8;" data-translate="google_sheets_desc">Connect to a Google Sheets document</div>
+                                        </div>
+                                    </div>
+                                </button>
+                                <button class="btn btn-secondary" style="width: 100%; justify-content: flex-start; text-align: left; padding: 1rem; opacity: 0.6;" disabled>
+                                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                                        </svg>
+                                        <div>
+                                            <div style="font-weight: 600;" data-translate="other_options">Other Options</div>
+                                            <div style="font-size: 0.875rem; opacity: 0.8;" data-translate="coming_soon">Coming Soon (OneDrive, Dropbox, etc.)</div>
+                                        </div>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="confirm-actions">
+                            <button class="btn btn-secondary" onclick="closeConnectionModal()" data-translate="cancel">Cancel</button>
+                        </div>
+                    </div>
+                `;
+
+                const overlay = document.getElementById('modal-overlay');
+                const content = document.getElementById('modal-content');
+                content.innerHTML = modalHTML;
+                overlay.classList.add('active');
+
+                window.selectConnectionType = (type) => {
+                    overlay.classList.remove('active');
+                    delete window.selectConnectionType;
+                    delete window.closeConnectionModal;
+                    resolve(type);
+                };
+
+                window.closeConnectionModal = () => {
+                    overlay.classList.remove('active');
+                    delete window.selectConnectionType;
+                    delete window.closeConnectionModal;
+                    resolve(null);
+                };
+
+                overlay.onclick = (e) => {
+                    if (e.target === overlay) {
+                        window.closeConnectionModal();
+                    }
+                };
+            });
+        }
+
+        // Show backup storage options modal
+        function showBackupStorageOptions() {
+            return new Promise((resolve) => {
+                const modalHTML = `
+                    <div class="confirm-modal" style="max-width: 500px;">
+                        <div class="confirm-header">
+                            <div class="confirm-icon info">💾</div>
+                            <h3 class="confirm-title" data-translate="backup_storage">Backup Storage</h3>
+                        </div>
+                        <div class="confirm-body" style="padding: 1.5rem;">
+                            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                <button class="btn btn-primary" style="width: 100%; justify-content: flex-start; text-align: left; padding: 1rem;" onclick="selectBackupStorage('local')">
+                                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                                            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                                            <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                                        </svg>
+                                        <div>
+                                            <div style="font-weight: 600;" data-translate="local_storage">Local Storage</div>
+                                            <div style="font-size: 0.875rem; opacity: 0.8;" data-translate="local_storage_desc">Save backup to your browser's local storage</div>
+                                        </div>
+                                    </div>
+                                </button>
+                                <button class="btn btn-secondary" style="width: 100%; justify-content: flex-start; text-align: left; padding: 1rem;" onclick="selectBackupStorage('google-drive')">
+                                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                                        </svg>
+                                        <div>
+                                            <div style="font-weight: 600;" data-translate="google_drive">Google Drive</div>
+                                            <div style="font-size: 0.875rem; opacity: 0.8;" data-translate="google_drive_desc">Save backup to your Google Drive</div>
+                                        </div>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="confirm-actions">
+                            <button class="btn btn-secondary" onclick="closeBackupModal()" data-translate="cancel">Cancel</button>
+                        </div>
+                    </div>
+                `;
+
+                const overlay = document.getElementById('modal-overlay');
+                const content = document.getElementById('modal-content');
+                content.innerHTML = modalHTML;
+                overlay.classList.add('active');
+
+                window.selectBackupStorage = (type) => {
+                    overlay.classList.remove('active');
+                    delete window.selectBackupStorage;
+                    delete window.closeBackupModal;
+                    resolve(type);
+                };
+
+                window.closeBackupModal = () => {
+                    overlay.classList.remove('active');
+                    delete window.selectBackupStorage;
+                    delete window.closeBackupModal;
+                    resolve(null);
+                };
+
+                overlay.onclick = (e) => {
+                    if (e.target === overlay) {
+                        window.closeBackupModal();
+                    }
+                };
+            });
+        }
+
         function deleteItem(type, index) {
             const itemName = type === 'income' ? 'income entry' :
                 type === 'expenses' ? 'expense entry' :
@@ -10806,23 +11195,224 @@
         }
 
         // --- BACKUP & RESTORE ---
-        function backupData() {
+        async function backupData() {
+            // Show backup storage options modal
+            const storageType = await showBackupStorageOptions();
+            if (!storageType) return; // User cancelled
+
+            state.backupStorageType = storageType;
+
             const backup = {
                 timestamp: new Date().toISOString(),
                 version: '1.0',
                 data: state.data
             };
-            const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `finance_backup_${new Date().toISOString().split('T')[0]}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-            showToast('Backup created successfully', 'success');
+
+            if (storageType === 'local') {
+                await backupToLocalStorage(backup);
+            } else if (storageType === 'google-drive') {
+                await backupToGoogleDrive(backup);
+            }
+        }
+
+        async function backupToLocalStorage(backup) {
+            try {
+                // Save to browser's local storage
+                const backupKey = `finance_backup_${new Date().toISOString().split('T')[0]}`;
+                localStorage.setItem(backupKey, JSON.stringify(backup));
+                
+                // Also download as file
+                const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `finance_backup_${new Date().toISOString().split('T')[0]}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                
+                showToast('Backup saved to local storage and downloaded', 'success');
+            } catch (err) {
+                console.error('Error backing up to local storage:', err);
+                showToast('Error creating backup: ' + err.message, 'error');
+            }
+        }
+
+        async function backupToGoogleDrive(backup) {
+            try {
+                // NOTE: To use Google Drive backup, you need to:
+                // 1. Create a project in Google Cloud Console
+                // 2. Enable Google Drive API
+                // 3. Create OAuth 2.0 credentials
+                // 4. Replace 'YOUR_API_KEY' and 'YOUR_CLIENT_ID' below with your actual credentials
+                
+                // Initialize Google API
+                await new Promise((resolve) => {
+                    if (window.gapi && window.gapi.load) {
+                        window.gapi.load('client:auth2', resolve);
+                    } else {
+                        setTimeout(() => {
+                            if (window.gapi && window.gapi.load) {
+                                window.gapi.load('client:auth2', resolve);
+                            } else {
+                                showToast('Google API not loaded. Please refresh the page.', 'error');
+                                return;
+                            }
+                        }, 1000);
+                    }
+                });
+
+                // Initialize the client
+                await window.gapi.client.init({
+                    apiKey: 'YOUR_API_KEY', // Replace with your Google API key
+                    clientId: 'YOUR_CLIENT_ID', // Replace with your Google OAuth Client ID
+                    discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
+                    scope: 'https://www.googleapis.com/auth/drive.file'
+                });
+
+                // Sign in
+                const authInstance = window.gapi.auth2.getAuthInstance();
+                const isSignedIn = authInstance.isSignedIn.get();
+                
+                if (!isSignedIn) {
+                    await authInstance.signIn();
+                }
+
+                // Create file metadata
+                const fileName = `finance_backup_${new Date().toISOString().split('T')[0]}.json`;
+                const fileMetadata = {
+                    name: fileName,
+                    mimeType: 'application/json'
+                };
+
+                // Convert backup to blob
+                const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+                const reader = new FileReader();
+                
+                reader.onload = async function() {
+                    try {
+                        const base64Data = btoa(reader.result);
+                        
+                        // Upload to Google Drive
+                        const response = await window.gapi.client.drive.files.create({
+                            resource: fileMetadata,
+                            fields: 'id'
+                        });
+
+                        // Upload file content
+                        await fetch(`https://www.googleapis.com/upload/drive/v3/files/${response.result.id}?uploadType=media`, {
+                            method: 'PATCH',
+                            headers: {
+                                'Authorization': `Bearer ${authInstance.currentUser.get().getAuthResponse().access_token}`,
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(backup)
+                        });
+
+                        state.googleDriveFileId = response.result.id;
+                        showToast('Backup saved to Google Drive successfully!', 'success');
+                    } catch (err) {
+                        console.error('Error uploading to Google Drive:', err);
+                        showToast('Error uploading to Google Drive: ' + err.message, 'error');
+                    }
+                };
+
+                reader.readAsText(blob);
+
+            } catch (err) {
+                console.error('Error backing up to Google Drive:', err);
+                showToast('Error backing up to Google Drive: ' + err.message, 'error');
+            }
         }
 
         function restoreData() {
+            // Check for local storage backups first
+            const localBackups = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('finance_backup_')) {
+                    try {
+                        const backup = JSON.parse(localStorage.getItem(key));
+                        if (backup && backup.timestamp && backup.data) {
+                            localBackups.push({ key, backup });
+                        }
+                    } catch (e) {
+                        // Skip invalid entries
+                    }
+                }
+            }
+
+            if (localBackups.length > 0) {
+                // Show modal to choose between local storage or file
+                const modalHTML = `
+                    <div class="confirm-modal" style="max-width: 500px;">
+                        <div class="confirm-header">
+                            <div class="confirm-icon info">📥</div>
+                            <h3 class="confirm-title" data-translate="restore_backup">Restore Backup</h3>
+                        </div>
+                        <div class="confirm-body" style="padding: 1.5rem;">
+                            <div style="margin-bottom: 1rem;">
+                                <div style="font-weight: 600; margin-bottom: 0.5rem;" data-translate="local_storage_backups">Local Storage Backups:</div>
+                                <div style="max-height: 200px; overflow-y: auto; border: 1px solid var(--border); border-radius: 6px; padding: 0.5rem;">
+                                    ${localBackups.map((item, index) => `
+                                        <button class="btn btn-secondary" style="width: 100%; justify-content: flex-start; text-align: left; margin-bottom: 0.5rem; padding: 0.75rem;" onclick="restoreFromLocalStorage('${item.key}')">
+                                            <div>
+                                                <div style="font-weight: 600;">${new Date(item.backup.timestamp).toLocaleString()}</div>
+                                                <div style="font-size: 0.875rem; opacity: 0.8;">${item.key}</div>
+                                            </div>
+                                        </button>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            <div style="text-align: center; margin: 1rem 0; color: var(--text-light);">OR</div>
+                            <button class="btn btn-primary" style="width: 100%;" onclick="restoreFromFile()" data-translate="restore_from_file">Restore from File</button>
+                        </div>
+                        <div class="confirm-actions">
+                            <button class="btn btn-secondary" onclick="closeRestoreModal()" data-translate="cancel">Cancel</button>
+                        </div>
+                    </div>
+                `;
+
+                const overlay = document.getElementById('modal-overlay');
+                const content = document.getElementById('modal-content');
+                content.innerHTML = modalHTML;
+                overlay.classList.add('active');
+
+                window.restoreFromLocalStorage = (key) => {
+                    overlay.classList.remove('active');
+                    const backup = JSON.parse(localStorage.getItem(key));
+                    performRestore(backup);
+                    delete window.restoreFromLocalStorage;
+                    delete window.restoreFromFile;
+                    delete window.closeRestoreModal;
+                };
+
+                window.restoreFromFile = () => {
+                    overlay.classList.remove('active');
+                    delete window.restoreFromLocalStorage;
+                    delete window.restoreFromFile;
+                    delete window.closeRestoreModal;
+                    restoreFromFileInput();
+                };
+
+                window.closeRestoreModal = () => {
+                    overlay.classList.remove('active');
+                    delete window.restoreFromLocalStorage;
+                    delete window.restoreFromFile;
+                    delete window.closeRestoreModal;
+                };
+
+                overlay.onclick = (e) => {
+                    if (e.target === overlay) {
+                        window.closeRestoreModal();
+                    }
+                };
+            } else {
+                // No local backups, just show file picker
+                restoreFromFileInput();
+            }
+        }
+
+        function restoreFromFileInput() {
             const input = document.createElement('input');
             input.type = 'file';
             input.accept = '.json';
@@ -10834,22 +11424,7 @@
                 reader.onload = (event) => {
                     try {
                         const backup = JSON.parse(event.target.result);
-
-                        showConfirmModal({
-                            title: 'Restore Backup',
-                            message: `This will replace all your current data with the backup from ${new Date(backup.timestamp).toLocaleString()}. This action cannot be undone. Continue?`,
-                            type: 'danger',
-                            confirmText: 'Restore',
-                            cancelText: 'Cancel'
-                        }).then(confirmed => {
-                            if (!confirmed) return;
-
-                            state.data = backup.data;
-                            writeExcelFile().then(() => {
-                                showToast('Data restored successfully', 'success');
-                                renderAll();
-                            });
-                        });
+                        performRestore(backup);
                     } catch (error) {
                         showToast('Error restoring backup: ' + error.message, 'error');
                     }
@@ -10857,6 +11432,24 @@
                 reader.readAsText(file);
             };
             input.click();
+        }
+
+        function performRestore(backup) {
+            showConfirmModal({
+                title: 'Restore Backup',
+                message: `This will replace all your current data with the backup from ${new Date(backup.timestamp).toLocaleString()}. This action cannot be undone. Continue?`,
+                type: 'danger',
+                confirmText: 'Restore',
+                cancelText: 'Cancel'
+            }).then(confirmed => {
+                if (!confirmed) return;
+
+                state.data = backup.data;
+                writeExcelFile().then(() => {
+                    showToast('Data restored successfully', 'success');
+                    renderAll();
+                });
+            });
         }
 
         // --- TEMPLATES MANAGEMENT ---
