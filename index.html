@@ -10960,24 +10960,51 @@
                 // Handle contributors (family members who contributed)
                 if (expense.familyMembers && Array.isArray(expense.familyMembers)) {
                     if (expense.expenseFor) {
-                        // If expenseFor is set, contributors also pay the full amount each
-                        expense.familyMembers.forEach(memberName => {
-                            if (stats[memberName]) {
-                                stats[memberName].totalExpenses += amount;
-                                stats[memberName].expenseCount++;
-                            }
-                        });
+                        // If expenseFor is set, contributors split the amount among themselves
+                        if (expense.contributionType === 'custom' && expense.contributions) {
+                            // Custom contributions - use the specified amounts
+                            expense.familyMembers.forEach(memberName => {
+                                if (stats[memberName]) {
+                                    const contributionAmount = Number(expense.contributions[memberName] || 0);
+                                    stats[memberName].totalExpenses += contributionAmount;
+                                    stats[memberName].expenseCount++;
+                                }
+                            });
+                        } else {
+                            // Equal split among contributors
+                            const shareCount = expense.familyMembers.length;
+                            const sharePerPerson = shareCount > 0 ? amount / shareCount : 0;
+                            
+                            expense.familyMembers.forEach(memberName => {
+                                if (stats[memberName]) {
+                                    stats[memberName].totalExpenses += sharePerPerson;
+                                    stats[memberName].expenseCount++;
+                                }
+                            });
+                        }
                     } else {
                         // Normal shared expense - divide equally
-                        const shareCount = expense.familyMembers.length;
-                        const sharePerPerson = shareCount > 0 ? amount / shareCount : 0;
-                        
-                        expense.familyMembers.forEach(memberName => {
-                            if (stats[memberName]) {
-                                stats[memberName].totalExpenses += sharePerPerson;
-                                stats[memberName].expenseCount++;
-                            }
-                        });
+                        if (expense.contributionType === 'custom' && expense.contributions) {
+                            // Custom contributions - use the specified amounts
+                            expense.familyMembers.forEach(memberName => {
+                                if (stats[memberName]) {
+                                    const contributionAmount = Number(expense.contributions[memberName] || 0);
+                                    stats[memberName].totalExpenses += contributionAmount;
+                                    stats[memberName].expenseCount++;
+                                }
+                            });
+                        } else {
+                            // Equal split
+                            const shareCount = expense.familyMembers.length;
+                            const sharePerPerson = shareCount > 0 ? amount / shareCount : 0;
+                            
+                            expense.familyMembers.forEach(memberName => {
+                                if (stats[memberName]) {
+                                    stats[memberName].totalExpenses += sharePerPerson;
+                                    stats[memberName].expenseCount++;
+                                }
+                            });
+                        }
                     }
                 }
             });
