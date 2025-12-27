@@ -26,7 +26,8 @@
             <!-- Desktop Controls -->
             <div class="header-desktop-controls">
                 <!-- Language Selector -->
-                <select class="filter-input" id="language-selector" onchange="changeLanguage(this.value)" style="width: auto; padding: 0.5rem; border-radius: 6px; border: 1px solid var(--border); background: var(--card-bg); color: var(--text-main);">
+                <select class="filter-input" id="language-selector" onchange="changeLanguage(this.value)"
+                    style="width: auto; padding: 0.5rem; border-radius: 6px; border: 1px solid var(--border); background: var(--card-bg); color: var(--text-main);">
                     <option value="en">🇬🇧 English</option>
                     <option value="bn">🇧🇩 বাংলা</option>
                     <option value="es">🇪🇸 Español</option>
@@ -36,27 +37,35 @@
                     <option value="ar">🇸🇦 العربية</option>
                     <option value="zh">🇨🇳 中文</option>
                 </select>
-                
+
                 <!-- Notification Icon -->
                 <div style="position: relative;">
-                    <button class="btn btn-secondary" style="width: auto; position: relative;" onclick="toggleNotifications()" id="notification-btn" title="Notifications">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <button class="btn btn-secondary" style="width: auto; position: relative;"
+                        onclick="toggleNotifications()" id="notification-btn" title="Notifications">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
                             <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
                             <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
                         </svg>
-                        <span id="notification-badge" style="position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; border-radius: 50%; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: bold; display: none;">0</span>
+                        <span id="notification-badge"
+                            style="position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; border-radius: 50%; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: bold; display: none;">0</span>
                     </button>
-                    <div id="notification-dropdown" style="position: absolute; right: 0; top: calc(100% + 0.5rem); background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); min-width: 300px; max-width: 400px; max-height: 400px; overflow-y: auto; z-index: 1000; display: none;">
-                        <div style="padding: 1rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                    <div id="notification-dropdown"
+                        style="position: absolute; right: 0; top: calc(100% + 0.5rem); background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); min-width: 300px; max-width: 400px; max-height: 400px; overflow-y: auto; z-index: 1000; display: none;">
+                        <div
+                            style="padding: 1rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
                             <h3 style="margin: 0; font-size: 1rem;" data-translate="notifications">Notifications</h3>
-                            <button onclick="clearAllNotifications()" style="background: none; border: none; color: var(--primary); cursor: pointer; font-size: 0.875rem;" data-translate="clear_all">Clear All</button>
+                            <button onclick="clearAllNotifications()"
+                                style="background: none; border: none; color: var(--primary); cursor: pointer; font-size: 0.875rem;"
+                                data-translate="clear_all">Clear All</button>
                         </div>
                         <div id="notification-list" style="padding: 0.5rem;">
-                            <div style="padding: 2rem; text-align: center; color: var(--text-light);" data-translate="no_notifications">No notifications</div>
+                            <div style="padding: 2rem; text-align: center; color: var(--text-light);"
+                                data-translate="no_notifications">No notifications</div>
                         </div>
                     </div>
                 </div>
-                
+
                 <button class="btn btn-secondary" style="width: auto; display: none;" onclick="refreshData()"
                     title="Refresh Data" id="refresh-btn">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" xml:space="preserve" width="16"
@@ -124,7 +133,8 @@
             <!-- Mobile Controls -->
             <div class="header-mobile-controls">
                 <!-- Language Selector -->
-                <select class="filter-input" id="language-selector-mobile" onchange="changeLanguage(this.value)" style="width: auto; padding: 0.5rem; border-radius: 6px; border: 1px solid var(--border); background: var(--card-bg); color: var(--text-main); font-size: 0.875rem;">
+                <select class="filter-input" id="language-selector-mobile" onchange="changeLanguage(this.value)"
+                    style="width: auto; padding: 0.5rem; border-radius: 6px; border: 1px solid var(--border); background: var(--card-bg); color: var(--text-main); font-size: 0.875rem;">
                     <option value="en">🇬🇧</option>
                     <option value="bn">🇧🇩</option>
                     <option value="es">🇪🇸</option>
@@ -134,43 +144,59 @@
                     <option value="ar">🇸🇦</option>
                     <option value="zh">🇨🇳</option>
                 </select>
-                
+
                 <!-- Notification Icon -->
                 <div style="position: relative;">
-                    <button class="btn btn-secondary" style="width: auto; position: relative; padding: 0.5rem;" onclick="toggleNotificationsMobile(event)" id="notification-btn-mobile" title="Notifications">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
+                    <button class="btn btn-secondary" style="width: auto; position: relative; padding: 0.5rem;"
+                        onclick="toggleNotificationsMobile(event)" id="notification-btn-mobile" title="Notifications">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
                             <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
                             <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
                         </svg>
-                        <span id="notification-badge-mobile" style="position: absolute; top: -3px; right: -3px; background: var(--danger); color: white; border-radius: 50%; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: bold; display: none;">0</span>
+                        <span id="notification-badge-mobile"
+                            style="position: absolute; top: -3px; right: -3px; background: var(--danger); color: white; border-radius: 50%; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: bold; display: none;">0</span>
                     </button>
-                    <div id="notification-dropdown-mobile" style="position: absolute; right: 0; top: calc(100% + 0.5rem); background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); min-width: calc(100vw - 2rem); max-width: calc(100vw - 2rem); max-height: 400px; overflow-y: auto; z-index: 1002; display: none;">
-                        <div style="padding: 1rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+                    <div id="notification-dropdown-mobile"
+                        style="position: absolute; right: 0; top: calc(100% + 0.5rem); background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); min-width: calc(100vw - 2rem); max-width: calc(100vw - 2rem); max-height: 400px; overflow-y: auto; z-index: 1002; display: none;">
+                        <div
+                            style="padding: 1rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
                             <h3 style="margin: 0; font-size: 1rem;" data-translate="notifications">Notifications</h3>
-                            <button onclick="clearAllNotifications()" style="background: none; border: none; color: var(--primary); cursor: pointer; font-size: 0.875rem;" data-translate="clear_all">Clear All</button>
+                            <button onclick="clearAllNotifications()"
+                                style="background: none; border: none; color: var(--primary); cursor: pointer; font-size: 0.875rem;"
+                                data-translate="clear_all">Clear All</button>
                         </div>
                         <div id="notification-list-mobile" style="padding: 0.5rem;">
-                            <div style="padding: 2rem; text-align: center; color: var(--text-light);" data-translate="no_notifications">No notifications</div>
+                            <div style="padding: 2rem; text-align: center; color: var(--text-light);"
+                                data-translate="no_notifications">No notifications</div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Connect Excel Button (Mobile) -->
-                <button class="btn btn-secondary" style="width: auto; display: inline-flex; align-items: center; padding: 0.5rem;" onclick="connectExcelFile()" title="Connect Excel File" id="connect-btn-mobile">
+                <button class="btn btn-secondary"
+                    style="width: auto; display: inline-flex; align-items: center; padding: 0.5rem;"
+                    onclick="connectExcelFile()" title="Connect Excel File" id="connect-btn-mobile">
                     <svg width="16" height="16" viewBox="-0.08 0 1.28 1.28" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M.103 0a.1.1 0 0 0-.101.102v1.077a.1.1 0 0 0 .101.101h.915a.1.1 0 0 0 .101-.101V.406L.742 0z" fill-rule="evenodd" clip-rule="evenodd" fill="#0c8fe8"></path>
+                        <path
+                            d="M.103 0a.1.1 0 0 0-.101.102v1.077a.1.1 0 0 0 .101.101h.915a.1.1 0 0 0 .101-.101V.406L.742 0z"
+                            fill-rule="evenodd" clip-rule="evenodd" fill="#0c8fe8"></path>
                         <g fill-rule="evenodd" clip-rule="evenodd">
                             <path d="M1.12.407v.02H.864S.738.402.741.293c0 0 .004.114.12.114z" fill="#0973e2"></path>
                             <path d="M.741 0v.291c0 .033.022.116.122.116h.256z" opacity=".5" fill="#fff"></path>
                         </g>
-                        <path d="M.565.712a.106.106 0 0 0-.151 0L.353.773a.11.11 0 0 0 0 .151.025.025 0 0 0 .035 0 .024.024 0 0 0 0-.035.06.06 0 0 1 0-.082L.45.746a.057.057 0 0 1 .081 0 .06.06 0 0 1 0 .081l-.029.03q.01.03.008.061L.566.862a.106.106 0 0 0 0-.151M.412.83a.025.025 0 0 0 0 .035.057.057 0 0 1 0 .081l-.061.061a.057.057 0 0 1-.081 0 .06.06 0 0 1 0-.081L.299.897A.14.14 0 0 1 .291.835L.235.891a.106.106 0 0 0 0 .151.11.11 0 0 0 .151 0L.448.98a.106.106 0 0 0 0-.151.025.025 0 0 0-.035 0" fill="#fff"></path>
+                        <path
+                            d="M.565.712a.106.106 0 0 0-.151 0L.353.773a.11.11 0 0 0 0 .151.025.025 0 0 0 .035 0 .024.024 0 0 0 0-.035.06.06 0 0 1 0-.082L.45.746a.057.057 0 0 1 .081 0 .06.06 0 0 1 0 .081l-.029.03q.01.03.008.061L.566.862a.106.106 0 0 0 0-.151M.412.83a.025.025 0 0 0 0 .035.057.057 0 0 1 0 .081l-.061.061a.057.057 0 0 1-.081 0 .06.06 0 0 1 0-.081L.299.897A.14.14 0 0 1 .291.835L.235.891a.106.106 0 0 0 0 .151.11.11 0 0 0 .151 0L.448.98a.106.106 0 0 0 0-.151.025.025 0 0 0-.035 0"
+                            fill="#fff"></path>
                     </svg>
                 </button>
 
                 <!-- 3-Dot Menu -->
                 <div style="position: relative; display: none;" id="mobile-menu-container">
-                    <button class="btn btn-secondary" style="width: auto; padding: 0.5rem;" onclick="toggleMobileMenu(event)" id="mobile-menu-btn" title="Menu">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
+                    <button class="btn btn-secondary" style="width: auto; padding: 0.5rem;"
+                        onclick="toggleMobileMenu(event)" id="mobile-menu-btn" title="Menu">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
                             <circle cx="12" cy="12" r="1"></circle>
                             <circle cx="12" cy="5" r="1"></circle>
                             <circle cx="12" cy="19" r="1"></circle>
@@ -178,7 +204,8 @@
                     </button>
                     <div id="mobile-menu-dropdown" class="mobile-menu-dropdown-header">
                         <button class="mobile-menu-item-header" onclick="refreshData(); closeMobileMenuHeader();">
-                            <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <polyline points="23 4 23 10 17 10"></polyline>
                                 <polyline points="1 20 1 14 7 14"></polyline>
                                 <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
@@ -186,15 +213,18 @@
                             <span data-translate="refresh">Refresh</span>
                         </button>
                         <button class="mobile-menu-item-header" onclick="exportData(); closeMobileMenuHeader();">
-                            <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                                 <polyline points="7 10 12 15 17 10"></polyline>
                                 <line x1="12" y1="15" x2="12" y2="3"></line>
                             </svg>
                             <span data-translate="export">Export</span>
                         </button>
-                        <button class="mobile-menu-item-header" onclick="disconnectExcelFile(); closeMobileMenuHeader();">
-                            <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <button class="mobile-menu-item-header"
+                            onclick="disconnectExcelFile(); closeMobileMenuHeader();">
+                            <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
                                 <polyline points="16 17 21 12 16 7"></polyline>
                                 <line x1="21" y1="12" x2="9" y2="12"></line>
@@ -202,7 +232,8 @@
                             <span data-translate="disconnect">Disconnect</span>
                         </button>
                         <button class="mobile-menu-item-header" onclick="toggleDarkMode(); closeMobileMenuHeader();">
-                            <svg class="icon icon-sm" id="dark-mode-icon-mobile" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg class="icon icon-sm" id="dark-mode-icon-mobile" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <circle cx="12" cy="12" r="5"></circle>
                                 <line x1="12" y1="1" x2="12" y2="3"></line>
                                 <line x1="12" y1="21" x2="12" y2="23"></line>
@@ -215,10 +246,14 @@
                             </svg>
                             <span data-translate="dark_mode">Dark Mode</span>
                         </button>
-                        <button class="mobile-menu-item-header" onclick="switchTab('settings'); closeMobileMenuHeader();">
-                            <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <button class="mobile-menu-item-header"
+                            onclick="switchTab('settings'); closeMobileMenuHeader();">
+                            <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <circle cx="12" cy="12" r="3"></circle>
-                                <path d="M12 1v6m0 6v6m9-9h-6m-6 0H3m15.364 6.364l-4.243-4.243m-4.242 0L5.636 17.364m12.728 0l-4.243-4.243m-4.242 0L5.636 6.636"></path>
+                                <path
+                                    d="M12 1v6m0 6v6m9-9h-6m-6 0H3m15.364 6.364l-4.243-4.243m-4.242 0L5.636 17.364m12.728 0l-4.243-4.243m-4.242 0L5.636 6.636">
+                                </path>
                             </svg>
                             <span data-translate="settings">Settings</span>
                         </button>
@@ -304,7 +339,8 @@
 
             <!-- Family Members Overview -->
             <div class="card" id="family-members-overview-card" style="margin-bottom: 1.5rem; display: none;">
-                <h2>👨‍👩‍👧‍👦 <span data-translate="family_members">Family Members</span> <span data-translate="overview">Overview</span></h2>
+                <h2>👨‍👩‍👧‍👦 <span data-translate="family_members">Family Members</span> <span
+                        data-translate="overview">Overview</span></h2>
                 <div id="family-members-overview-content" style="margin-top: 1rem;">
                     <div class="text-center" style="padding: 1rem; color: var(--text-light);">Loading...</div>
                 </div>
@@ -314,7 +350,8 @@
             <div class="card" style="margin-bottom: 1.5rem;">
                 <h2>📅 <span data-translate="upcoming_bills">Upcoming Bills & Reminders</span></h2>
                 <div id="bill-reminders-content" style="margin-top: 1rem;">
-                    <div class="text-center" style="padding: 1rem; color: var(--text-light);" data-translate="loading_reminders">Loading reminders...</div>
+                    <div class="text-center" style="padding: 1rem; color: var(--text-light);"
+                        data-translate="loading_reminders">Loading reminders...</div>
                 </div>
             </div>
 
@@ -333,18 +370,21 @@
                 <div
                     style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
                     <div>
-                        <div style="font-size: 0.875rem; opacity: 0.9; margin-bottom: 0.5rem;" data-translate="financial_health_score">Financial Health Score</div>
+                        <div style="font-size: 0.875rem; opacity: 0.9; margin-bottom: 0.5rem;"
+                            data-translate="financial_health_score">Financial Health Score</div>
                         <div style="font-size: 3rem; font-weight: bold;" id="health-score">-</div>
                         <div style="font-size: 0.875rem; opacity: 0.9; margin-top: 0.5rem;" id="health-status"></div>
                     </div>
                     <div style="flex: 1; min-width: 200px;">
                         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
                             <div>
-                                <div style="font-size: 0.75rem; opacity: 0.8;" data-translate="savings_rate">Savings Rate</div>
+                                <div style="font-size: 0.75rem; opacity: 0.8;" data-translate="savings_rate">Savings
+                                    Rate</div>
                                 <div style="font-size: 1.5rem; font-weight: bold;" id="savings-rate">0%</div>
                             </div>
                             <div>
-                                <div style="font-size: 0.75rem; opacity: 0.8;" data-translate="expense_ratio">Expense Ratio</div>
+                                <div style="font-size: 0.75rem; opacity: 0.8;" data-translate="expense_ratio">Expense
+                                    Ratio</div>
                                 <div style="font-size: 1.5rem; font-weight: bold;" id="expense-ratio">0%</div>
                             </div>
                         </div>
@@ -430,7 +470,8 @@
                     </div>
                     <div class="filter-bar" style="margin: 0;">
                         <div class="search-box">
-                            <input type="text" id="search-input" placeholder="" data-translate-placeholder="search" onkeyup="applyFilters()">
+                            <input type="text" id="search-input" placeholder="" data-translate-placeholder="search"
+                                onkeyup="applyFilters()">
                             <span class="search-icon">🔍</span>
                         </div>
                         <select class="filter-input" id="category-filter" onchange="applyFilters()">
@@ -491,7 +532,8 @@
             <div class="card">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                     <h2 data-translate="budgets">Budget Tracking</h2>
-                    <button class="btn btn-primary" style="width: auto;" onclick="openModal('form', 'budget')" data-translate="add_budget">+ Add
+                    <button class="btn btn-primary" style="width: auto;" onclick="openModal('form', 'budget')"
+                        data-translate="add_budget">+ Add
                         Budget</button>
                 </div>
                 <div id="budgets-container"></div>
@@ -568,7 +610,8 @@
                             <select class="filter-input" id="report-account" onchange="renderReports()"
                                 style="width: 100%;">
                                 <option value="">${t('all_accounts')}</option>
-                                ${(state.data.accounts || []).map(acc => `<option value="${acc.name}">${acc.name} (${acc.type})</option>`).join('')}
+                                ${(state.data.accounts || []).map(acc => `<option value="${acc.name}">${acc.name}
+                                    (${acc.type})</option>`).join('')}
                             </select>
                         </div>
                         <div>
@@ -766,7 +809,8 @@
             <div class="card">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                     <h2 data-translate="investment_portfolio">Investment Portfolio</h2>
-                    <button class="btn btn-primary" onclick="openInvestmentModal()" style="width: auto;" data-translate="add_investment">
+                    <button class="btn btn-primary" onclick="openInvestmentModal()" style="width: auto;"
+                        data-translate="add_investment">
                         <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                             stroke-linecap="round" stroke-linejoin="round">
                             <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -789,7 +833,8 @@
                     <div class="settings-row">
                         <div>
                             <div class="settings-label" data-translate="currency_symbol">Currency Symbol</div>
-                            <div class="settings-description" data-translate="currency_symbol_description">Default currency symbol for all amounts</div>
+                            <div class="settings-description" data-translate="currency_symbol_description">Default
+                                currency symbol for all amounts</div>
                         </div>
                         <select class="form-select" id="setting-currency" style="width: 200px;"
                             onchange="saveSettings()">
@@ -804,7 +849,8 @@
                     <div class="settings-row">
                         <div>
                             <div class="settings-label" data-translate="date_format">Date Format</div>
-                            <div class="settings-description" data-translate="date_format_description">Preferred date display format</div>
+                            <div class="settings-description" data-translate="date_format_description">Preferred date
+                                display format</div>
                         </div>
                         <select class="form-select" id="setting-date-format" style="width: 200px;"
                             onchange="saveSettings()">
@@ -817,7 +863,8 @@
                     <div class="settings-row">
                         <div>
                             <div class="settings-label" data-translate="auto_save">Auto-save</div>
-                            <div class="settings-description" data-translate="auto_save_description">Automatically save changes to Excel file</div>
+                            <div class="settings-description" data-translate="auto_save_description">Automatically save
+                                changes to Excel file</div>
                         </div>
                         <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
                             <input type="checkbox" id="setting-auto-save" onchange="saveSettings()">
@@ -831,91 +878,133 @@
                     <div class="settings-row">
                         <div>
                             <div class="settings-label" data-translate="export_data">Export Data</div>
-                            <div class="settings-description" data-translate="export_data_description">Download all data as Excel file</div>
+                            <div class="settings-description" data-translate="export_data_description">Download all data
+                                as Excel file</div>
                         </div>
                         <div style="display: flex; gap: 0.5rem;">
-                            <button class="btn btn-primary" onclick="exportData()" data-translate="export_to_excel">Export to Excel</button>
-                            <button class="btn btn-secondary" onclick="exportDataCSV()" data-translate="export_to_csv">Export to CSV</button>
+                            <button class="btn btn-primary" onclick="exportData()"
+                                data-translate="export_to_excel">Export to Excel</button>
+                            <button class="btn btn-secondary" onclick="exportDataCSV()"
+                                data-translate="export_to_csv">Export to CSV</button>
                         </div>
                     </div>
                     <div class="settings-row">
                         <div>
                             <div class="settings-label" data-translate="import_data">Import Data</div>
-                            <div class="settings-description" data-translate="import_data_description">Import data from Excel file (will merge with existing data)</div>
+                            <div class="settings-description" data-translate="import_data_description">Import data from
+                                Excel file (will merge with existing data)</div>
                         </div>
-                        <button class="btn btn-primary" onclick="importData()" style="width: auto;" data-translate="import_from_excel">Import from Excel</button>
+                        <button class="btn btn-primary" onclick="importData()" style="width: auto;"
+                            data-translate="import_from_excel">Import from Excel</button>
                     </div>
                     <div class="settings-row">
                         <div>
                             <div class="settings-label" data-translate="backup_data">Backup Data</div>
-                            <div class="settings-description" data-translate="backup_data_description">Create a backup of all your data</div>
+                            <div class="settings-description" data-translate="backup_data_description">Create a backup
+                                of all your data</div>
                         </div>
-                        <button class="btn btn-secondary" onclick="backupData()" style="width: auto;" data-translate="create_backup">Create Backup</button>
+                        <button class="btn btn-secondary" onclick="backupData()" style="width: auto;"
+                            data-translate="create_backup">Create Backup</button>
                     </div>
                     <div class="settings-row">
                         <div>
                             <div class="settings-label" data-translate="restore_data">Restore Data</div>
-                            <div class="settings-description" data-translate="restore_data_description">Restore data from a backup file</div>
+                            <div class="settings-description" data-translate="restore_data_description">Restore data
+                                from a backup file</div>
                         </div>
-                        <button class="btn btn-secondary" onclick="restoreData()" style="width: auto;" data-translate="restore_backup">Restore Backup</button>
+                        <button class="btn btn-secondary" onclick="restoreData()" style="width: auto;"
+                            data-translate="restore_backup">Restore Backup</button>
                     </div>
                     <div class="settings-row">
                         <div>
                             <div class="settings-label" data-translate="undo_last_action">Undo Last Action</div>
-                            <div class="settings-description" data-translate="undo_last_action_description">Undo the last transaction (add/edit/delete)</div>
+                            <div class="settings-description" data-translate="undo_last_action_description">Undo the
+                                last transaction (add/edit/delete)</div>
                         </div>
-                        <button class="btn btn-secondary" onclick="undoLastAction()" id="undo-btn" style="width: auto;" data-translate="undo">Undo</button>
+                        <button class="btn btn-secondary" onclick="undoLastAction()" id="undo-btn" style="width: auto;"
+                            data-translate="undo">Undo</button>
                     </div>
                 </div>
 
                 <div class="settings-section">
                     <div class="settings-section-title" data-translate="keyboard_shortcuts">Keyboard Shortcuts</div>
                     <div style="padding: 1rem 0;">
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+                        <div
+                            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
                             <div>
-                                <div style="font-weight: 600; margin-bottom: 0.75rem; color: var(--primary);" data-translate="navigation">Navigation</div>
+                                <div style="font-weight: 600; margin-bottom: 0.75rem; color: var(--primary);"
+                                    data-translate="navigation">Navigation</div>
                                 <div style="font-size: 0.875rem; line-height: 2;">
-                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">1</span> - <span data-translate="dashboard">Dashboard</span></div>
-                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">2</span> - <span data-translate="income">Income</span></div>
-                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">3</span> - <span data-translate="expenses">Expenses</span></div>
-                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">4</span> - <span data-translate="receivables">Receivables</span></div>
-                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">5</span> - <span data-translate="payables">Payables</span></div>
-                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">6</span> - <span data-translate="plans">Plans</span></div>
-                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">7</span> - <span data-translate="budgets">Budgets</span></div>
-                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">8</span> - <span data-translate="categories">Categories</span></div>
-                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">9</span> - <span data-translate="reports">Reports</span></div>
-                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">0</span> - <span data-translate="settings">Settings</span></div>
-                                    <div><span class="shortcut-key">←</span> / <span class="shortcut-key">→</span> - Navigate Tabs</div>
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">1</span> -
+                                        <span data-translate="dashboard">Dashboard</span></div>
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">2</span> -
+                                        <span data-translate="income">Income</span></div>
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">3</span> -
+                                        <span data-translate="expenses">Expenses</span></div>
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">4</span> -
+                                        <span data-translate="receivables">Receivables</span></div>
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">5</span> -
+                                        <span data-translate="payables">Payables</span></div>
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">6</span> -
+                                        <span data-translate="plans">Plans</span></div>
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">7</span> -
+                                        <span data-translate="budgets">Budgets</span></div>
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">8</span> -
+                                        <span data-translate="categories">Categories</span></div>
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">9</span> -
+                                        <span data-translate="reports">Reports</span></div>
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">0</span> -
+                                        <span data-translate="settings">Settings</span></div>
+                                    <div><span class="shortcut-key">←</span> / <span class="shortcut-key">→</span> -
+                                        Navigate Tabs</div>
                                 </div>
                             </div>
                             <div>
-                                <div style="font-weight: 600; margin-bottom: 0.75rem; color: var(--primary);" data-translate="actions">Actions</div>
+                                <div style="font-weight: 600; margin-bottom: 0.75rem; color: var(--primary);"
+                                    data-translate="actions">Actions</div>
                                 <div style="font-size: 0.875rem; line-height: 2;">
-                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">N</span> - <span data-translate="add_new_item">Add New Item</span></div>
-                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">S</span> - <span data-translate="save">Save</span></div>
-                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">E</span> - <span data-translate="export_data">Export Data</span></div>
-                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">I</span> - <span data-translate="import_data">Import Data</span></div>
-                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">B</span> - <span data-translate="backup_data">Backup Data</span></div>
-                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">Z</span> - <span data-translate="undo">Undo</span></div>
-                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">R</span> - <span data-translate="refresh">Refresh</span></div>
-                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">F</span> - <span data-translate="search">Search</span></div>
-                                    <div><span class="shortcut-key">Del</span> - <span data-translate="delete">Delete Selected</span></div>
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">N</span> -
+                                        <span data-translate="add_new_item">Add New Item</span></div>
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">S</span> -
+                                        <span data-translate="save">Save</span></div>
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">E</span> -
+                                        <span data-translate="export_data">Export Data</span></div>
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">I</span> -
+                                        <span data-translate="import_data">Import Data</span></div>
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">B</span> -
+                                        <span data-translate="backup_data">Backup Data</span></div>
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">Z</span> -
+                                        <span data-translate="undo">Undo</span></div>
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">R</span> -
+                                        <span data-translate="refresh">Refresh</span></div>
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">F</span> -
+                                        <span data-translate="search">Search</span></div>
+                                    <div><span class="shortcut-key">Del</span> - <span data-translate="delete">Delete
+                                            Selected</span></div>
                                 </div>
                             </div>
                             <div>
-                                <div style="font-weight: 600; margin-bottom: 0.75rem; color: var(--primary);" data-translate="quick_access">Quick Access</div>
+                                <div style="font-weight: 600; margin-bottom: 0.75rem; color: var(--primary);"
+                                    data-translate="quick_access">Quick Access</div>
                                 <div style="font-size: 0.875rem; line-height: 2;">
-                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">,</span> / <span class="shortcut-key">P</span> - <span data-translate="settings">Settings</span></div>
-                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">/</span> - <span data-translate="show_shortcuts">Show Shortcuts</span></div>
-                                    <div><span class="shortcut-key">F1</span> - <span data-translate="show_shortcuts">Show Shortcuts</span></div>
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">,</span> /
+                                        <span class="shortcut-key">P</span> - <span
+                                            data-translate="settings">Settings</span></div>
+                                    <div><span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">/</span> -
+                                        <span data-translate="show_shortcuts">Show Shortcuts</span></div>
+                                    <div><span class="shortcut-key">F1</span> - <span
+                                            data-translate="show_shortcuts">Show Shortcuts</span></div>
                                     <div><span class="shortcut-key">Esc</span> - Close Modal / Clear Search</div>
                                     <div><span class="shortcut-key">Enter</span> - Submit Form</div>
                                 </div>
                             </div>
                         </div>
-                        <div style="margin-top: 1.5rem; padding: 1rem; background: var(--card-bg); border-radius: 8px; border: 1px solid var(--border);">
+                        <div
+                            style="margin-top: 1.5rem; padding: 1rem; background: var(--card-bg); border-radius: 8px; border: 1px solid var(--border);">
                             <div style="font-size: 0.75rem; color: var(--text-light); line-height: 1.6;">
-                                <strong>💡 Tip:</strong> Keyboard shortcuts work globally except when typing in input fields. Use <span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">/</span> or <span class="shortcut-key">F1</span> to view this help anytime.
+                                <strong>💡 Tip:</strong> Keyboard shortcuts work globally except when typing in input
+                                fields. Use <span class="shortcut-key">Ctrl</span> + <span class="shortcut-key">/</span>
+                                or <span class="shortcut-key">F1</span> to view this help anytime.
                             </div>
                         </div>
                     </div>
@@ -3700,7 +3789,7 @@
             const langSelectorMobile = document.getElementById('language-selector-mobile');
             if (langSelector) langSelector.value = lang;
             if (langSelectorMobile) langSelectorMobile.value = lang;
-            
+
             // Re-render current view to regenerate all dynamic content with new language
             const activeTab = document.querySelector('.nav-tab.active');
             if (activeTab && activeTab.getAttribute('onclick')) {
@@ -3719,7 +3808,7 @@
                 translatePage();
                 switchTab('dashboard');
             }
-            
+
             // Final translation pass after everything is rendered
             setTimeout(() => translatePage(), 300);
         }
@@ -3965,7 +4054,7 @@
                     el.setAttribute('placeholder', translations[currentLanguage][key]);
                 }
             });
-            
+
             // Also translate regular placeholders
             document.querySelectorAll('input[placeholder], textarea[placeholder]').forEach(el => {
                 if (!el.hasAttribute('data-translate-placeholder')) {
@@ -3975,7 +4064,7 @@
                     }
                 }
             });
-            
+
             // Translate .stat-label, .insight-title, .chart-title, .insight-trend elements
             document.querySelectorAll('.stat-label, .insight-title, .chart-title, .insight-trend').forEach(el => {
                 const text = el.textContent.trim();
@@ -3995,7 +4084,7 @@
                     }
                 }
             });
-            
+
             // Translate h2 elements (handle emoji prefixes)
             document.querySelectorAll('h2').forEach(el => {
                 if (!el.querySelector('[data-translate]')) {
@@ -4008,7 +4097,7 @@
                     }
                 }
             });
-            
+
             // Translate any span elements inside h2 that might have been missed
             document.querySelectorAll('h2 span[data-translate]').forEach(el => {
                 const key = el.getAttribute('data-translate');
@@ -4030,7 +4119,7 @@
                     }
                 }
             });
-            
+
             // Update notification badge counts
             updateNotificationBadge();
         }
@@ -4097,7 +4186,7 @@
             const badgeMobile = document.getElementById('notification-badge-mobile');
             const unreadCount = notifications.filter(n => !n.read).length;
             const badgeText = unreadCount > 99 ? '99+' : unreadCount;
-            
+
             if (badge) {
                 if (unreadCount > 0) {
                     badge.textContent = badgeText;
@@ -4106,7 +4195,7 @@
                     badge.style.display = 'none';
                 }
             }
-            
+
             if (badgeMobile) {
                 if (unreadCount > 0) {
                     badgeMobile.textContent = badgeText;
@@ -4214,7 +4303,7 @@
             const minutes = Math.floor(diff / 60000);
             const hours = Math.floor(diff / 3600000);
             const days = Math.floor(diff / 86400000);
-            
+
             if (minutes < 1) return 'Just now';
             if (minutes < 60) return `${minutes}m ago`;
             if (hours < 24) return `${hours}h ago`;
@@ -4228,7 +4317,7 @@
             const dropdownMobile = document.getElementById('notification-dropdown-mobile');
             const btn = document.getElementById('notification-btn');
             const btnMobile = document.getElementById('notification-btn-mobile');
-            
+
             if (dropdown && btn && !dropdown.contains(e.target) && !btn.contains(e.target)) {
                 dropdown.style.display = 'none';
             }
@@ -4623,7 +4712,7 @@
                 await new Promise(resolve => setTimeout(resolve, 500));
                 retries++;
             }
-            
+
             if (!window.gapi) {
                 throw new Error('Google API failed to load. Please refresh the page and ensure you have internet connection.');
             }
@@ -4633,11 +4722,11 @@
         function getGoogleSheetsSetupInstructions() {
             const currentOrigin = window.location.origin;
             const isLocalhost = currentOrigin.includes('localhost') || currentOrigin.includes('127.0.0.1') || currentOrigin.includes('file://');
-            
+
             let instructions = 'Google Sheets Setup Instructions:\n\n';
             instructions += 'IMPORTANT: Copy the EXACT origin below to avoid errors!\n';
             instructions += `Your current origin: "${currentOrigin}"\n\n`;
-            
+
             instructions += '1. Go to: https://console.cloud.google.com/\n';
             instructions += '2. Select your project (or create a new one)\n';
             instructions += '3. Enable APIs:\n';
@@ -4693,16 +4782,16 @@
             instructions += '- Origin must match EXACTLY (including http vs https)\n';
             instructions += '- OAuth consent screen must be fully configured (all steps completed)\n';
             instructions += '- If still failing, try creating a NEW OAuth client ID\n';
-            
+
             return instructions;
         }
 
         async function connectGoogleSheets() {
             try {
                 showToast('Initializing Google API...', 'info');
-                
+
                 await ensureGoogleAPILoaded();
-                
+
 
                 // Load client library
                 await new Promise((resolve, reject) => {
@@ -4772,14 +4861,14 @@
                         console.log('Initializing auth2...');
                         console.log('Current origin:', currentOrigin);
                         console.log('Client ID:', '415209089700-fp7cm5l9n53kkrfqkmhdo9k4f8n8omvt.apps.googleusercontent.com');
-                        
+
                         // Initialize auth2 - returns a Thenable (promise-like)
                         const initPromise = window.gapi.auth2.init({
                             client_id: '415209089700-fp7cm5l9n53kkrfqkmhdo9k4f8n8omvt.apps.googleusercontent.com',
                             scope: 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file',
                             ux_mode: 'popup' // Use popup instead of redirect
                         });
-                        
+
                         // Wait for initialization to complete
                         await new Promise((resolve, reject) => {
                             initPromise.then(
@@ -4796,16 +4885,16 @@
                 } catch (initError) {
                     console.error('Auth2 initialization error:', initError);
                     console.error('Error details:', JSON.stringify(initError, null, 2));
-                    
+
                     // Check for idpiframe_initialization_failed in various error formats
                     const errorString = JSON.stringify(initError);
                     const errorMessage = initError.message || initError.error || initError.details || errorString;
-                    
-                    if (errorString.includes('idpiframe_initialization_failed') || 
+
+                    if (errorString.includes('idpiframe_initialization_failed') ||
                         errorMessage.includes('idpiframe_initialization_failed') ||
                         (initError.error && initError.error === 'idpiframe_initialization_failed') ||
                         (initError.details && initError.details === 'idpiframe_initialization_failed')) {
-                        
+
                         const setupInstructions = getGoogleSheetsSetupInstructions();
                         const detailedError = `OAuth initialization failed (idpiframe_initialization_failed).\n\n` +
                             `Current origin: "${currentOrigin}"\n\n` +
@@ -4817,17 +4906,17 @@
                             `- OAuth consent screen not fully configured\n` +
                             `- Changes not propagated yet (wait 5-10 minutes)\n\n` +
                             `Full setup instructions:\n\n${setupInstructions}`;
-                        
+
                         throw new Error(detailedError);
                     }
-                    
+
                     // For other errors, provide generic message
                     throw new Error(`OAuth initialization failed: ${errorMessage}\n\n${getGoogleSheetsSetupInstructions()}`);
                 }
 
                 // Sign in
                 const isSignedIn = authInstance.isSignedIn.get();
-                
+
                 if (!isSignedIn) {
                     showToast('Please sign in to Google...', 'info');
                     try {
@@ -4872,7 +4961,7 @@
             } catch (err) {
                 console.error('Error connecting to Google Sheets:', err);
                 let errorMessage = 'Error connecting to Google Sheets:\n\n';
-                
+
                 // Handle specific error types
                 if (err.error) {
                     if (err.error.code === 403 || err.error.status === 'PERMISSION_DENIED') {
@@ -4895,7 +4984,7 @@
                 } else {
                     errorMessage += 'Unknown error occurred. Check browser console for details.';
                 }
-                
+
                 // Show detailed error in alert for better visibility
                 alert(errorMessage);
                 showToast('Connection failed. See alert for details.', 'error');
@@ -4918,7 +5007,7 @@
                 }
 
                 const sheetNames = ['Income', 'Expenses', 'Receivables', 'Payables', 'Plans', 'Budgets', 'Categories', 'Templates', 'Accounts', 'Transfers', 'FamilyMembers', 'Debts'];
-                
+
                 for (const sheetName of sheetNames) {
                     try {
                         const range = `${sheetName}!A:Z`;
@@ -4937,7 +5026,7 @@
                                 });
                                 return obj;
                             });
-                            
+
                             const dataKey = sheetName.toLowerCase();
                             if (state.data[dataKey]) {
                                 state.data[dataKey] = normalizeSheetData(data, dataKey);
@@ -4989,7 +5078,7 @@
 
                 // Prepare batch update requests
                 const valueRanges = [];
-                
+
                 for (const mapping of sheetMappings) {
                     if (mapping.data.length === 0) {
                         // Clear sheet if no data
@@ -5002,7 +5091,7 @@
 
                     // Get headers from first object
                     const headers = Object.keys(mapping.data[0]);
-                    
+
                     // Convert data to 2D array
                     const values = [
                         headers, // Header row
@@ -5364,7 +5453,7 @@
                 }
 
                 if (!state.fileHandle) return;
-                
+
                 const file = await state.fileHandle.getFile();
                 const arrayBuffer = await file.arrayBuffer();
                 const workbook = XLSX.read(arrayBuffer, { type: 'array' });
@@ -5645,15 +5734,15 @@
         function formatCurrency(amount) {
             return CONFIG.currency + Number(amount).toLocaleString('en-BD');
         }
-        
+
         // Format date according to user's date format setting
         function formatDate(dateValue) {
             if (!dateValue) return '';
-            
+
             // Get date format from settings
             const settings = getSettings();
             const dateFormat = settings.dateFormat || CONFIG.dateFormat || 'YYYY-MM-DD';
-            
+
             // Parse the date value (could be string in YYYY-MM-DD format or Date object)
             let date;
             if (dateValue instanceof Date) {
@@ -5669,14 +5758,14 @@
             } else {
                 return '';
             }
-            
+
             // Check if date is valid
             if (isNaN(date.getTime())) return '';
-            
+
             const year = date.getFullYear();
             const month = String(date.getMonth() + 1).padStart(2, '0');
             const day = String(date.getDate()).padStart(2, '0');
-            
+
             // Format according to setting
             switch (dateFormat) {
                 case 'DD/MM/YYYY':
@@ -5779,7 +5868,7 @@
                 document.getElementById('view-list').classList.remove('hidden');
                 renderListTable(tabId);
             }
-            
+
             // Re-translate after switching tabs
             setTimeout(() => translatePage(), 100);
         }
@@ -5808,7 +5897,7 @@
             } else {
                 switchTab('dashboard');
             }
-            
+
             // Re-translate after rendering
             setTimeout(() => translatePage(), 100);
 
@@ -5936,10 +6025,10 @@
 
             // Render Bill Reminders
             renderBillReminders();
-            
+
             // Render Family Members Overview
             renderFamilyMembersOverview();
-            
+
             // Re-translate after rendering dashboard
             setTimeout(() => translatePage(), 50);
 
@@ -6383,13 +6472,13 @@
                 const daysUntil = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
                 const isToday = daysUntil === 0;
                 const isTomorrow = daysUntil === 1;
-                
+
                 // Check if notification already exists for this bill
                 const billIndex = state.data[bill.type === 'payable' ? 'payables' : 'receivables'].indexOf(bill);
-                const existingNotif = notifications.find(n => 
+                const existingNotif = notifications.find(n =>
                     n.data && n.data.billId === `${bill.type}-${billIndex}`
                 );
-                
+
                 if (!existingNotif) {
                     const daysText = isToday ? t('today') : isTomorrow ? t('tomorrow') : `${daysUntil} ${t('days')}`;
                     addNotification(
@@ -6437,46 +6526,46 @@
         function renderFamilyMembersOverview() {
             const card = document.getElementById('family-members-overview-card');
             const container = document.getElementById('family-members-overview-content');
-            
+
             if (!card || !container) return;
-            
+
             const familyMembers = state.data.familyMembers || [];
-            
+
             // Filter only active members for dashboard overview
             const activeMembers = familyMembers.filter(m => m.active !== false);
-            
+
             if (activeMembers.length === 0) {
                 card.style.display = 'none';
                 return;
             }
-            
+
             card.style.display = 'block';
             const memberStats = calculateFamilyMemberStats();
-            
+
             // Sort members by net contribution (top contributors first)
             const sortedMembers = [...activeMembers].sort((a, b) => {
                 const statsA = memberStats[a.name] || { netContribution: 0 };
                 const statsB = memberStats[b.name] || { netContribution: 0 };
                 return statsB.netContribution - statsA.netContribution;
             });
-            
+
             // Show top 5 members
             const topMembers = sortedMembers.slice(0, 5);
-            
+
             if (topMembers.length === 0) {
                 container.innerHTML = `<div class="text-center" style="padding: 1rem; color: var(--text-light);">${t('no_family_members')}</div>`;
                 return;
             }
-            
+
             container.innerHTML = `
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
                     ${topMembers.map((member, idx) => {
-                        const stats = memberStats[member.name] || { totalIncome: 0, totalExpenses: 0, netContribution: 0 };
-                        const rank = idx + 1;
-                        const rankEmoji = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '📊';
-                        const memberIndex = familyMembers.indexOf(member);
-                        
-                        return `
+                const stats = memberStats[member.name] || { totalIncome: 0, totalExpenses: 0, netContribution: 0 };
+                const rank = idx + 1;
+                const rankEmoji = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '📊';
+                const memberIndex = familyMembers.indexOf(member);
+
+                return `
                             <div class="card" style="padding: 1rem; cursor: pointer; transition: transform 0.2s;" 
                                  onclick="switchTab('family'); setTimeout(() => showFamilyMemberDetails(${memberIndex}), 100);"
                                  onmouseover="this.style.transform='translateY(-2px)'" 
@@ -6508,7 +6597,7 @@
                                 </div>
                             </div>
                         `;
-                    }).join('')}
+            }).join('')}
                 </div>
                 ${sortedMembers.length > 5 ? `
                     <div style="margin-top: 1rem; text-align: center;">
@@ -6527,9 +6616,9 @@
 
             const overlay = document.getElementById('modal-overlay');
             const content = document.getElementById('modal-content');
-            
+
             if (!overlay || !content) return;
-            
+
             const dueDate = new Date(bill.dueDate);
             const today = new Date();
             today.setHours(0, 0, 0, 0);
@@ -6539,7 +6628,7 @@
             const daysText = isToday ? t('today') : isTomorrow ? t('tomorrow') : `${daysUntil} ${t('days')}`;
             const status = bill.status || 'unpaid';
             const priority = bill.priority || 'medium';
-            
+
             overlay.classList.add('active');
             content.innerHTML = `
                 <div class="modal-header">
@@ -7237,11 +7326,11 @@
                             <div class="mobile-details-row">
                                 <span class="mobile-details-label">Contributors:</span>
                                 <span class="mobile-details-value">${item.familyMembers.map(name => {
-                                    if (item.contributionType === 'custom' && item.contributions && item.contributions[name]) {
-                                        return `👤 ${name} (${formatCurrency(item.contributions[name])})`;
-                                    }
-                                    return `👤 ${name}`;
-                                }).join(', ')}</span>
+                        if (item.contributionType === 'custom' && item.contributions && item.contributions[name]) {
+                            return `👤 ${name} (${formatCurrency(item.contributions[name])})`;
+                        }
+                        return `👤 ${name}`;
+                    }).join(', ')}</span>
                             </div>
                             ` : ''}
                             <div class="mobile-details-row">
@@ -7254,7 +7343,7 @@
                     `;
                     // Build "Given to" badge
                     const givenToBadge = item.expenseFor ? `<span style="background: #fff3cd; color: #856404; padding: 0.125rem 0.5rem; border-radius: 12px; font-size: 0.75rem; margin-left: 0.5rem; font-weight: 500;">🎁 Given to: ${item.expenseFor}</span>` : '';
-                    
+
                     // Build contributor badges for expenses
                     let contributorBadges = '';
                     if (item.familyMembers && Array.isArray(item.familyMembers) && item.familyMembers.length > 0) {
@@ -7266,7 +7355,7 @@
                             }).join('');
                         } else {
                             // Show equal contributions
-                            contributorBadges = item.familyMembers.map(name => 
+                            contributorBadges = item.familyMembers.map(name =>
                                 `<span style="background: #e6f3ff; color: #0066cc; padding: 0.125rem 0.5rem; border-radius: 12px; font-size: 0.75rem; margin-left: 0.5rem; font-weight: 500;">👤 ${name}</span>`
                             ).join('');
                         }
@@ -7707,7 +7796,7 @@
                     countEl.textContent = `${t('showing')} ${filteredCount} ${t('of')} ${totalCount} ${totalCount !== 1 ? t('items') : t('item')}`;
                 }
             }
-            
+
             // Re-translate after rendering
             setTimeout(() => translatePage(), 100);
         }
@@ -8810,14 +8899,14 @@
                             <div style="display: flex; gap: 0.5rem; align-items: start;">
                                 <div style="flex: 1; display: flex; flex-direction: column; gap: 0.5rem;">
                                     ${(state.data.familyMembers || []).filter(m => m.active !== false).map((member, idx) => {
-                                        const actualIdx = (state.data.familyMembers || []).indexOf(member);
-                                        return `
+                        const actualIdx = (state.data.familyMembers || []).indexOf(member);
+                        return `
                                         <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.5rem; background: #f7fafc; border-radius: 4px;">
                                             <input type="checkbox" id="inp-family-member-${actualIdx}" value="${member.name}" ${item?.familyMembers && Array.isArray(item.familyMembers) && item.familyMembers.includes(member.name) ? 'checked' : ''} onchange="updateContributionUI()">
                                             <span>${member.name}${member.relation ? ` (${member.relation})` : ''}</span>
                                         </label>
                                     `;
-                                    }).join('')}
+                    }).join('')}
                                     ${(state.data.familyMembers || []).filter(m => m.active !== false).length === 0 ? `<div style="padding: 0.5rem; color: var(--text-light); font-size: 0.875rem;">No active family members. <a href="#" onclick="closeModal(); setTimeout(() => switchTab('family'), 100);" style="color: var(--primary);">Add or activate family members</a> first.</div>` : ''}
                                 </div>
                                 <button type="button" class="btn-icon" onclick="closeModal(); setTimeout(() => switchTab('family'), 100);" title="Manage Family Members">⚙️</button>
@@ -8837,17 +8926,17 @@
                                 </div>
                                 <div id="custom-contribution-inputs" style="display: none; padding: 0.5rem; background: #f7fafc; border-radius: 4px;">
                                     ${(state.data.familyMembers || []).filter(m => m.active !== false).map((member, idx) => {
-                                        const actualIdx = (state.data.familyMembers || []).indexOf(member);
-                                        const contributions = item?.contributions || {};
-                                        const memberAmount = contributions[member.name] || '';
-                                        const isSelected = item?.familyMembers && Array.isArray(item.familyMembers) && item.familyMembers.includes(member.name);
-                                        return `
+                        const actualIdx = (state.data.familyMembers || []).indexOf(member);
+                        const contributions = item?.contributions || {};
+                        const memberAmount = contributions[member.name] || '';
+                        const isSelected = item?.familyMembers && Array.isArray(item.familyMembers) && item.familyMembers.includes(member.name);
+                        return `
                                         <div class="form-group" style="margin-bottom: 0.5rem; display: none;" id="contribution-${actualIdx}">
                                             <label class="form-label" style="font-size: 0.875rem;">${member.name}${member.relation ? ` (${member.relation})` : ''}</label>
                                             <input type="number" class="form-input" id="inp-contribution-${actualIdx}" step="0.01" value="${memberAmount}" placeholder="0.00" onchange="updateContributionTotal()">
                                         </div>
                                     `;
-                                    }).join('')}
+                    }).join('')}
                                     <div id="contribution-total" style="margin-top: 0.5rem; padding: 0.5rem; background: #fff3cd; border-radius: 4px; font-size: 0.875rem;">
                                         <strong>Total:</strong> <span id="contribution-total-amount">0.00</span> / <span id="expense-total-amount">0.00</span>
                                     </div>
@@ -9090,16 +9179,16 @@
                             amountInput.addEventListener('input', updateContributionUI);
                             amountInput.addEventListener('change', updateContributionUI);
                         }
-                        
+
                         const expenseForSelect = document.getElementById('inp-expense-for');
                         if (expenseForSelect) {
                             expenseForSelect.addEventListener('change', updateContributionUI);
                         }
-                        
+
                         document.querySelectorAll('input[id^="inp-family-member-"]').forEach(checkbox => {
                             checkbox.addEventListener('change', updateContributionUI);
                         });
-                        
+
                         // Initial calculation
                         setTimeout(updateContributionUI, 100);
                     }
@@ -9300,12 +9389,12 @@
                 if (!validateRequired(val('inp-account'), 'Account')) return;
                 // Get "Expense for / Given to" field
                 const expenseFor = val('inp-expense-for') || undefined;
-                
+
                 // Get selected family members (only active ones) - these are the contributors
                 const selectedFamilyMembers = [];
                 const contributionType = val('inp-contribution-type') || 'equal';
                 const contributions = {};
-                
+
                 (state.data.familyMembers || []).forEach((member, idx) => {
                     if (member.active === false) return; // Skip inactive members
                     const checkbox = document.getElementById(`inp-family-member-${idx}`);
@@ -9320,7 +9409,7 @@
                         }
                     }
                 });
-                
+
                 newItem = {
                     description: val('inp-desc'),
                     category: val('inp-category') || 'Other',
@@ -9766,10 +9855,10 @@
                 langSelectorMobile.value = currentLanguage;
             }
             translatePage();
-            
+
             // Initialize notifications
             updateNotificationBadge();
-            
+
             // Initialize IndexedDB
             try {
                 await initDB();
@@ -9826,20 +9915,20 @@
         function getSettings() {
             return JSON.parse(localStorage.getItem('financeManagerSettings') || '{}');
         }
-        
+
         function shouldAutoSave() {
             const settings = getSettings();
             return settings.autoSave !== false; // Default to true if not set
         }
-        
+
         // Format date according to user's date format setting
         function formatDate(dateValue) {
             if (!dateValue) return '';
-            
+
             // Get date format from settings
             const settings = getSettings();
             const dateFormat = settings.dateFormat || 'YYYY-MM-DD';
-            
+
             // Parse the date value (could be string in YYYY-MM-DD format or Date object)
             let date;
             if (dateValue instanceof Date) {
@@ -9855,14 +9944,14 @@
             } else {
                 return '';
             }
-            
+
             // Check if date is valid
             if (isNaN(date.getTime())) return '';
-            
+
             const year = date.getFullYear();
             const month = String(date.getMonth() + 1).padStart(2, '0');
             const day = String(date.getDate()).padStart(2, '0');
-            
+
             // Format according to setting
             switch (dateFormat) {
                 case 'DD/MM/YYYY':
@@ -9876,10 +9965,10 @@
                     return `${year}-${month}-${day}`;
             }
         }
-        
+
         function loadSettings() {
             const settings = getSettings();
-            
+
             // Load currency setting
             const currency = settings.currency || '৳';
             if (document.getElementById('setting-currency')) {
@@ -9887,7 +9976,7 @@
             }
             // Apply currency to CONFIG
             CONFIG.currency = currency;
-            
+
             // Load date format setting
             const dateFormat = settings.dateFormat || 'YYYY-MM-DD';
             if (document.getElementById('setting-date-format')) {
@@ -9895,13 +9984,13 @@
             }
             // Store date format in CONFIG for easy access
             CONFIG.dateFormat = dateFormat;
-            
+
             // Load auto-save setting (default to true if not set)
             const autoSave = settings.autoSave !== undefined ? settings.autoSave : true;
             if (document.getElementById('setting-auto-save')) {
                 document.getElementById('setting-auto-save').checked = autoSave;
             }
-            
+
             // Update state.settings to sync with the other settings system
             if (state && state.settings) {
                 state.settings.currency = currency;
@@ -9914,29 +10003,29 @@
             const currencyEl = document.getElementById('setting-currency');
             const dateFormatEl = document.getElementById('setting-date-format');
             const autoSaveEl = document.getElementById('setting-auto-save');
-            
+
             if (!currencyEl || !dateFormatEl || !autoSaveEl) {
                 console.error('Settings elements not found');
                 return;
             }
-            
+
             const currency = currencyEl.value || '৳';
             const dateFormat = dateFormatEl.value || 'YYYY-MM-DD';
             const autoSave = autoSaveEl.checked === true;
-            
+
             const settings = {
                 currency: currency,
                 dateFormat: dateFormat,
                 autoSave: autoSave
             };
-            
+
             // Save to localStorage
             localStorage.setItem('financeManagerSettings', JSON.stringify(settings));
-            
+
             // Apply settings immediately
             CONFIG.currency = currency;
             CONFIG.dateFormat = dateFormat;
-            
+
             // Update state.settings to sync
             if (state && state.settings) {
                 state.settings.currency = currency;
@@ -9944,7 +10033,7 @@
                 state.settings.autoSave = autoSave;
                 saveSettingsToStorage();
             }
-            
+
             // Re-render all views to apply date format changes
             const activeTab = document.querySelector('.nav-tab.active');
             if (activeTab) {
@@ -9953,7 +10042,7 @@
                     switchTab(tabId);
                 }
             }
-            
+
             // Show success message
             const t = (key) => translations[currentLanguage] && translations[currentLanguage][key] ? translations[currentLanguage][key] : key;
             showToast(t('saved_successfully'), 'success');
@@ -10038,7 +10127,7 @@
                 // Save to browser's local storage
                 const backupKey = `finance_backup_${new Date().toISOString().split('T')[0]}`;
                 localStorage.setItem(backupKey, JSON.stringify(backup));
-                
+
                 // Also download as file
                 const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
@@ -10047,7 +10136,7 @@
                 a.download = `finance_backup_${new Date().toISOString().split('T')[0]}.json`;
                 a.click();
                 URL.revokeObjectURL(url);
-                
+
                 showToast('Backup saved to local storage and downloaded', 'success');
             } catch (err) {
                 console.error('Error backing up to local storage:', err);
@@ -10062,7 +10151,7 @@
                 // 2. Enable Google Drive API
                 // 3. Create OAuth 2.0 credentials
                 // 4. Replace 'YOUR_API_KEY' and 'YOUR_CLIENT_ID' below with your actual credentials
-                
+
                 // Initialize Google API
                 await new Promise((resolve) => {
                     if (window.gapi && window.gapi.load) {
@@ -10090,7 +10179,7 @@
                 // Sign in
                 const authInstance = window.gapi.auth2.getAuthInstance();
                 const isSignedIn = authInstance.isSignedIn.get();
-                
+
                 if (!isSignedIn) {
                     await authInstance.signIn();
                 }
@@ -10105,11 +10194,11 @@
                 // Convert backup to blob
                 const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
                 const reader = new FileReader();
-                
-                reader.onload = async function() {
+
+                reader.onload = async function () {
                     try {
                         const base64Data = btoa(reader.result);
-                        
+
                         // Upload to Google Drive
                         const response = await window.gapi.client.drive.files.create({
                             resource: fileMetadata,
@@ -10857,7 +10946,7 @@
 
             // Calculate statistics for each family member
             const memberStats = calculateFamilyMemberStats();
-            
+
             familyMembers.forEach((member, index) => {
                 const stats = memberStats[member.name] || { totalIncome: 0, totalExpenses: 0, expenseCount: 0, incomeCount: 0, netContribution: 0 };
                 const div = document.createElement('div');
@@ -10920,12 +11009,12 @@
                 container.appendChild(div);
             });
         }
-        
+
         // Calculate statistics for all family members
         function calculateFamilyMemberStats() {
             const stats = {};
             const familyMembers = state.data.familyMembers || [];
-            
+
             // Initialize stats for each member
             familyMembers.forEach(member => {
                 stats[member.name] = {
@@ -10936,7 +11025,7 @@
                     netContribution: 0
                 };
             });
-            
+
             // Calculate income contributions
             (state.data.income || []).forEach(income => {
                 if (income.familyMember && stats[income.familyMember]) {
@@ -10945,18 +11034,18 @@
                     stats[income.familyMember].incomeCount++;
                 }
             });
-            
+
             // Calculate expense shares
             (state.data.expenses || []).forEach(expense => {
                 const amount = Number(expense.amount || 0);
-                
+
                 // Handle "Expense for / Given to" - when expense is given to a specific person
                 if (expense.expenseFor && stats[expense.expenseFor]) {
                     // Full amount goes to the person it's given to
                     stats[expense.expenseFor].totalExpenses += amount;
                     stats[expense.expenseFor].expenseCount++;
                 }
-                
+
                 // Handle contributors (family members who contributed)
                 if (expense.familyMembers && Array.isArray(expense.familyMembers)) {
                     if (expense.expenseFor) {
@@ -10974,7 +11063,7 @@
                             // Equal split among contributors
                             const shareCount = expense.familyMembers.length;
                             const sharePerPerson = shareCount > 0 ? amount / shareCount : 0;
-                            
+
                             expense.familyMembers.forEach(memberName => {
                                 if (stats[memberName]) {
                                     stats[memberName].totalExpenses += sharePerPerson;
@@ -10997,7 +11086,7 @@
                             // Equal split
                             const shareCount = expense.familyMembers.length;
                             const sharePerPerson = shareCount > 0 ? amount / shareCount : 0;
-                            
+
                             expense.familyMembers.forEach(memberName => {
                                 if (stats[memberName]) {
                                     stats[memberName].totalExpenses += sharePerPerson;
@@ -11008,36 +11097,36 @@
                     }
                 }
             });
-            
+
             // Calculate net contribution
             familyMembers.forEach(member => {
                 if (stats[member.name]) {
                     stats[member.name].netContribution = stats[member.name].totalIncome - stats[member.name].totalExpenses;
                 }
             });
-            
+
             return stats;
         }
-        
+
         // Show detailed view for a family member
         function showFamilyMemberDetails(memberIndex) {
             const member = state.data.familyMembers[memberIndex];
             if (!member) return;
-            
+
             const stats = calculateFamilyMemberStats()[member.name] || { totalIncome: 0, totalExpenses: 0, expenseCount: 0, incomeCount: 0, netContribution: 0 };
-            
+
             // Get related transactions
             const relatedIncome = (state.data.income || []).filter(i => i.familyMember === member.name);
-            const relatedExpenses = (state.data.expenses || []).filter(e => 
+            const relatedExpenses = (state.data.expenses || []).filter(e =>
                 (e.familyMembers && Array.isArray(e.familyMembers) && e.familyMembers.includes(member.name)) ||
                 e.expenseFor === member.name
             );
-            
+
             const overlay = document.getElementById('modal-overlay');
             const content = document.getElementById('modal-content');
-            
+
             if (!overlay || !content) return;
-            
+
             overlay.classList.add('active');
             content.innerHTML = `
                 <div class="modal-header">
@@ -11118,9 +11207,9 @@
                                 </thead>
                                 <tbody>
                                     ${relatedExpenses.map(expense => {
-                                        const shareCount = expense.familyMembers ? expense.familyMembers.length : 1;
-                                        const share = Number(expense.amount || 0) / shareCount;
-                                        return `
+                const shareCount = expense.familyMembers ? expense.familyMembers.length : 1;
+                const share = Number(expense.amount || 0) / shareCount;
+                return `
                                             <tr style="border-bottom: 1px solid var(--border);">
                                                 <td style="padding: 0.5rem;">${formatDate(expense.date)}</td>
                                                 <td style="padding: 0.5rem;">${expense.description || '-'}</td>
@@ -11128,7 +11217,7 @@
                                                 <td style="padding: 0.5rem; text-align: right; color: var(--text-light); font-size: 0.875rem;">${formatCurrency(expense.amount)} (${shareCount} ${shareCount === 1 ? t('person') : t('people')})</td>
                                             </tr>
                                         `;
-                                    }).join('')}
+            }).join('')}
                                 </tbody>
                             </table>
                         </div>
@@ -12061,11 +12150,11 @@
         document.addEventListener('keydown', (e) => {
             // Don't trigger shortcuts when typing in inputs, textareas, or contenteditable elements
             const target = e.target;
-            const isInputFocused = target.tagName === 'INPUT' || 
-                                   target.tagName === 'TEXTAREA' || 
-                                   target.isContentEditable ||
-                                   (target.closest('.modal') && target.tagName !== 'BUTTON');
-            
+            const isInputFocused = target.tagName === 'INPUT' ||
+                target.tagName === 'TEXTAREA' ||
+                target.isContentEditable ||
+                (target.closest('.modal') && target.tagName !== 'BUTTON');
+
             // Ctrl/Cmd combinations
             if (e.ctrlKey || e.metaKey) {
                 switch (e.key.toLowerCase()) {
@@ -12251,7 +12340,7 @@
             if (!isInputFocused && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
                 const navTabs = Array.from(document.querySelectorAll('.nav-tab'));
                 const activeIndex = navTabs.findIndex(tab => tab.classList.contains('active'));
-                
+
                 if (activeIndex !== -1) {
                     if (e.key === 'ArrowLeft' && activeIndex > 0) {
                         e.preventDefault();
@@ -12269,7 +12358,7 @@
         });
 
         // Update contribution UI for expense form
-        window.updateContributionUI = function() {
+        window.updateContributionUI = function () {
             const amountInput = document.getElementById('inp-amount');
             const contributionTypeSection = document.getElementById('contribution-type-section');
             const contributionTypeSelect = document.getElementById('inp-contribution-type');
@@ -12278,18 +12367,18 @@
             const perPersonAmount = document.getElementById('per-person-amount');
             const expenseTotalAmount = document.getElementById('expense-total-amount');
             const expenseForSelect = document.getElementById('inp-expense-for');
-            
+
             if (!amountInput || !contributionTypeSection) return;
-            
+
             const amount = parseFloat(amountInput.value) || 0;
             const selectedCount = document.querySelectorAll('input[id^="inp-family-member-"]:checked').length;
             const expenseFor = expenseForSelect ? expenseForSelect.value : '';
-            
+
             // Show/hide contribution section based on selected members
             if (selectedCount > 0) {
                 contributionTypeSection.style.display = 'block';
                 const contributionType = contributionTypeSelect ? contributionTypeSelect.value : 'equal';
-                
+
                 // If expenseFor is set, show special message
                 if (expenseFor) {
                     if (equalDisplay) {
@@ -12330,26 +12419,26 @@
                 contributionTypeSection.style.display = 'none';
             }
         };
-        
+
         // Update contribution total for custom contributions
-        window.updateContributionTotal = function() {
+        window.updateContributionTotal = function () {
             const totalSpan = document.getElementById('contribution-total-amount');
             const expenseTotalSpan = document.getElementById('expense-total-amount');
             if (!totalSpan) return;
-            
+
             let total = 0;
             document.querySelectorAll('input[id^="inp-contribution-"]').forEach(input => {
                 const value = parseFloat(input.value) || 0;
                 total += value;
             });
-            
+
             totalSpan.textContent = formatCurrency(total);
-            
+
             const expenseAmount = parseFloat(document.getElementById('inp-amount')?.value || 0);
             if (expenseTotalSpan) {
                 expenseTotalSpan.textContent = formatCurrency(expenseAmount);
             }
-            
+
             // Highlight if total doesn't match expense amount
             const totalDiv = document.getElementById('contribution-total');
             if (totalDiv) {
