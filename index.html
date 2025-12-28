@@ -8,6 +8,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <!-- Chart.js for visualizations -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- html2canvas for image export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <!-- Google API for Sheets and Drive -->
     <script src="https://apis.google.com/js/api.js"></script>
     <script src="https://accounts.google.com/gsi/client"></script>
@@ -485,6 +487,10 @@
                             <option value="recurring">Recurring Only</option>
                             <option value="non-recurring">Non-Recurring</option>
                         </select>
+                        <select class="filter-input" id="family-member-filter" onchange="applyFilters()"
+                            style="min-width: 150px;">
+                            <option value="" data-translate="all_family_members">All Family Members</option>
+                        </select>
                         <select class="filter-input" id="sort-by" onchange="applyFilters()" style="min-width: 150px;">
                             <option value="" data-translate="sort_by">Sort by...</option>
                             <option value="date-asc">Date (Oldest First)</option>
@@ -505,6 +511,12 @@
                                 <line x1="6" y1="6" x2="18" y2="18"></line>
                             </svg>
                             Clear Filters
+                        </button>
+                        <button class="btn btn-secondary" onclick="exportFilteredToExcel()" style="width: auto; margin-left: 0.5rem;" title="Export Filtered Data to Excel">
+                            📊 Export to Excel
+                        </button>
+                        <button class="btn btn-secondary" onclick="exportFilteredToImage()" style="width: auto; margin-left: 0.5rem;" title="Export Filtered Data as Image">
+                            🖼️ Export as Image
                         </button>
                     </div>
                 </div>
@@ -1157,6 +1169,7 @@
                 showing: 'Showing',
                 of: 'of',
                 all_categories: 'All Categories',
+                all_family_members: 'All Family Members',
                 no_data_found: 'No data found.',
                 no_future_plans: 'No future plans found.',
                 no_budgets_set: 'No budgets set. Add a budget to track spending limits.',
@@ -1510,6 +1523,7 @@
                 showing: 'দেখাচ্ছে',
                 of: 'এর',
                 all_categories: 'সব বিভাগ',
+                all_family_members: 'সব পরিবারের সদস্য',
                 no_data_found: 'কোন ডেটা পাওয়া যায়নি।',
                 no_future_plans: 'কোন ভবিষ্যত পরিকল্পনা পাওয়া যায়নি।',
                 no_budgets_set: 'কোন বাজেট সেট করা নেই। ব্যয় সীমা ট্র্যাক করতে একটি বাজেট যোগ করুন।',
@@ -1843,6 +1857,7 @@
                 showing: 'Mostrando',
                 of: 'de',
                 all_categories: 'Todas las Categorías',
+                all_family_members: 'Todos los Miembros de la Familia',
                 no_data_found: 'No se encontraron datos.',
                 no_future_plans: 'No se encontraron planes futuros.',
                 no_budgets_set: 'No se han establecido presupuestos. Agregue un presupuesto para rastrear los límites de gasto.',
@@ -1896,6 +1911,7 @@
                 showing: 'Mostrando',
                 of: 'de',
                 all_categories: 'Todas las Categorías',
+                all_family_members: 'Todos los Miembros de la Familia',
                 no_data_found: 'No se encontraron datos.',
                 no_future_plans: 'No se encontraron planes futuros.',
                 no_budgets_set: 'No se han establecido presupuestos. Agregue un presupuesto para rastrear los límites de gasto.',
@@ -2224,6 +2240,7 @@
                 showing: 'Affichage',
                 of: 'de',
                 all_categories: 'Toutes les Catégories',
+                all_family_members: 'Tous les Membres de la Famille',
                 no_data_found: 'Aucune donnée trouvée.',
                 no_future_plans: 'Aucun plan futur trouvé.',
                 no_budgets_set: 'Aucun budget défini. Ajoutez un budget pour suivre les limites de dépenses.',
@@ -2564,6 +2581,7 @@
                 showing: 'Zeige',
                 of: 'von',
                 all_categories: 'Alle Kategorien',
+                all_family_members: 'Alle Familienmitglieder',
                 no_data_found: 'Keine Daten gefunden.',
                 no_future_plans: 'Keine zukünftigen Pläne gefunden.',
                 no_budgets_set: 'Keine Budgets festgelegt. Fügen Sie ein Budget hinzu, um Ausgabengrenzen zu verfolgen.',
@@ -2892,6 +2910,7 @@
                 showing: 'दिखा रहा है',
                 of: 'का',
                 all_categories: 'सभी श्रेणियां',
+                all_family_members: 'सभी परिवार के सदस्य',
                 no_data_found: 'कोई डेटा नहीं मिला।',
                 no_future_plans: 'कोई भविष्य की योजनाएं नहीं मिलीं।',
                 no_budgets_set: 'कोई बजट सेट नहीं किया गया। खर्च सीमा ट्रैक करने के लिए एक बजट जोड़ें।',
@@ -3220,6 +3239,7 @@
                 showing: 'عرض',
                 of: 'من',
                 all_categories: 'جميع الفئات',
+                all_family_members: 'جميع أفراد الأسرة',
                 no_data_found: 'لم يتم العثور على بيانات.',
                 no_future_plans: 'لم يتم العثور على خطط مستقبلية.',
                 no_budgets_set: 'لم يتم تعيين ميزانيات. أضف ميزانية لتتبع حدود الإنفاق.',
@@ -3548,6 +3568,7 @@
                 showing: '显示',
                 of: '共',
                 all_categories: '所有类别',
+                all_family_members: '所有家庭成员',
                 no_data_found: '未找到数据。',
                 no_future_plans: '未找到未来计划。',
                 no_budgets_set: '未设置预算。添加预算以跟踪支出限额。',
@@ -7172,6 +7193,8 @@
 
             // Populate category filter
             populateCategoryFilter(type, data);
+            // Populate family member filter
+            populateFamilyMemberFilter(type, data);
 
             // Render Headers
             const trHead = document.createElement('tr');
@@ -7219,6 +7242,50 @@
             const categories = [...new Set(data.map(item => item.category || 'Other').filter(Boolean))].sort();
             categoryFilter.innerHTML = `<option value="">${t('all_categories')}</option>` +
                 categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+        }
+
+        function populateFamilyMemberFilter(type, data) {
+            const familyMemberFilter = document.getElementById('family-member-filter');
+            if (!familyMemberFilter) return;
+
+            const familyMembers = new Set();
+            
+            // Collect family members from data
+            data.forEach(item => {
+                if (type === 'income' && item.familyMember) {
+                    familyMembers.add(item.familyMember);
+                } else if (type === 'expenses') {
+                    // Include expenseFor (Given to)
+                    if (item.expenseFor) {
+                        familyMembers.add(item.expenseFor);
+                    }
+                    // Include contributors (familyMembers)
+                    if (item.familyMembers) {
+                        if (Array.isArray(item.familyMembers)) {
+                            item.familyMembers.forEach(member => familyMembers.add(member));
+                        } else if (typeof item.familyMembers === 'string') {
+                            // Handle comma-separated string
+                            item.familyMembers.split(',').forEach(member => {
+                                const trimmed = member.trim();
+                                if (trimmed) familyMembers.add(trimmed);
+                            });
+                        }
+                    }
+                } else if (item.familyMember) {
+                    familyMembers.add(item.familyMember);
+                }
+            });
+
+            // Also include all active family members from state
+            (state.data.familyMembers || []).forEach(member => {
+                if (member.active !== false && member.name) {
+                    familyMembers.add(member.name);
+                }
+            });
+
+            const sortedMembers = Array.from(familyMembers).sort();
+            familyMemberFilter.innerHTML = `<option value="">${t('all_family_members') || 'All Family Members'}</option>` +
+                sortedMembers.map(member => `<option value="${member}">${member}</option>`).join('');
         }
 
         function renderTableRows(type, data, tbody, colspan) {
@@ -7713,6 +7780,7 @@
             const dateFrom = document.getElementById('date-from-filter')?.value || '';
             const dateTo = document.getElementById('date-to-filter')?.value || '';
             const recurringFilter = document.getElementById('recurring-filter')?.value || '';
+            const familyMemberFilter = document.getElementById('family-member-filter')?.value || '';
             const sortBy = document.getElementById('sort-by')?.value || '';
 
             const data = state.data[currentListType] || [];
@@ -7738,6 +7806,44 @@
                     const isRecurring = item.recurring === true || item.recurring === 'true';
                     if (recurringFilter === 'recurring' && !isRecurring) return false;
                     if (recurringFilter === 'non-recurring' && isRecurring) return false;
+                }
+
+                // Family member filter
+                if (familyMemberFilter) {
+                    if (currentListType === 'income') {
+                        // Income has familyMember (singular) field
+                        if (item.familyMember !== familyMemberFilter) return false;
+                    } else if (currentListType === 'expenses') {
+                        // For expenses, check both:
+                        // 1. Expense for / Given to (expenseFor field)
+                        // 2. Contributors (familyMembers array)
+                        let matches = false;
+                        
+                        // Check if expense is for/given to this family member
+                        if (item.expenseFor === familyMemberFilter) {
+                            matches = true;
+                        }
+                        
+                        // Check if family member is in contributors
+                        if (!matches) {
+                            const familyMembers = item.familyMembers || [];
+                            if (Array.isArray(familyMembers)) {
+                                matches = familyMembers.includes(familyMemberFilter);
+                            } else if (typeof familyMembers === 'string') {
+                                // Handle comma-separated string
+                                matches = familyMembers.split(',').map(s => s.trim()).includes(familyMemberFilter);
+                            }
+                        }
+                        
+                        if (!matches) return false;
+                    } else {
+                        // For other types, check if they have familyMember or familyMembers
+                        if (item.familyMember && item.familyMember !== familyMemberFilter) return false;
+                        if (item.familyMembers) {
+                            const familyMembers = Array.isArray(item.familyMembers) ? item.familyMembers : [item.familyMembers];
+                            if (!familyMembers.includes(familyMemberFilter)) return false;
+                        }
+                    }
                 }
 
                 return true;
@@ -7805,6 +7911,7 @@
             document.getElementById('date-from-filter').value = '';
             document.getElementById('date-to-filter').value = '';
             document.getElementById('recurring-filter').value = '';
+            document.getElementById('family-member-filter').value = '';
             document.getElementById('sort-by').value = '';
             applyFilters();
         }
@@ -9830,6 +9937,226 @@
             link.click();
             URL.revokeObjectURL(link.href);
             showToast('Data exported to CSV successfully', 'success');
+        }
+
+        function getFilteredMonthYear() {
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'];
+            
+            // Get dates from filtered data to determine actual min/max
+            let minDate = null;
+            let maxDate = null;
+            
+            if (filteredData && filteredData.length > 0) {
+                const dateField = currentListType === 'receivables' || currentListType === 'payables' ? 'dueDate' : 'date';
+                const dates = filteredData
+                    .map(item => item[dateField])
+                    .filter(date => date)
+                    .map(date => new Date(date))
+                    .filter(date => !isNaN(date.getTime()));
+                
+                if (dates.length > 0) {
+                    minDate = new Date(Math.min(...dates.map(d => d.getTime())));
+                    maxDate = new Date(Math.max(...dates.map(d => d.getTime())));
+                }
+            }
+            
+            // If we have dates from filtered data, use them
+            if (minDate && maxDate) {
+                const minMonth = minDate.getMonth();
+                const minYear = minDate.getFullYear();
+                const maxMonth = maxDate.getMonth();
+                const maxYear = maxDate.getFullYear();
+                
+                // If same month and year, show single month
+                if (minMonth === maxMonth && minYear === maxYear) {
+                    return `${monthNames[minMonth]} ${minYear}`;
+                }
+                // Otherwise show range
+                return `${monthNames[minMonth]} ${minYear} - ${monthNames[maxMonth]} ${maxYear}`;
+            }
+            
+            // Fallback to date filters if no filtered data
+            const dateFrom = document.getElementById('date-from-filter')?.value || '';
+            const dateTo = document.getElementById('date-to-filter')?.value || '';
+            
+            if (dateFrom || dateTo) {
+                const fromDate = dateFrom ? new Date(dateFrom) : null;
+                const toDate = dateTo ? new Date(dateTo) : null;
+                
+                if (fromDate && toDate) {
+                    const fromMonth = fromDate.getMonth();
+                    const fromYear = fromDate.getFullYear();
+                    const toMonth = toDate.getMonth();
+                    const toYear = toDate.getFullYear();
+                    
+                    // If same month and year, show single month
+                    if (fromMonth === toMonth && fromYear === toYear) {
+                        return `${monthNames[fromMonth]} ${fromYear}`;
+                    }
+                    // Otherwise show range
+                    return `${monthNames[fromMonth]} ${fromYear} - ${monthNames[toMonth]} ${toYear}`;
+                } else if (fromDate) {
+                    return `${monthNames[fromDate.getMonth()]} ${fromDate.getFullYear()}`;
+                } else if (toDate) {
+                    return `${monthNames[toDate.getMonth()]} ${toDate.getFullYear()}`;
+                }
+            }
+            
+            // If no date filter, use current month/year
+            const now = new Date();
+            return `${monthNames[now.getMonth()]} ${now.getFullYear()}`;
+        }
+
+        function exportFilteredToExcel() {
+            if (!currentListType || !filteredData || filteredData.length === 0) {
+                showToast('No filtered data to export', 'warning');
+                return;
+            }
+
+            const monthYear = getFilteredMonthYear();
+            
+            // Calculate total
+            const total = filteredData.reduce((sum, item) => sum + Number(item.amount || 0), 0);
+            
+            // Prepare data with only date, description, amount
+            const exportData = filteredData.map(item => {
+                const dateField = currentListType === 'receivables' || currentListType === 'payables' ? 'dueDate' : 'date';
+                return {
+                    'Date': item[dateField] || '',
+                    'Description': item.description || item.source || item.from || item.to || '',
+                    'Amount': item.amount || 0
+                };
+            });
+
+            // Create workbook
+            const wb = XLSX.utils.book_new();
+            
+            // Add header row with month/year
+            const headerData = [
+                [`${monthYear}`],
+                [],
+                ['Date', 'Description', 'Amount']
+            ];
+            
+            // Convert to sheet
+            const ws = XLSX.utils.aoa_to_sheet(headerData);
+            
+            // Add data starting from row 4 (after header)
+            const dataStartRow = 4;
+            XLSX.utils.sheet_add_json(ws, exportData, { origin: `A${dataStartRow}`, skipHeader: true });
+            
+            // Add total row after data
+            const totalRow = exportData.length + dataStartRow;
+            ws[`A${totalRow}`] = { t: 's', v: 'Total' };
+            ws[`B${totalRow}`] = { t: 's', v: '' };
+            ws[`C${totalRow}`] = { t: 'n', v: total };
+            
+            // Style the header (merge cells for month/year)
+            if (!ws['!merges']) ws['!merges'] = [];
+            ws['!merges'].push({ s: { r: 0, c: 0 }, e: { r: 0, c: 2 } });
+            
+            // Set column widths
+            ws['!cols'] = [
+                { wch: 12 }, // Date
+                { wch: 40 }, // Description
+                { wch: 15 }  // Amount
+            ];
+            
+            XLSX.utils.book_append_sheet(wb, ws, 'Filtered Data');
+            
+            const dateStr = new Date().toISOString().split('T')[0];
+            XLSX.writeFile(wb, `filtered_data_${dateStr}.xlsx`);
+            showToast('Filtered data exported to Excel successfully', 'success');
+        }
+
+        function exportFilteredToImage() {
+            if (!currentListType || !filteredData || filteredData.length === 0) {
+                showToast('No filtered data to export', 'warning');
+                return;
+            }
+
+            const monthYear = getFilteredMonthYear();
+            
+            // Create a temporary container for the export
+            const exportContainer = document.createElement('div');
+            exportContainer.style.cssText = 'position: absolute; left: -9999px; width: 800px; background: white; padding: 2rem; font-family: Arial, sans-serif;';
+            
+            // Build HTML table
+            let html = `
+                <div style="text-align: center; margin-bottom: 1.5rem;">
+                    <h2 style="margin: 0; color: #333; font-size: 1.5rem;">${monthYear}</h2>
+                </div>
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+                    <thead>
+                        <tr style="background: #f5f5f5;">
+                            <th style="padding: 0.75rem; text-align: left; border: 1px solid #ddd;">Date</th>
+                            <th style="padding: 0.75rem; text-align: left; border: 1px solid #ddd;">Description</th>
+                            <th style="padding: 0.75rem; text-align: right; border: 1px solid #ddd;">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            // Calculate total
+            const total = filteredData.reduce((sum, item) => sum + Number(item.amount || 0), 0);
+            const formattedTotal = formatCurrency(total);
+            
+            filteredData.forEach(item => {
+                const dateField = currentListType === 'receivables' || currentListType === 'payables' ? 'dueDate' : 'date';
+                const date = item[dateField] || '';
+                const description = item.description || item.source || item.from || item.to || '';
+                const amount = item.amount || 0;
+                const formattedAmount = formatCurrency(amount);
+                
+                html += `
+                    <tr>
+                        <td style="padding: 0.75rem; border: 1px solid #ddd;">${date}</td>
+                        <td style="padding: 0.75rem; border: 1px solid #ddd;">${description}</td>
+                        <td style="padding: 0.75rem; text-align: right; border: 1px solid #ddd;">${formattedAmount}</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                    </tbody>
+                    <tfoot>
+                        <tr style="background: #f5f5f5; font-weight: bold;">
+                            <td style="padding: 0.75rem; border: 1px solid #ddd; text-align: right;" colspan="2">Total</td>
+                            <td style="padding: 0.75rem; border: 1px solid #ddd; text-align: right;">${formattedTotal}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            `;
+            
+            exportContainer.innerHTML = html;
+            document.body.appendChild(exportContainer);
+            
+            // Use html2canvas to capture
+            html2canvas(exportContainer, {
+                backgroundColor: '#ffffff',
+                scale: 2,
+                logging: false
+            }).then(canvas => {
+                // Convert to blob and download
+                canvas.toBlob(blob => {
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    const dateStr = new Date().toISOString().split('T')[0];
+                    link.download = `filtered_data_${dateStr}.png`;
+                    link.click();
+                    URL.revokeObjectURL(url);
+                    
+                    // Clean up
+                    document.body.removeChild(exportContainer);
+                    showToast('Filtered data exported as image successfully', 'success');
+                }, 'image/png');
+            }).catch(err => {
+                console.error('Error exporting to image:', err);
+                document.body.removeChild(exportContainer);
+                showToast('Error exporting to image', 'error');
+            });
         }
 
         function toggleRecurringOptions(type) {
