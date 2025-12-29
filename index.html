@@ -10080,19 +10080,24 @@
             
             // Create a temporary container for the export
             const exportContainer = document.createElement('div');
-            exportContainer.style.cssText = 'position: absolute; left: -9999px; width: 800px; background: white; padding: 2rem; font-family: Arial, sans-serif;';
+            exportContainer.style.cssText = 'position: absolute; left: -9999px; width: 1000px; min-width: 1000px; background: white; padding: 2rem; font-family: Arial, sans-serif; box-sizing: border-box;';
             
             // Build HTML table
             let html = `
                 <div style="text-align: center; margin-bottom: 1.5rem;">
                     <h2 style="margin: 0; color: #333; font-size: 1.5rem;">${monthYear}</h2>
                 </div>
-                <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem; table-layout: fixed;">
+                    <colgroup>
+                        <col style="width: 15%;">
+                        <col style="width: 50%;">
+                        <col style="width: 35%;">
+                    </colgroup>
                     <thead>
                         <tr style="background: #f5f5f5;">
-                            <th style="padding: 0.75rem; text-align: left; border: 1px solid #ddd;">Date</th>
-                            <th style="padding: 0.75rem; text-align: left; border: 1px solid #ddd;">Description</th>
-                            <th style="padding: 0.75rem; text-align: right; border: 1px solid #ddd;">Amount</th>
+                            <th style="padding: 0.75rem; text-align: left; border: 1px solid #ddd; word-wrap: break-word;">Date</th>
+                            <th style="padding: 0.75rem; text-align: left; border: 1px solid #ddd; word-wrap: break-word;">Description</th>
+                            <th style="padding: 0.75rem; text-align: right; border: 1px solid #ddd; word-wrap: break-word;">Amount</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -10111,9 +10116,9 @@
                 
                 html += `
                     <tr>
-                        <td style="padding: 0.75rem; border: 1px solid #ddd;">${date}</td>
-                        <td style="padding: 0.75rem; border: 1px solid #ddd;">${description}</td>
-                        <td style="padding: 0.75rem; text-align: right; border: 1px solid #ddd;">${formattedAmount}</td>
+                        <td style="padding: 0.75rem; border: 1px solid #ddd; word-wrap: break-word; overflow-wrap: break-word;">${date}</td>
+                        <td style="padding: 0.75rem; border: 1px solid #ddd; word-wrap: break-word; overflow-wrap: break-word;">${description}</td>
+                        <td style="padding: 0.75rem; text-align: right; border: 1px solid #ddd; word-wrap: break-word; overflow-wrap: break-word; white-space: nowrap;">${formattedAmount}</td>
                     </tr>
                 `;
             });
@@ -10122,8 +10127,8 @@
                     </tbody>
                     <tfoot>
                         <tr style="background: #f5f5f5; font-weight: bold;">
-                            <td style="padding: 0.75rem; border: 1px solid #ddd; text-align: right;" colspan="2">Total</td>
-                            <td style="padding: 0.75rem; border: 1px solid #ddd; text-align: right;">${formattedTotal}</td>
+                            <td style="padding: 0.75rem; border: 1px solid #ddd; text-align: right; word-wrap: break-word;" colspan="2">Total</td>
+                            <td style="padding: 0.75rem; border: 1px solid #ddd; text-align: right; word-wrap: break-word; white-space: nowrap;">${formattedTotal}</td>
                         </tr>
                     </tfoot>
                 </table>
@@ -10132,12 +10137,19 @@
             exportContainer.innerHTML = html;
             document.body.appendChild(exportContainer);
             
-            // Use html2canvas to capture
-            html2canvas(exportContainer, {
-                backgroundColor: '#ffffff',
-                scale: 2,
-                logging: false
-            }).then(canvas => {
+            // Wait for rendering to complete
+            setTimeout(() => {
+                // Use html2canvas to capture
+                html2canvas(exportContainer, {
+                    backgroundColor: '#ffffff',
+                    scale: 2,
+                    logging: false,
+                    width: exportContainer.scrollWidth || 1000,
+                    height: exportContainer.scrollHeight,
+                    useCORS: true,
+                    allowTaint: true,
+                    windowWidth: exportContainer.scrollWidth || 1000
+                }).then(canvas => {
                 // Convert to blob and download
                 canvas.toBlob(blob => {
                     const url = URL.createObjectURL(blob);
@@ -10152,11 +10164,12 @@
                     document.body.removeChild(exportContainer);
                     showToast('Filtered data exported as image successfully', 'success');
                 }, 'image/png');
-            }).catch(err => {
-                console.error('Error exporting to image:', err);
-                document.body.removeChild(exportContainer);
-                showToast('Error exporting to image', 'error');
-            });
+                }).catch(err => {
+                    console.error('Error exporting to image:', err);
+                    document.body.removeChild(exportContainer);
+                    showToast('Error exporting to image', 'error');
+                });
+            }, 100);
         }
 
         function toggleRecurringOptions(type) {
