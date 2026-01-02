@@ -1590,3 +1590,119 @@ button.modal-close {
   color: var(--text-light);
   cursor: pointer;
 }
+
+/* Payment History */
+.payment-history-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.payment-history-summary > div {
+  background: linear-gradient(135deg, rgba(49, 130, 206, 0.08), rgba(72, 187, 120, 0.08));
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.75rem;
+}
+
+.summary-label {
+  font-size: 0.85rem;
+  color: var(--text-light);
+  margin-bottom: 0.25rem;
+}
+
+.summary-value {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.payment-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: 420px;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.payment-history-item {
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 0.85rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+}
+
+.payment-history-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+}
+
+.payment-history-amount {
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.payment-history-meta {
+  font-size: 0.85rem;
+  color: var(--text-light);
+}
+
+.payment-history-note {
+  margin-top: 0.35rem;
+  color: var(--text-main);
+  font-size: 0.95rem;
+}
+
+.payment-history-footer {
+  margin-top: 0.45rem;
+  font-size: 0.8rem;
+  color: var(--text-light);
+}
+
+/* Properties & Islamic */
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
+}
+
+.summary-tile {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.85rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+}
+
+.property-card {
+  margin-bottom: 0.75rem;
+}
+
+.islamic-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1rem;
+}
+
+.islamic-card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem;
+  background: var(--card-bg);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+}
+
+.islamic-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.65rem;
+  margin-top: 0.5rem;
+}
+
+.islamic-record {
+  margin-bottom: 0.75rem;
+}

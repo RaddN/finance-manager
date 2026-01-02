@@ -289,6 +289,8 @@
         <div class="nav-tab" onclick="switchTab('calendar')" data-translate="calendar">📅 Calendar</div>
         <div class="nav-tab" onclick="switchTab('cashflow')" data-translate="cashflow">💰 Cash Flow</div>
         <div class="nav-tab" onclick="switchTab('investments')" data-translate="investments">📈 Investments</div>
+        <div class="nav-tab" onclick="switchTab('properties')" data-translate="properties">🏠 Properties</div>
+        <div class="nav-tab" onclick="switchTab('islamic')" data-translate="islamic_tools">🕌 Islamic</div>
         <div class="nav-tab" onclick="switchTab('settings')" data-translate="settings">⚙️ Settings</div>
     </nav>
 
@@ -763,6 +765,115 @@
         </div>
 
 
+        <!-- Properties View -->
+        <div id="view-properties" class="hidden">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; gap: 1rem; flex-wrap: wrap;">
+                    <h2 data-translate="property_manager">Property & Asset Manager</h2>
+                    <button class="btn btn-primary" onclick="openPropertyModal()" style="width: auto;">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        <span data-translate="add_property">Add Property</span>
+                    </button>
+                </div>
+                <div class="summary-grid" id="properties-summary" style="margin-bottom: 1rem;"></div>
+                <div id="properties-container"></div>
+            </div>
+        </div>
+
+        <!-- Islamic View -->
+        <div id="view-islamic" class="hidden">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
+                    <h2 data-translate="islamic_tools">Islamic Calculator</h2>
+                    <button class="btn btn-secondary" style="width: auto;" onclick="saveIslamicCalculation()">
+                        <span data-translate="save_calculation">Save Calculation</span>
+                    </button>
+                </div>
+                <div class="islamic-grid">
+                    <div class="islamic-card">
+                        <h3 style="margin-bottom: 0.75rem;">Zakat</h3>
+                        <div class="form-group">
+                            <label class="form-label">Cash & Bank</label>
+                            <input type="number" class="form-input" id="zakat-cash" placeholder="0.00" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Gold/Silver Value</label>
+                            <input type="number" class="form-input" id="zakat-gold" placeholder="0.00" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Investments & Business Assets</label>
+                            <input type="number" class="form-input" id="zakat-investments" placeholder="0.00" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Receivables</label>
+                            <input type="number" class="form-input" id="zakat-receivables" placeholder="0.00" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Other Zakatable Assets</label>
+                            <input type="number" class="form-input" id="zakat-other" placeholder="0.00" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Liabilities/Debts</label>
+                            <input type="number" class="form-input" id="zakat-liabilities" placeholder="0.00" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Nisab Threshold (value)</label>
+                            <input type="number" class="form-input" id="zakat-nisab" placeholder="0.00" step="0.01" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Zakat Rate (%)</label>
+                            <input type="number" class="form-input" id="zakat-rate" placeholder="2.5" step="0.01" value="2.5">
+                        </div>
+                        <div class="form-group" style="background: var(--card-bg); padding: 0.75rem; border: 1px solid var(--border); border-radius: 10px;">
+                            <div style="font-size: 0.9rem; color: var(--text-light); margin-bottom: 0.25rem;">Zakatable from Properties</div>
+                            <div id="zakat-from-properties" style="font-weight: 700;">0.00</div>
+                        </div>
+                        <button class="btn btn-primary" style="width: 100%;" onclick="calculateIslamic()">Calculate</button>
+                    </div>
+                    <div class="islamic-card">
+                        <h3 style="margin-bottom: 0.75rem;">Fitra</h3>
+                        <div class="form-group">
+                            <label class="form-label">Household Members</label>
+                            <input type="number" class="form-input" id="fitra-people" placeholder="0" step="1" value="4">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Fitra Rate Per Person</label>
+                            <input type="number" class="form-input" id="fitra-rate" placeholder="0.00" step="0.01" value="10">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Notes</label>
+                            <textarea class="form-input" id="fitra-notes" rows="3" placeholder="Optional notes"></textarea>
+                        </div>
+                        <div class="islamic-summary" id="islamic-summary-box">
+                            <div>
+                                <div class="summary-label">Zakat Due</div>
+                                <div class="summary-value" id="zakat-due">0.00</div>
+                            </div>
+                            <div>
+                                <div class="summary-label">Net Zakatable Assets</div>
+                                <div class="summary-value" id="zakat-net">0.00</div>
+                            </div>
+                            <div>
+                                <div class="summary-label">Fitra Total</div>
+                                <div class="summary-value" id="fitra-total">0.00</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card" style="margin-top: 1rem; background: var(--card-bg);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                        <h3 style="margin: 0;">Saved Records</h3>
+                        <div style="font-size: 0.9rem; color: var(--text-light);" id="islamic-record-count">0</div>
+                    </div>
+                    <div id="islamic-history"></div>
+                </div>
+            </div>
+        </div>
+
         <!-- Recurring Transactions View -->
         <div id="view-recurring" class="hidden">
             <div class="card">
@@ -1095,6 +1206,8 @@
                 calendar: 'Calendar',
                 cashflow: 'Cash Flow',
                 investments: 'Investments',
+                properties: 'Properties',
+                islamic_tools: 'Islamic',
                 settings: 'Settings',
                 bill_details: 'Bill Details',
                 amount: 'Amount',
@@ -1118,6 +1231,7 @@
                 dark_mode: 'Dark Mode',
                 income_sources: 'Income Sources',
                 date: 'Date',
+                payment_date: 'Payment Date',
                 source: 'Source',
                 actions: 'Actions',
                 details: 'Details',
@@ -1261,10 +1375,31 @@
                 from_account: 'From Account',
                 to_account: 'To Account',
                 transfer_description_placeholder: 'e.g. Cash withdrawal, Account transfer',
+                area: 'Area',
+                save_calculation: 'Save Calculation',
+                zakat: 'Zakat',
+                fitra: 'Fitra',
+                property_manager: 'Property & Asset Manager',
+                add_property: 'Add Property',
+                property_name: 'Property Name',
+                property_type: 'Property Type',
+                purchase_value: 'Purchase Value',
+                estimated_value: 'Estimated Value',
+                total_properties: 'Total Properties',
+                zakatable_assets: 'Zakatable Assets',
+                zakat_eligible: 'Zakat Eligible',
+                delete_property: 'Delete Property',
+                acquired_date: 'Acquired Date',
                 debt_name: 'Debt Name',
                 debt_type: 'Debt Type',
                 principal_amount: 'Principal Amount',
                 amount_paid: 'Amount Paid',
+                remaining: 'Remaining',
+                last_payment: 'Last Payment',
+                payment_history: 'Payment History',
+                view_records: 'View Records',
+                record_payment: 'Record Payment',
+                no_payment_records: 'No payment records yet.',
                 creditor_lender: 'Creditor/Lender',
                 goal_name: 'Goal Name',
                 current_amount: 'Current Amount',
@@ -4177,7 +4312,9 @@
         });
 
         function t(key) {
-            return translations[currentLanguage] && translations[currentLanguage][key] ? translations[currentLanguage][key] : key;
+            if (translations[currentLanguage] && translations[currentLanguage][key]) return translations[currentLanguage][key];
+            if (translations.en && translations.en[key]) return translations.en[key];
+            return key;
         }
 
         // --- NOTIFICATION SYSTEM ---
@@ -4365,6 +4502,8 @@
                 transfers: [],
                 familyMembers: [],
                 debts: [],
+                properties: [],
+                islamicCalculations: [],
                 tags: [],
                 transactionHistory: []
             },
@@ -4374,6 +4513,8 @@
                 dateFormat: 'YYYY-MM-DD'
             }
         };
+
+        let lastIslamicCalculation = null;
 
         // --- 2. EXCEL FILE SYSTEM LOGIC ---
 
@@ -5028,7 +5169,7 @@
                     throw new Error('Unable to access spreadsheet. Please check permissions.');
                 }
 
-                const sheetNames = ['Income', 'Expenses', 'Receivables', 'Payables', 'Plans', 'Budgets', 'Categories', 'Templates', 'Accounts', 'Transfers', 'FamilyMembers', 'Debts'];
+                const sheetNames = ['Income', 'Expenses', 'Receivables', 'Payables', 'Plans', 'Budgets', 'Categories', 'Templates', 'Accounts', 'Transfers', 'FamilyMembers', 'Debts', 'Properties', 'Islamic'];
 
                 for (const sheetName of sheetNames) {
                     try {
@@ -5052,6 +5193,8 @@
                             const dataKey = sheetName.toLowerCase();
                             if (state.data[dataKey]) {
                                 state.data[dataKey] = normalizeSheetData(data, dataKey);
+                            } else if (sheetName === 'Islamic') {
+                                state.data.islamicCalculations = normalizeSheetData(data, 'islamic');
                             }
                         }
                     } catch (err) {
@@ -5095,7 +5238,9 @@
                     { name: 'Accounts', data: state.data.accounts || [] },
                     { name: 'Transfers', data: state.data.transfers || [] },
                     { name: 'FamilyMembers', data: state.data.familyMembers || [] },
-                    { name: 'Debts', data: state.data.debts || [] }
+                    { name: 'Debts', data: serializeDebtsForSheet(state.data.debts || []) },
+                    { name: 'Properties', data: state.data.properties || [] },
+                    { name: 'Islamic', data: state.data.islamicCalculations || [] }
                 ];
 
                 // Prepare batch update requests
@@ -5378,6 +5523,63 @@
             return 0;
         }
 
+        function normalizePaymentHistory(rawHistory) {
+            if (!rawHistory) return [];
+            let parsedHistory = rawHistory;
+            if (typeof rawHistory === 'string') {
+                try {
+                    parsedHistory = JSON.parse(rawHistory);
+                } catch (e) {
+                    return [];
+                }
+            }
+            if (!Array.isArray(parsedHistory)) return [];
+
+            return parsedHistory.map(entry => {
+                const normalizedEntry = { ...entry };
+                normalizedEntry.amount = parseNumber(entry?.amount ?? entry?.paid ?? 0);
+                const paymentDate = entry?.date || entry?.paymentDate || entry?.recordedAt;
+                normalizedEntry.date = paymentDate ? parseDate(paymentDate) : '';
+                normalizedEntry.note = entry?.note || entry?.notes || '';
+                normalizedEntry.method = entry?.method || entry?.paymentMethod || 'Other';
+                normalizedEntry.recordedAt = entry?.recordedAt || new Date().toISOString();
+                return normalizedEntry;
+            }).filter(entry => entry.amount || entry.note || entry.date);
+        }
+
+        function serializeDebtsForSheet(debts) {
+            return (debts || []).map(debt => {
+                const serialized = { ...debt };
+                serialized.paymentHistory = JSON.stringify(serialized.paymentHistory || []);
+                serialized.paid = calculateDebtPaid(debt);
+                serialized.historicalPaid = parseNumber(debt.historicalPaid || 0);
+                return serialized;
+            });
+        }
+
+        function calculateDebtPaid(debt) {
+            if (!debt) return 0;
+            const base = parseNumber(debt.historicalPaid || 0);
+            const historyTotal = (debt.paymentHistory || []).reduce((sum, entry) => sum + parseNumber(entry.amount), 0);
+            return Math.min(parseNumber(debt.principal || 0), base + historyTotal);
+        }
+
+        function getAccountBalance(account) {
+            if (!account || !account.name) return 0;
+            let balance = Number(account.initialBalance || 0);
+            state.data.income.forEach(item => {
+                if (item.account === account.name) balance += Number(item.amount || 0);
+            });
+            state.data.expenses.forEach(item => {
+                if (item.account === account.name) balance -= Number(item.amount || 0);
+            });
+            (state.data.transfers || []).forEach(transfer => {
+                if (transfer.fromAccount === account.name) balance -= Number(transfer.amount || 0);
+                if (transfer.toAccount === account.name) balance += Number(transfer.amount || 0);
+            });
+            return balance;
+        }
+
         // Normalize data from Excel sheet
         function normalizeSheetData(items, sheetType) {
             if (!Array.isArray(items)) return [];
@@ -5394,8 +5596,31 @@
                     if (normalized.deadline) normalized.deadline = parseDate(normalized.deadline);
                 } else if (sheetType === 'debts') {
                     if (normalized.dueDate) normalized.dueDate = parseDate(normalized.dueDate);
-                    if ('principal' in normalized) normalized.principal = parseNumber(normalized.principal);
-                    if ('paid' in normalized) normalized.paid = parseNumber(normalized.paid);
+                    normalized.principal = parseNumber(normalized.principal);
+                    normalized.paymentHistory = normalizePaymentHistory(normalized.paymentHistory);
+                    const historyTotal = normalized.paymentHistory.reduce((sum, entry) => sum + parseNumber(entry.amount), 0);
+                    const paidFromSheet = parseNumber(normalized.paid);
+                    const providedHistorical = Object.prototype.hasOwnProperty.call(normalized, 'historicalPaid')
+                        ? parseNumber(normalized.historicalPaid)
+                        : null;
+                    normalized.historicalPaid = providedHistorical !== null ? providedHistorical : (paidFromSheet > historyTotal ? paidFromSheet - historyTotal : 0);
+                    normalized.paid = calculateDebtPaid(normalized);
+                } else if (sheetType === 'properties') {
+                    normalized.value = parseNumber(normalized.value);
+                    normalized.estimatedValue = parseNumber(normalized.estimatedValue || normalized.value);
+                    normalized.area = parseNumber(normalized.area);
+                    if (normalized.acquiredDate) normalized.acquiredDate = parseDate(normalized.acquiredDate);
+                    normalized.zakatEligible = String(normalized.zakatEligible || '').toLowerCase() === 'true' || normalized.zakatEligible === true || normalized.zakatEligible === 1 || normalized.type === 'Gold';
+                } else if (sheetType === 'islamic') {
+                    normalized.totalAssets = parseNumber(normalized.totalAssets);
+                    normalized.liabilities = parseNumber(normalized.liabilities);
+                    normalized.netAssets = parseNumber(normalized.netAssets);
+                    normalized.zakatDue = parseNumber(normalized.zakatDue);
+                    normalized.fitraDue = parseNumber(normalized.fitraDue);
+                    normalized.peopleCount = parseNumber(normalized.peopleCount);
+                    normalized.fitraRate = parseNumber(normalized.fitraRate);
+                    if (normalized.date) normalized.date = parseDate(normalized.date);
+                    if (normalized.calculatedOn) normalized.calculatedOn = parseDate(normalized.calculatedOn);
                 }
 
                 // Normalize numeric amounts
@@ -5511,6 +5736,8 @@
                 state.data.templates = parseSheet('Templates', 'templates') || [];
                 state.data.accounts = parseSheet('Accounts', 'accounts') || [];
                 state.data.debts = parseSheet('Debts', 'debts') || [];
+                state.data.properties = parseSheet('Properties', 'properties') || [];
+                state.data.islamicCalculations = parseSheet('Islamic', 'islamic') || [];
                 state.data.transfers = parseSheet('Transfers', 'transfers') || [];
                 state.data.familyMembers = parseSheet('FamilyMembers', 'familyMembers') || [];
 
@@ -5520,6 +5747,8 @@
                 if (!Array.isArray(state.data.templates)) state.data.templates = [];
                 if (!Array.isArray(state.data.accounts)) state.data.accounts = [];
                 if (!Array.isArray(state.data.debts)) state.data.debts = [];
+                if (!Array.isArray(state.data.properties)) state.data.properties = [];
+                if (!Array.isArray(state.data.islamicCalculations)) state.data.islamicCalculations = [];
                 if (!Array.isArray(state.data.transfers)) state.data.transfers = [];
                 if (!Array.isArray(state.data.familyMembers)) state.data.familyMembers = [];
                 if (!Array.isArray(state.data.transactionHistory)) state.data.transactionHistory = [];
@@ -5579,7 +5808,9 @@
                 const accountsSheet = XLSX.utils.json_to_sheet(state.data.accounts || []);
                 const transfersSheet = XLSX.utils.json_to_sheet(state.data.transfers || []);
                 const familyMembersSheet = XLSX.utils.json_to_sheet(state.data.familyMembers || []);
-                const debtsSheet = XLSX.utils.json_to_sheet(state.data.debts || []);
+                const debtsSheet = XLSX.utils.json_to_sheet(serializeDebtsForSheet(state.data.debts || []));
+                const propertiesSheet = XLSX.utils.json_to_sheet(state.data.properties || []);
+                const islamicSheet = XLSX.utils.json_to_sheet(state.data.islamicCalculations || []);
 
                 // Append sheets
                 XLSX.utils.book_append_sheet(wb, incomeSheet, "Income");
@@ -5594,6 +5825,8 @@
                 XLSX.utils.book_append_sheet(wb, transfersSheet, "Transfers");
                 XLSX.utils.book_append_sheet(wb, familyMembersSheet, "FamilyMembers");
                 XLSX.utils.book_append_sheet(wb, debtsSheet, "Debts");
+                XLSX.utils.book_append_sheet(wb, propertiesSheet, "Properties");
+                XLSX.utils.book_append_sheet(wb, islamicSheet, "Islamic");
 
                 // Write to file
                 const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
@@ -5832,6 +6065,8 @@
             document.getElementById('view-calendar')?.classList.add('hidden');
             document.getElementById('view-cashflow')?.classList.add('hidden');
             document.getElementById('view-investments')?.classList.add('hidden');
+            document.getElementById('view-properties')?.classList.add('hidden');
+            document.getElementById('view-islamic')?.classList.add('hidden');
             document.getElementById('view-settings')?.classList.add('hidden');
 
             // Show selected view
@@ -5871,6 +6106,13 @@
             } else if (tabId === 'debts') {
                 document.getElementById('view-debts').classList.remove('hidden');
                 renderDebtsList();
+            } else if (tabId === 'properties') {
+                document.getElementById('view-properties').classList.remove('hidden');
+                renderPropertiesList();
+            } else if (tabId === 'islamic') {
+                document.getElementById('view-islamic').classList.remove('hidden');
+                calculateIslamic();
+                renderIslamicHistory();
             } else if (tabId === 'recurring') {
                 document.getElementById('view-recurring').classList.remove('hidden');
                 renderRecurringList();
@@ -9904,7 +10146,9 @@
             const plansSheet = XLSX.utils.json_to_sheet(state.data.plans);
             const budgetsSheet = XLSX.utils.json_to_sheet(state.data.budgets || []);
             const categoriesSheet = XLSX.utils.json_to_sheet(state.data.categories || []);
-            const debtsSheet = XLSX.utils.json_to_sheet(state.data.debts || []);
+            const debtsSheet = XLSX.utils.json_to_sheet(serializeDebtsForSheet(state.data.debts || []));
+            const propertiesSheet = XLSX.utils.json_to_sheet(state.data.properties || []);
+            const islamicSheet = XLSX.utils.json_to_sheet(state.data.islamicCalculations || []);
 
             XLSX.utils.book_append_sheet(wb, incomeSheet, "Income");
             XLSX.utils.book_append_sheet(wb, expensesSheet, "Expenses");
@@ -9914,6 +10158,8 @@
             XLSX.utils.book_append_sheet(wb, budgetsSheet, "Budgets");
             XLSX.utils.book_append_sheet(wb, categoriesSheet, "Categories");
             XLSX.utils.book_append_sheet(wb, debtsSheet, "Debts");
+            XLSX.utils.book_append_sheet(wb, propertiesSheet, "Properties");
+            XLSX.utils.book_append_sheet(wb, islamicSheet, "Islamic");
 
             const dateStr = new Date().toISOString().split('T')[0];
             XLSX.writeFile(wb, `finance_data_export_${dateStr}.xlsx`);
@@ -9933,7 +10179,9 @@
                 { name: 'Plans', data: state.data.plans },
                 { name: 'Budgets', data: state.data.budgets || [] },
                 { name: 'Categories', data: state.data.categories || [] },
-                { name: 'Debts', data: state.data.debts || [] }
+                { name: 'Debts', data: serializeDebtsForSheet(state.data.debts || []) },
+                { name: 'Properties', data: state.data.properties || [] },
+                { name: 'Islamic', data: state.data.islamicCalculations || [] }
             ];
 
             dataTypes.forEach(({ name, data }) => {
@@ -10433,7 +10681,7 @@
                         }).then(confirmed => {
                             if (!confirmed) return;
 
-                            const sheetNames = ['Income', 'Expenses', 'Receivables', 'Payables', 'Plans', 'Budgets', 'Categories', 'Debts'];
+            const sheetNames = ['Income', 'Expenses', 'Receivables', 'Payables', 'Plans', 'Budgets', 'Categories', 'Debts', 'Properties', 'Islamic'];
                             let importedCount = 0;
 
                             sheetNames.forEach(sheetName => {
@@ -10442,8 +10690,13 @@
                                     const jsonData = XLSX.utils.sheet_to_json(sheet);
                                     const dataKey = sheetName.toLowerCase();
                                     if (state.data[dataKey]) {
-                                        state.data[dataKey].push(...jsonData);
-                                        importedCount += jsonData.length;
+                                        const normalized = normalizeSheetData(jsonData, dataKey);
+                                        state.data[dataKey].push(...normalized);
+                                        importedCount += normalized.length;
+                                    } else if (sheetName === 'Islamic') {
+                                        const normalized = normalizeSheetData(jsonData, 'islamic');
+                                        state.data.islamicCalculations.push(...normalized);
+                                        importedCount += normalized.length;
                                     }
                                 }
                             });
@@ -11712,8 +11965,12 @@
                 div.style.padding = '1.5rem';
 
                 const principal = Number(debt.principal || 0);
-                const paid = Number(debt.paid || 0);
-                const remaining = principal - paid;
+                const paid = calculateDebtPaid(debt);
+                debt.paid = paid;
+                const remaining = Math.max(0, principal - paid);
+                const history = debt.paymentHistory || [];
+                const lastPayment = history.length ? history[history.length - 1] : null;
+                const lastPaymentDate = lastPayment?.date ? formatDate(lastPayment.date) : 'N/A';
                 totalDebt += remaining;
                 const percentPaid = principal > 0 ? (paid / principal) * 100 : 0;
 
@@ -11749,10 +12006,20 @@
                                 <div class="progress-fill" style="width: ${Math.min(100, percentPaid)}%; background: var(--success);"></div>
                             </div>
                             ${debt.dueDate ? `<div style="font-size: 0.75rem; color: var(--text-light);">Due Date: ${formatDate(debt.dueDate)}</div>` : ''}
+                            <div style="margin-top: 0.75rem; padding: 0.85rem; border: 1px dashed var(--border); border-radius: 10px; background: var(--card-bg); display: flex; justify-content: space-between; align-items: center; gap: 0.75rem;">
+                                <div>
+                                    <div style="font-size: 0.75rem; color: var(--text-light);">${t('last_payment')}</div>
+                                    <div style="font-weight: 600;">${lastPayment ? `${formatCurrency(lastPayment.amount)} | ${lastPaymentDate}` : t('no_payment_records')}</div>
+                                    ${lastPayment?.note ? `<div style="font-size: 0.85rem; color: var(--text-light); margin-top: 0.25rem;">${lastPayment.note}</div>` : ''}
+                                </div>
+                                <button class="btn btn-secondary" style="width: auto; white-space: nowrap;" onclick="viewPaymentHistory(${index})">
+                                    ${t('view_records')} (${history.length || 0})
+                                </button>
+                            </div>
                         </div>
                         <div style="display: flex; gap: 0.5rem;">
                             <button class="btn btn-primary" onclick="makePayment(${index})" style="font-size: 0.875rem;">
-                                Record Payment
+                                ${t('record_payment')}
                             </button>
                             <button class="btn-edit" onclick="editDebt(${index})">
                                 <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -11795,6 +12062,7 @@
             const debt = debtIndex !== null ? state.data.debts[debtIndex] : null;
             const overlay = document.getElementById('modal-overlay');
             const content = document.getElementById('modal-content');
+            const debtPaidValue = debt ? calculateDebtPaid(debt) : 0;
 
             if (!overlay || !content) return;
 
@@ -11825,7 +12093,7 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label">${t('amount_paid')}</label>
-                        <input type="number" class="form-input" id="debt-paid" step="0.01" value="${debt?.paid || 0}" placeholder="0.00">
+                        <input type="number" class="form-input" id="debt-paid" step="0.01" value="${debtPaidValue}" placeholder="0.00">
                     </div>
                     <div class="form-group">
                         <label class="form-label">${t('creditor_lender')}</label>
@@ -11851,17 +12119,23 @@
             if (event) event.preventDefault();
             if (!state.data.debts) state.data.debts = [];
 
+            const index = debtIndex === 'null' || debtIndex === null ? null : parseInt(debtIndex);
+            const existingDebt = index !== null && index >= 0 ? state.data.debts[index] : null;
+            const existingHistory = existingDebt?.paymentHistory ? [...existingDebt.paymentHistory] : [];
+            const historyTotal = existingHistory.reduce((sum, entry) => sum + parseNumber(entry.amount), 0);
+
             const debt = {
                 name: document.getElementById('debt-name').value,
                 type: document.getElementById('debt-type').value,
                 principal: Number(document.getElementById('debt-principal').value) || 0,
-                paid: Number(document.getElementById('debt-paid').value) || 0,
+                paymentHistory: existingHistory,
+                historicalPaid: Math.max(0, (Number(document.getElementById('debt-paid').value) || 0) - historyTotal),
                 creditor: document.getElementById('debt-creditor').value,
                 dueDate: document.getElementById('debt-due-date').value,
                 description: document.getElementById('debt-description').value
             };
+            debt.paid = calculateDebtPaid(debt);
 
-            const index = debtIndex === 'null' || debtIndex === null ? null : parseInt(debtIndex);
             if (index !== null && index >= 0) {
                 state.data.debts[index] = debt;
             } else {
@@ -11886,45 +12160,130 @@
             content.innerHTML = `
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h2>Record Payment</h2>
-                        <button class="modal-close" onclick="closeModal()">×</button>
+                        <h2>${t('record_payment')}</h2>
+                        <button class="modal-close" onclick="closeModal()">&times;</button>
                     </div>
                     <form onsubmit="savePayment(event, ${debtIndex})">
                         <div class="form-group">
-                            <label class="form-label">Payment Amount *</label>
+                            <label class="form-label">${t('amount_paid')} *</label>
                             <input type="number" class="form-input" id="payment-amount" required step="0.01" placeholder="0.00">
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Payment Date</label>
+                            <label class="form-label">${t('payment_date') || 'Payment Date'}</label>
                             <input type="date" class="form-input" id="payment-date" value="${new Date().toISOString().split('T')[0]}">
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Notes</label>
+                            <label class="form-label">${t('payment_method')}</label>
+                            <select class="form-input" id="payment-method">
+                                <option value="Cash">${t('cash')}</option>
+                                <option value="Bank Transfer">${t('bank_transfer')}</option>
+                                <option value="Card">${t('card')}</option>
+                                <option value="Mobile Payment">${t('mobile_payment')}</option>
+                                <option value="Other" selected>${t('other')}</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">${t('notes')}</label>
                             <textarea class="form-input" id="payment-notes" rows="3" placeholder="${t('optional_notes')}"></textarea>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-                            <button type="submit" class="btn btn-primary">Record Payment</button>
+                            <button type="button" class="btn btn-secondary" onclick="closeModal()">${t('cancel')}</button>
+                            <button type="submit" class="btn btn-primary">${t('record_payment')}</button>
                         </div>
                     </form>
                 </div>
             `;
-            modal.classList.add('show');
         }
 
         function savePayment(event, debtIndex) {
             event.preventDefault();
             const paymentAmount = Number(document.getElementById('payment-amount').value) || 0;
-            const debt = state.data.debts[debtIndex];
+            const paymentDate = document.getElementById('payment-date').value || new Date().toISOString().split('T')[0];
+            const paymentNote = document.getElementById('payment-notes').value || '';
+            const paymentMethod = document.getElementById('payment-method') ? document.getElementById('payment-method').value : 'Other';
 
-            debt.paid = (Number(debt.paid || 0) + paymentAmount);
-            if (debt.paid > debt.principal) debt.paid = debt.principal;
+            const debt = state.data.debts[debtIndex];
+            if (!debt.paymentHistory) debt.paymentHistory = [];
+            if (debt.historicalPaid === undefined) {
+                const historyTotal = debt.paymentHistory.reduce((sum, entry) => sum + parseNumber(entry.amount), 0);
+                debt.historicalPaid = Math.max(0, parseNumber(debt.paid || 0) - historyTotal);
+            }
+
+            debt.paymentHistory.push({
+                amount: paymentAmount,
+                date: paymentDate,
+                note: paymentNote,
+                method: paymentMethod,
+                recordedAt: new Date().toISOString()
+            });
+
+            debt.paid = calculateDebtPaid(debt);
 
             writeExcelFile().then(() => {
                 renderDebtsList();
                 closeModal();
                 showToast('Payment recorded successfully', 'success');
             });
+        }
+
+        function viewPaymentHistory(debtIndex) {
+            const debt = state.data.debts[debtIndex];
+            const overlay = document.getElementById('modal-overlay');
+            const content = document.getElementById('modal-content');
+            if (!debt || !overlay || !content) return;
+
+            const history = debt.paymentHistory || [];
+            const principal = parseNumber(debt.principal || 0);
+            const paid = calculateDebtPaid(debt);
+            const remaining = Math.max(0, principal - paid);
+
+            const historyHtml = history.length
+                ? history.slice().reverse().map(entry => `
+                    <div class="payment-history-item">
+                        <div class="payment-history-top">
+                            <div class="payment-history-amount">${formatCurrency(entry.amount)}</div>
+                            <div class="payment-history-meta">${entry.date ? formatDate(entry.date) : 'N/A'} | ${entry.method || t('other')}</div>
+                        </div>
+                        ${entry.note ? `<div class="payment-history-note">${entry.note}</div>` : ''}
+                        <div class="payment-history-footer">Recorded ${entry.recordedAt ? formatDate(entry.recordedAt.split('T')[0]) : 'now'}</div>
+                    </div>
+                `).join('')
+                : `<div class="empty-state" style="padding: 1.25rem; color: var(--text-light); text-align: center;">${t('no_payment_records')}</div>`;
+
+            overlay.classList.add('active');
+            content.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>${t('payment_history')}</h2>
+                        <button class="modal-close" onclick="closeModal()">&times;</button>
+                    </div>
+                    <div class="payment-history-summary">
+                        <div>
+                            <div class="summary-label">${t('principal_amount')}</div>
+                            <div class="summary-value">${formatCurrency(principal)}</div>
+                        </div>
+                        <div>
+                            <div class="summary-label">${t('paid')}</div>
+                            <div class="summary-value" style="color: var(--success);">${formatCurrency(paid)}</div>
+                        </div>
+                        <div>
+                            <div class="summary-label">${t('remaining')}</div>
+                            <div class="summary-value" style="color: var(--danger);">${formatCurrency(remaining)}</div>
+                        </div>
+                        <div>
+                            <div class="summary-label">${t('due_date')}</div>
+                            <div class="summary-value">${debt.dueDate ? formatDate(debt.dueDate) : 'N/A'}</div>
+                        </div>
+                    </div>
+                    <div class="payment-history-list">
+                        ${historyHtml}
+                    </div>
+                    <div class="modal-footer" style="margin-top: 1rem;">
+                        <button type="button" class="btn btn-secondary" onclick="makePayment(${debtIndex})">${t('record_payment')}</button>
+                        <button type="button" class="btn btn-primary" onclick="closeModal()">${t('close')}</button>
+                    </div>
+                </div>
+            `;
         }
 
         function editDebt(debtIndex) {
@@ -11943,6 +12302,351 @@
                     renderDebtsList();
                     showToast('Debt deleted successfully', 'success');
                 });
+            });
+        }
+
+        // --- PROPERTY MANAGEMENT ---
+        function renderPropertiesList() {
+            const container = document.getElementById('properties-container');
+            const summary = document.getElementById('properties-summary');
+            if (!container || !summary) return;
+            container.innerHTML = '';
+            summary.innerHTML = '';
+
+            const properties = state.data.properties || [];
+            const totalValue = properties.reduce((sum, p) => sum + parseNumber(p.estimatedValue || p.value), 0);
+            const zakatValue = properties.filter(p => p.zakatEligible).reduce((sum, p) => sum + parseNumber(p.estimatedValue || p.value), 0);
+
+            const summaryTiles = [
+                { label: t('total_properties'), value: properties.length },
+                { label: t('estimated_value'), value: formatCurrency(totalValue) },
+                { label: t('zakatable_assets'), value: formatCurrency(zakatValue) }
+            ];
+            summary.innerHTML = summaryTiles.map(tile => `
+                <div class="summary-tile">
+                    <div class="summary-label">${tile.label}</div>
+                    <div class="summary-value">${tile.value}</div>
+                </div>
+            `).join('');
+
+            if (properties.length === 0) {
+                container.innerHTML = '<div class="text-center" style="padding: 1.25rem; color: var(--text-light);">No properties added yet. Add one to get started.</div>';
+                return;
+            }
+
+            properties.forEach((property, index) => {
+                const div = document.createElement('div');
+                div.className = 'card property-card';
+                const estimated = parseNumber(property.estimatedValue || property.value);
+                const typeColor = property.type === 'Gold' ? 'var(--warning)' :
+                    property.type === 'Land' ? 'var(--primary)' :
+                        property.type === 'Home' ? 'var(--purple)' :
+                            property.type === 'Vehicle' ? 'var(--success)' : 'var(--text-light)';
+                const zakatBadge = property.zakatEligible ? `<span style="background: var(--success); color: white; padding: 0.25rem 0.5rem; border-radius: 6px; font-size: 0.75rem;">Zakat Eligible</span>` : '';
+
+                div.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem; flex-wrap: wrap;">
+                        <div style="flex: 1;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                                <h3 style="margin: 0;">${property.name || 'Untitled Property'}</h3>
+                                <span style="background: ${typeColor}; color: white; padding: 0.25rem 0.5rem; border-radius: 6px; font-size: 0.75rem;">${property.type || 'Property'}</span>
+                                ${zakatBadge}
+                            </div>
+                            <div style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 0.5rem;">
+                                ${property.location || 'Location not set'} ${property.area ? `• ${property.area} ${property.areaUnit || 'sqft'}` : ''}
+                            </div>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem;">
+                                <div>
+                                    <div class="summary-label">${t('purchase_value')}</div>
+                                    <div class="summary-value">${formatCurrency(parseNumber(property.value))}</div>
+                                </div>
+                                <div>
+                                    <div class="summary-label">${t('estimated_value')}</div>
+                                    <div class="summary-value">${formatCurrency(estimated)}</div>
+                                </div>
+                                <div>
+                                    <div class="summary-label">${t('acquired_date')}</div>
+                                    <div class="summary-value">${property.acquiredDate ? formatDate(property.acquiredDate) : 'N/A'}</div>
+                                </div>
+                            </div>
+                            ${property.notes ? `<div style="margin-top: 0.5rem; color: var(--text-light);">${property.notes}</div>` : ''}
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn-edit" onclick="editProperty(${index})">
+                                <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                </svg>
+                            </button>
+                            <button class="btn-delete" onclick="deleteProperty(${index})">
+                                <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function openPropertyModal(propertyIndex = null) {
+            const property = propertyIndex !== null ? state.data.properties[propertyIndex] : null;
+            const overlay = document.getElementById('modal-overlay');
+            const content = document.getElementById('modal-content');
+            if (!overlay || !content) return;
+
+            overlay.classList.add('active');
+            content.innerHTML = `
+                <div class="modal-header">
+                    <h2>${property ? t('edit_property') : t('add_property')}</h2>
+                    <button class="modal-close" onclick="closeModal()">&times;</button>
+                </div>
+                <form onsubmit="saveProperty(event, ${propertyIndex !== null ? propertyIndex : 'null'}); return false;">
+                    <div class="form-group">
+                        <label class="form-label">${t('property_name')} *</label>
+                        <input type="text" class="form-input" id="property-name" required value="${property?.name || ''}" placeholder="e.g. Plot 12B">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">${t('property_type')}</label>
+                        <select class="form-input" id="property-type">
+                            <option value="Land" ${property?.type === 'Land' ? 'selected' : ''}>Land</option>
+                            <option value="Home" ${property?.type === 'Home' ? 'selected' : ''}>Home</option>
+                            <option value="Gold" ${property?.type === 'Gold' ? 'selected' : ''}>Gold</option>
+                            <option value="Vehicle" ${property?.type === 'Vehicle' ? 'selected' : ''}>Vehicle</option>
+                            <option value="Other" ${property?.type === 'Other' ? 'selected' : ''}>Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">${t('purchase_value')}</label>
+                        <input type="number" class="form-input" id="property-value" step="0.01" value="${property?.value || 0}" placeholder="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">${t('estimated_value')}</label>
+                        <input type="number" class="form-input" id="property-estimated" step="0.01" value="${property?.estimatedValue || property?.value || 0}" placeholder="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">${t('location')}</label>
+                        <input type="text" class="form-input" id="property-location" value="${property?.location || ''}" placeholder="City, Country">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">${t('area')}</label>
+                        <input type="number" class="form-input" id="property-area" step="0.01" value="${property?.area || ''}" placeholder="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">${t('acquired_date')}</label>
+                        <input type="date" class="form-input" id="property-date" value="${property?.acquiredDate || ''}">
+                    </div>
+                    <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" id="property-zakat" ${property?.zakatEligible ? 'checked' : property?.type === 'Gold' ? 'checked' : ''}>
+                        <label for="property-zakat" class="form-label" style="margin: 0;">${t('zakat_eligible')}</label>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">${t('notes')}</label>
+                        <textarea class="form-input" id="property-notes" rows="3" placeholder="${t('optional_description')}">${property?.notes || ''}</textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" onclick="closeModal()">${t('cancel')}</button>
+                        <button type="submit" class="btn btn-primary">${property ? t('update') : t('save')}</button>
+                    </div>
+                </form>
+            `;
+        }
+
+        function saveProperty(event, propertyIndex) {
+            if (event) event.preventDefault();
+            if (!state.data.properties) state.data.properties = [];
+
+            const property = {
+                name: document.getElementById('property-name').value,
+                type: document.getElementById('property-type').value,
+                value: parseNumber(document.getElementById('property-value').value),
+                estimatedValue: parseNumber(document.getElementById('property-estimated').value),
+                location: document.getElementById('property-location').value,
+                area: parseNumber(document.getElementById('property-area').value),
+                acquiredDate: document.getElementById('property-date').value,
+                zakatEligible: document.getElementById('property-zakat').checked,
+                notes: document.getElementById('property-notes').value
+            };
+
+            const index = propertyIndex === 'null' || propertyIndex === null ? null : parseInt(propertyIndex);
+            if (index !== null && index >= 0) {
+                state.data.properties[index] = property;
+            } else {
+                state.data.properties.push(property);
+            }
+
+            writeExcelFile().then(() => {
+                renderPropertiesList();
+                calculateIslamic();
+                closeModal();
+                showToast(`Property ${index !== null ? 'updated' : 'added'} successfully`, 'success');
+            });
+        }
+
+        function editProperty(index) {
+            openPropertyModal(index);
+        }
+
+        function deleteProperty(index) {
+            showConfirmModal({
+                title: t('delete_property') || 'Delete Property',
+                message: 'Are you sure you want to delete this property?',
+                type: 'danger'
+            }).then(confirmed => {
+                if (!confirmed) return;
+                state.data.properties.splice(index, 1);
+                writeExcelFile().then(() => {
+                    renderPropertiesList();
+                    calculateIslamic();
+                    showToast('Property deleted successfully', 'success');
+                });
+            });
+        }
+
+        // --- ISLAMIC CALCULATOR ---
+        function populateIslamicAuto() {
+            const accounts = state.data.accounts || [];
+            const investments = state.data.investments || [];
+            const receivables = state.data.receivables || [];
+            const debts = state.data.debts || [];
+
+            const cashBankTotal = accounts
+                .filter(acc => ['Cash', 'Bank', 'Savings'].includes(acc.type))
+                .reduce((sum, acc) => sum + getAccountBalance(acc), 0);
+
+            const investmentTotal = investments.reduce((sum, inv) => {
+                const currentValue = parseNumber(inv.currentValue || inv.value || inv.cost);
+                return sum + currentValue;
+            }, 0);
+
+            const receivableTotal = receivables.reduce((sum, rec) => sum + parseNumber(rec.amount), 0);
+            const debtLiabilities = debts.reduce((sum, debt) => {
+                const paid = calculateDebtPaid(debt);
+                const remaining = Math.max(0, parseNumber(debt.principal) - paid);
+                return sum + remaining;
+            }, 0);
+
+            const cashEl = document.getElementById('zakat-cash');
+            const investEl = document.getElementById('zakat-investments');
+            const recvEl = document.getElementById('zakat-receivables');
+            const liabilitiesEl = document.getElementById('zakat-liabilities');
+
+            if (cashEl) cashEl.value = cashBankTotal.toFixed(2);
+            if (investEl) investEl.value = investmentTotal.toFixed(2);
+            if (recvEl) recvEl.value = receivableTotal.toFixed(2);
+            if (liabilitiesEl) liabilitiesEl.value = debtLiabilities.toFixed(2);
+        }
+
+        function calculateIslamic() {
+            populateIslamicAuto();
+            const propertyZakatValue = (state.data.properties || [])
+                .filter(p => p.zakatEligible)
+                .reduce((sum, p) => sum + parseNumber(p.estimatedValue || p.value), 0);
+            const propertyEl = document.getElementById('zakat-from-properties');
+            if (propertyEl) propertyEl.textContent = formatCurrency(propertyZakatValue);
+
+            const cash = parseNumber(document.getElementById('zakat-cash')?.value);
+            const gold = parseNumber(document.getElementById('zakat-gold')?.value);
+            const investments = parseNumber(document.getElementById('zakat-investments')?.value);
+            const receivables = parseNumber(document.getElementById('zakat-receivables')?.value);
+            const other = parseNumber(document.getElementById('zakat-other')?.value);
+            const liabilities = parseNumber(document.getElementById('zakat-liabilities')?.value);
+            const nisab = parseNumber(document.getElementById('zakat-nisab')?.value);
+            const rate = parseNumber(document.getElementById('zakat-rate')?.value) || 2.5;
+
+            const people = parseNumber(document.getElementById('fitra-people')?.value);
+            const fitraRate = parseNumber(document.getElementById('fitra-rate')?.value);
+
+            const totalAssets = cash + gold + investments + receivables + other + propertyZakatValue;
+            const netAssets = Math.max(0, totalAssets - liabilities);
+            const meetsNisab = nisab > 0 ? netAssets >= nisab : true;
+            const zakatDue = meetsNisab ? (netAssets * (rate / 100)) : 0;
+            const fitraTotal = people * fitraRate;
+
+            lastIslamicCalculation = {
+                totalAssets,
+                liabilities,
+                netAssets,
+                zakatDue,
+                fitraDue: fitraTotal,
+                peopleCount: people,
+                fitraRate,
+                date: new Date().toISOString().split('T')[0],
+                notes: document.getElementById('fitra-notes')?.value || ''
+            };
+
+            const zakatDueEl = document.getElementById('zakat-due');
+            const zakatNetEl = document.getElementById('zakat-net');
+            const fitraTotalEl = document.getElementById('fitra-total');
+            if (zakatDueEl) zakatDueEl.textContent = formatCurrency(zakatDue);
+            if (zakatNetEl) zakatNetEl.textContent = formatCurrency(netAssets);
+            if (fitraTotalEl) fitraTotalEl.textContent = formatCurrency(fitraTotal);
+
+            return lastIslamicCalculation;
+        }
+
+        function renderIslamicHistory() {
+            const historyContainer = document.getElementById('islamic-history');
+            const countEl = document.getElementById('islamic-record-count');
+            if (!historyContainer) return;
+
+            const history = state.data.islamicCalculations || [];
+            historyContainer.innerHTML = '';
+            if (countEl) countEl.textContent = `${history.length} record(s)`;
+
+            if (!history.length) {
+                historyContainer.innerHTML = '<div class="text-center" style="padding: 1rem; color: var(--text-light);">No calculations saved yet.</div>';
+                return;
+            }
+
+            history.slice().reverse().forEach((item, idx) => {
+                const div = document.createElement('div');
+                div.className = 'card islamic-record';
+                const recordIndex = history.length - 1 - idx;
+                div.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: start; gap: 0.5rem; flex-wrap: wrap;">
+                        <div>
+                            <div style="font-weight: 700; font-size: 1rem;">${item.date || item.calculatedOn || 'Record'}</div>
+                            <div style="color: var(--text-light); font-size: 0.9rem;">Net Assets: ${formatCurrency(item.netAssets || 0)} • Zakat: ${formatCurrency(item.zakatDue || 0)} • Fitra: ${formatCurrency(item.fitraDue || 0)}</div>
+                            ${item.notes ? `<div style="margin-top: 0.35rem; color: var(--text-light);">${item.notes}</div>` : ''}
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <button class="btn-delete" onclick="deleteIslamicRecord(${recordIndex})">
+                                <svg class="icon icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                historyContainer.appendChild(div);
+            });
+        }
+
+        function saveIslamicCalculation() {
+            const calc = calculateIslamic();
+            if (!calc) return;
+            if (!state.data.islamicCalculations) state.data.islamicCalculations = [];
+            state.data.islamicCalculations.push({
+                ...calc,
+                calculatedOn: new Date().toISOString(),
+                notes: calc.notes
+            });
+            writeExcelFile().then(() => {
+                renderIslamicHistory();
+                showToast('Calculation saved', 'success');
+            });
+        }
+
+        function deleteIslamicRecord(index) {
+            if (!state.data.islamicCalculations || !state.data.islamicCalculations[index]) return;
+            state.data.islamicCalculations.splice(index, 1);
+            writeExcelFile().then(() => {
+                renderIslamicHistory();
+                showToast('Calculation deleted', 'success');
             });
         }
 
