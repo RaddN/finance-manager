@@ -4362,6 +4362,9 @@
                 categories: [],
                 templates: [],
                 accounts: [],
+                transfers: [],
+                familyMembers: [],
+                debts: [],
                 tags: [],
                 transactionHistory: []
             },
@@ -5389,6 +5392,10 @@
                     if (normalized.dueDate) normalized.dueDate = parseDate(normalized.dueDate);
                 } else if (sheetType === 'plans') {
                     if (normalized.deadline) normalized.deadline = parseDate(normalized.deadline);
+                } else if (sheetType === 'debts') {
+                    if (normalized.dueDate) normalized.dueDate = parseDate(normalized.dueDate);
+                    if ('principal' in normalized) normalized.principal = parseNumber(normalized.principal);
+                    if ('paid' in normalized) normalized.paid = parseNumber(normalized.paid);
                 }
 
                 // Normalize numeric amounts
@@ -5572,6 +5579,7 @@
                 const accountsSheet = XLSX.utils.json_to_sheet(state.data.accounts || []);
                 const transfersSheet = XLSX.utils.json_to_sheet(state.data.transfers || []);
                 const familyMembersSheet = XLSX.utils.json_to_sheet(state.data.familyMembers || []);
+                const debtsSheet = XLSX.utils.json_to_sheet(state.data.debts || []);
 
                 // Append sheets
                 XLSX.utils.book_append_sheet(wb, incomeSheet, "Income");
@@ -5585,6 +5593,7 @@
                 XLSX.utils.book_append_sheet(wb, accountsSheet, "Accounts");
                 XLSX.utils.book_append_sheet(wb, transfersSheet, "Transfers");
                 XLSX.utils.book_append_sheet(wb, familyMembersSheet, "FamilyMembers");
+                XLSX.utils.book_append_sheet(wb, debtsSheet, "Debts");
 
                 // Write to file
                 const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
@@ -5972,6 +5981,9 @@
                     categories: [],
                     templates: [],
                     accounts: [],
+                    transfers: [],
+                    familyMembers: [],
+                    debts: [],
                     tags: [],
                     transactionHistory: []
                 };
@@ -5982,6 +5994,14 @@
             if (!Array.isArray(state.data.expenses)) state.data.expenses = [];
             if (!Array.isArray(state.data.receivables)) state.data.receivables = [];
             if (!Array.isArray(state.data.payables)) state.data.payables = [];
+            if (!Array.isArray(state.data.plans)) state.data.plans = [];
+            if (!Array.isArray(state.data.budgets)) state.data.budgets = [];
+            if (!Array.isArray(state.data.categories)) state.data.categories = [];
+            if (!Array.isArray(state.data.templates)) state.data.templates = [];
+            if (!Array.isArray(state.data.accounts)) state.data.accounts = [];
+            if (!Array.isArray(state.data.transfers)) state.data.transfers = [];
+            if (!Array.isArray(state.data.familyMembers)) state.data.familyMembers = [];
+            if (!Array.isArray(state.data.debts)) state.data.debts = [];
 
             // Calculate Stats
             const totalIncome = state.data.income.reduce((sum, i) => sum + Number(i.amount || 0), 0);
@@ -9884,6 +9904,7 @@
             const plansSheet = XLSX.utils.json_to_sheet(state.data.plans);
             const budgetsSheet = XLSX.utils.json_to_sheet(state.data.budgets || []);
             const categoriesSheet = XLSX.utils.json_to_sheet(state.data.categories || []);
+            const debtsSheet = XLSX.utils.json_to_sheet(state.data.debts || []);
 
             XLSX.utils.book_append_sheet(wb, incomeSheet, "Income");
             XLSX.utils.book_append_sheet(wb, expensesSheet, "Expenses");
@@ -9892,6 +9913,7 @@
             XLSX.utils.book_append_sheet(wb, plansSheet, "Plans");
             XLSX.utils.book_append_sheet(wb, budgetsSheet, "Budgets");
             XLSX.utils.book_append_sheet(wb, categoriesSheet, "Categories");
+            XLSX.utils.book_append_sheet(wb, debtsSheet, "Debts");
 
             const dateStr = new Date().toISOString().split('T')[0];
             XLSX.writeFile(wb, `finance_data_export_${dateStr}.xlsx`);
@@ -9910,7 +9932,8 @@
                 { name: 'Payables', data: state.data.payables },
                 { name: 'Plans', data: state.data.plans },
                 { name: 'Budgets', data: state.data.budgets || [] },
-                { name: 'Categories', data: state.data.categories || [] }
+                { name: 'Categories', data: state.data.categories || [] },
+                { name: 'Debts', data: state.data.debts || [] }
             ];
 
             dataTypes.forEach(({ name, data }) => {
@@ -10410,7 +10433,7 @@
                         }).then(confirmed => {
                             if (!confirmed) return;
 
-                            const sheetNames = ['Income', 'Expenses', 'Receivables', 'Payables', 'Plans', 'Budgets', 'Categories'];
+                            const sheetNames = ['Income', 'Expenses', 'Receivables', 'Payables', 'Plans', 'Budgets', 'Categories', 'Debts'];
                             let importedCount = 0;
 
                             sheetNames.forEach(sheetName => {
@@ -11854,8 +11877,13 @@
 
         function makePayment(debtIndex) {
             const debt = state.data.debts[debtIndex];
-            const modal = document.getElementById('modal');
-            modal.innerHTML = `
+            const overlay = document.getElementById('modal-overlay');
+            const content = document.getElementById('modal-content');
+
+            if (!overlay || !content) return;
+
+            overlay.classList.add('active');
+            content.innerHTML = `
                 <div class="modal-content">
                     <div class="modal-header">
                         <h2>Record Payment</h2>
