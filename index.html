@@ -618,12 +618,10 @@
                         </div>
                         <div>
                             <label
-                                style="display: block; font-size: 0.75rem; color: var(--text-light); margin-bottom: 0.25rem;">${t('account')}</label>
+                                style="display: block; font-size: 0.75rem; color: var(--text-light); margin-bottom: 0.25rem;" data-translate="account">Account</label>
                             <select class="filter-input" id="report-account" onchange="renderReports()"
                                 style="width: 100%;">
-                                <option value="">${t('all_accounts')}</option>
-                                ${(state.data.accounts || []).map(acc => `<option value="${acc.name}">${acc.name}
-                                    (${acc.type})</option>`).join('')}
+                                <option value="" data-translate="all_accounts">All Accounts</option>
                             </select>
                         </div>
                         <div>
@@ -8616,6 +8614,19 @@
                 categorySelect.innerHTML = '<option value="">All Categories</option>' +
                     allCategories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
                 if (currentValue) categorySelect.value = currentValue;
+            }
+
+            // Populate account dropdown
+            const accountSelect = document.getElementById('report-account');
+            if (accountSelect) {
+                const accounts = state.data.accounts || [];
+                const currentValue = accountSelect.value;
+                const allAccountsText = accountSelect.querySelector('option[value=""]')?.textContent || 'All Accounts';
+                accountSelect.innerHTML = `<option value="">${allAccountsText}</option>` +
+                    accounts.map(acc => `<option value="${acc.name}">${acc.name} (${acc.type})</option>`).join('');
+                if (currentValue) accountSelect.value = currentValue;
+                // Re-translate after updating
+                setTimeout(() => translatePage(), 10);
             }
 
             const now = new Date();
