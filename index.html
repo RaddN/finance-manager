@@ -13055,6 +13055,21 @@
             renderFinancialCalendar();
         }
 
+        // Toggle account details in cash flow
+        window.toggleAccountDetails = function(periodId) {
+            const row = document.getElementById(periodId);
+            const icon = document.getElementById(periodId + '-icon');
+            if (!row) return;
+            
+            if (row.style.display === 'none' || !row.style.display) {
+                row.style.display = '';
+                if (icon) icon.textContent = '▲';
+            } else {
+                row.style.display = 'none';
+                if (icon) icon.textContent = '▼';
+            }
+        };
+
         // --- CASH FLOW ANALYSIS ---
         function renderCashFlow() {
             const container = document.getElementById('cashflow-container');
@@ -13093,18 +13108,85 @@
 
                 const income = state.data.income
                     .filter(item => item.date && item.date >= periodStart && item.date <= periodEnd)
-                    .reduce((sum, item) => sum + Number(item.amount || 0), 0);
+                    .reduce((sum, item) => sum + parseNumber(item.amount || 0), 0);
 
                 const expenses = state.data.expenses
                     .filter(item => item.date && item.date >= periodStart && item.date <= periodEnd)
-                    .reduce((sum, item) => sum + Number(item.amount || 0), 0);
+                    .reduce((sum, item) => sum + parseNumber(item.amount || 0), 0);
 
                 const cashFlow = income - expenses;
-                periods.push({ label: periodLabel, income, expenses, cashFlow });
+                
+                // Calculate account-wise breakdown
+                const accounts = state.data.accounts || [];
+                const accountBreakdown = {};
+                
+                accounts.forEach(account => {
+                    accountBreakdown[account.name] = {
+                        income: 0,
+                        expenses: 0,
+                        cashFlow: 0
+                    };
+                });
+                
+                // Calculate income per account
+                state.data.income
+                    .filter(item => item.date && item.date >= periodStart && item.date <= periodEnd)
+                    .forEach(item => {
+                        const accountName = (item.account && item.account.trim()) || 'Unassigned Account';
+                        if (!accountBreakdown[accountName]) {
+                            accountBreakdown[accountName] = { income: 0, expenses: 0, cashFlow: 0 };
+                        }
+                        accountBreakdown[accountName].income += parseNumber(item.amount || 0);
+                    });
+                
+                // Calculate expenses per account
+                state.data.expenses
+                    .filter(item => item.date && item.date >= periodStart && item.date <= periodEnd)
+                    .forEach(item => {
+                        const accountName = (item.account && item.account.trim()) || 'Unassigned Account';
+                        if (!accountBreakdown[accountName]) {
+                            accountBreakdown[accountName] = { income: 0, expenses: 0, cashFlow: 0 };
+                        }
+                        accountBreakdown[accountName].expenses += parseNumber(item.amount || 0);
+                    });
+                
+                // Calculate cash flow per account
+                Object.keys(accountBreakdown).forEach(accountName => {
+                    accountBreakdown[accountName].cashFlow = accountBreakdown[accountName].income - accountBreakdown[accountName].expenses;
+                });
+                
+                periods.push({ 
+                    label: periodLabel, 
+                    income, 
+                    expenses, 
+                    cashFlow,
+                    accountBreakdown 
+                });
             }
 
+            // Get all unique accounts from all periods
+            const allAccounts = new Set();
+            periods.forEach(p => {
+                Object.keys(p.accountBreakdown || {}).forEach(account => allAccounts.add(account));
+            });
+            const sortedAccounts = Array.from(allAccounts).sort();
+            
             let html = `
-                <div style="overflow-x: auto;">
+                <div style="margin-bottom: 2rem;">
+                    <div style="background: #f7fafc; border: 1px solid var(--border); border-radius: 4px; padding: 1rem; margin-bottom: 1.5rem;">
+                        <h3 style="margin: 0 0 1rem 0; font-size: 1rem; color: var(--text-main);">📊 Account Information</h3>
+                        <p style="margin: 0; font-size: 0.875rem; color: var(--text-light);">
+                            Click on any period row below to see detailed account-wise breakdown (Cash In/Out) for that period. 
+                            This helps verify calculation accuracy.
+                        </p>
+                        ${sortedAccounts.length > 0 ? `
+                            <div style="margin-top: 0.75rem; font-size: 0.875rem;">
+                                <strong>Accounts tracked:</strong> ${sortedAccounts.join(', ')}
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+                <div style="overflow-x: auto; margin-bottom: 2rem;">
                     <table style="width: 100%; min-width: 600px;">
                         <thead>
                             <tr style="background: var(--card-bg);">
@@ -13120,9 +13202,13 @@
 
             periods.forEach((p, index) => {
                 const trend = index > 0 ? (p.cashFlow - periods[index - 1].cashFlow) : 0;
+                const periodId = `period-${index}`;
                 html += `
-                    <tr style="border-bottom: 1px solid var(--border);">
-                        <td style="padding: 1rem; font-weight: 600;">${p.label}</td>
+                    <tr style="border-bottom: 1px solid var(--border); cursor: pointer;" onclick="toggleAccountDetails('${periodId}')" onmouseover="this.style.background='#f7fafc'" onmouseout="this.style.background=''">
+                        <td style="padding: 1rem; font-weight: 600;">
+                            ${p.label}
+                            <span id="${periodId}-icon" style="font-size: 0.75rem; color: var(--text-light); margin-left: 0.5rem;">▼</span>
+                        </td>
                         <td style="padding: 1rem; text-align: right; color: var(--success);">${formatCurrency(p.income)}</td>
                         <td style="padding: 1rem; text-align: right; color: var(--danger);">${formatCurrency(p.expenses)}</td>
                         <td style="padding: 1rem; text-align: right; font-weight: bold; color: ${p.cashFlow >= 0 ? 'var(--success)' : 'var(--danger)'};">
@@ -13131,6 +13217,84 @@
                         <td style="padding: 1rem; text-align: center;">
                             ${trend > 0 ? '📈' : trend < 0 ? '📉' : '➡️'}
                             ${trend !== 0 ? `<span style="font-size: 0.75rem; color: ${trend > 0 ? 'var(--success)' : 'var(--danger)'};">${trend > 0 ? '+' : ''}${formatCurrency(trend)}</span>` : ''}
+                        </td>
+                    </tr>
+                    <tr id="${periodId}" style="display: none; background: #f7fafc;">
+                        <td colspan="5" style="padding: 1rem;">
+                            <div style="background: white; border-radius: 4px; padding: 1rem; border: 1px solid var(--border);">
+                                <h4 style="margin: 0 0 1rem 0; font-size: 1rem; color: var(--text-main);">Account Breakdown for ${p.label}</h4>
+                                <div style="overflow-x: auto;">
+                                    <table style="width: 100%; font-size: 0.875rem;">
+                                        <thead>
+                                            <tr style="background: #f0f4f8; border-bottom: 1px solid var(--border);">
+                                                <th style="padding: 0.75rem; text-align: left; font-weight: 600;">Account</th>
+                                                <th style="padding: 0.75rem; text-align: right; font-weight: 600; color: var(--success);">Cash In (Income)</th>
+                                                <th style="padding: 0.75rem; text-align: right; font-weight: 600; color: var(--danger);">Cash Out (Expenses)</th>
+                                                <th style="padding: 0.75rem; text-align: right; font-weight: 600;">Net Flow</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                `;
+                
+                // Sort accounts by name for consistency
+                const accountNames = Object.keys(p.accountBreakdown || {}).sort();
+                let hasData = false;
+                
+                accountNames.forEach(accountName => {
+                    const breakdown = p.accountBreakdown[accountName];
+                    if (breakdown.income > 0 || breakdown.expenses > 0) {
+                        hasData = true;
+                        html += `
+                                            <tr style="border-bottom: 1px solid #e2e8f0;">
+                                                <td style="padding: 0.75rem; font-weight: 500;">${accountName}</td>
+                                                <td style="padding: 0.75rem; text-align: right; color: var(--success);">${formatCurrency(breakdown.income)}</td>
+                                                <td style="padding: 0.75rem; text-align: right; color: var(--danger);">${formatCurrency(breakdown.expenses)}</td>
+                                                <td style="padding: 0.75rem; text-align: right; font-weight: 600; color: ${breakdown.cashFlow >= 0 ? 'var(--success)' : 'var(--danger)'};">
+                                                    ${formatCurrency(breakdown.cashFlow)}
+                                                </td>
+                                            </tr>
+                        `;
+                    }
+                });
+                
+                if (!hasData) {
+                    html += `
+                                            <tr>
+                                                <td colspan="4" style="padding: 0.75rem; text-align: center; color: var(--text-light);">
+                                                    No transactions for this period
+                                                </td>
+                                            </tr>
+                    `;
+                }
+                
+                // Add verification row
+                const totalAccountIncome = accountNames.reduce((sum, name) => sum + (p.accountBreakdown[name]?.income || 0), 0);
+                const totalAccountExpenses = accountNames.reduce((sum, name) => sum + (p.accountBreakdown[name]?.expenses || 0), 0);
+                const totalAccountCashFlow = totalAccountIncome - totalAccountExpenses;
+                const incomeMatch = Math.abs(totalAccountIncome - p.income) < 0.01;
+                const expensesMatch = Math.abs(totalAccountExpenses - p.expenses) < 0.01;
+                const cashFlowMatch = Math.abs(totalAccountCashFlow - p.cashFlow) < 0.01;
+                
+                html += `
+                                            <tr style="background: ${incomeMatch && expensesMatch && cashFlowMatch ? '#e6fffa' : '#fee'}; border-top: 2px solid ${incomeMatch && expensesMatch && cashFlowMatch ? 'var(--success)' : 'var(--danger)'};">
+                                                <td style="padding: 0.75rem; font-weight: 700;">Total (Verification)</td>
+                                                <td style="padding: 0.75rem; text-align: right; font-weight: 700; color: var(--success);">
+                                                    ${formatCurrency(totalAccountIncome)}
+                                                    ${incomeMatch ? '✓' : `⚠ (Expected: ${formatCurrency(p.income)})`}
+                                                </td>
+                                                <td style="padding: 0.75rem; text-align: right; font-weight: 700; color: var(--danger);">
+                                                    ${formatCurrency(totalAccountExpenses)}
+                                                    ${expensesMatch ? '✓' : `⚠ (Expected: ${formatCurrency(p.expenses)})`}
+                                                </td>
+                                                <td style="padding: 0.75rem; text-align: right; font-weight: 700; color: ${cashFlowMatch ? 'var(--success)' : 'var(--danger)'};">
+                                                    ${formatCurrency(totalAccountCashFlow)}
+                                                    ${cashFlowMatch ? '✓' : `⚠ (Expected: ${formatCurrency(p.cashFlow)})`}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </td>
                     </tr>
                 `;
