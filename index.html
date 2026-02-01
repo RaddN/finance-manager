@@ -5511,16 +5511,119 @@
         }
 
         // Normalize numeric values - convert strings to numbers
+        // Also evaluates equations if present
         function parseNumber(value) {
             if (value === null || value === undefined || value === '') return 0;
             if (typeof value === 'number') return value;
             if (typeof value === 'string') {
+                // First try to evaluate as equation
+                const equationResult = evaluateEquation(value);
+                if (equationResult !== null) {
+                    return equationResult;
+                }
+                // Fall back to regular number parsing
                 // Remove any currency symbols, commas, spaces
                 const cleaned = value.toString().replace(/[৳$€£,\s]/g, '').trim();
                 const num = parseFloat(cleaned);
                 return isNaN(num) ? 0 : num;
             }
             return 0;
+        }
+
+        // Setup equation result display for amount input fields
+        function setupEquationDisplay(inputId) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+            
+            // Create or get the result display element
+            let resultDisplay = input.parentElement.querySelector('.equation-result');
+            if (!resultDisplay) {
+                resultDisplay = document.createElement('div');
+                resultDisplay.className = 'equation-result';
+                resultDisplay.style.cssText = 'margin-top: 0.25rem; font-size: 0.875rem; color: var(--primary, #0066cc); font-weight: 500; min-height: 1.25rem;';
+                input.parentElement.appendChild(resultDisplay);
+            }
+            
+            // Function to update the display
+            const updateDisplay = () => {
+                const value = input.value.trim();
+                if (!value) {
+                    resultDisplay.textContent = '';
+                    resultDisplay.style.display = 'none';
+                    return;
+                }
+                
+                // Check if it looks like an equation
+                if (/[+\-*/%=]/.test(value)) {
+                    const result = evaluateEquation(value);
+                    if (result !== null && !isNaN(result) && isFinite(result)) {
+                        resultDisplay.textContent = `= ${formatCurrency(result)}`;
+                        resultDisplay.style.display = 'block';
+                        resultDisplay.style.color = 'var(--primary, #0066cc)';
+                    } else {
+                        resultDisplay.textContent = '';
+                        resultDisplay.style.display = 'none';
+                    }
+                } else {
+                    // Not an equation, hide the display
+                    resultDisplay.textContent = '';
+                    resultDisplay.style.display = 'none';
+                }
+            };
+            
+            // Add event listeners
+            input.addEventListener('input', updateDisplay);
+            input.addEventListener('change', updateDisplay);
+            
+            // Initial update
+            updateDisplay();
+        }
+
+        // Safe equation evaluator - evaluates mathematical expressions
+        function evaluateEquation(expression) {
+            if (!expression || typeof expression !== 'string') return null;
+            
+            // Remove currency symbols, commas, spaces
+            let cleaned = expression.toString().replace(/[৳$€£,\s]/g, '').trim();
+            
+            // If it's just a number, return it
+            if (/^-?\d*\.?\d+$/.test(cleaned)) {
+                return parseFloat(cleaned);
+            }
+            
+            // Check if it contains mathematical operators
+            if (!/[+\-*/%=]/.test(cleaned)) {
+                return null;
+            }
+            
+            // Remove '=' if present at the end (for equations like "10+5=")
+            cleaned = cleaned.replace(/=$/, '');
+            
+            // Only allow safe characters: numbers, decimal points, operators, parentheses
+            // Note: - is placed at the end of character class to be treated as literal
+            if (!/^[0-9+*/()%\s-]+$/.test(cleaned)) {
+                return null;
+            }
+            
+            try {
+                // Replace % with /100 for percentage calculations
+                // Handle cases like "100*10%" -> "100*0.1"
+                cleaned = cleaned.replace(/(\d+(?:\.\d+)?)%/g, '($1/100)');
+                
+                // Use Function constructor for safe evaluation (more secure than eval)
+                // This only allows mathematical operations
+                const result = Function('"use strict"; return (' + cleaned + ')')();
+                
+                // Check if result is a valid number
+                if (typeof result === 'number' && !isNaN(result) && isFinite(result)) {
+                    return result;
+                }
+            } catch (e) {
+                // Invalid expression
+                return null;
+            }
+            
+            return null;
         }
 
         function normalizePaymentHistory(rawHistory) {
@@ -5537,7 +5640,13 @@
 
             return parsedHistory.map(entry => {
                 const normalizedEntry = { ...entry };
-                normalizedEntry.amount = parseNumber(entry?.amount ?? entry?.paid ?? 0);
+                const amountValue = entry?.amount ?? entry?.paid ?? 0;
+                // Preserve equation strings, otherwise parse as number
+                if (typeof amountValue === 'string' && /[+\-*/%=]/.test(amountValue.trim())) {
+                    normalizedEntry.amount = amountValue.trim();
+                } else {
+                    normalizedEntry.amount = parseNumber(amountValue);
+                }
                 const paymentDate = entry?.date || entry?.paymentDate || entry?.recordedAt;
                 normalizedEntry.date = paymentDate ? parseDate(paymentDate) : '';
                 normalizedEntry.note = entry?.note || entry?.notes || '';
@@ -5568,14 +5677,14 @@
             if (!account || !account.name) return 0;
             let balance = Number(account.initialBalance || 0);
             state.data.income.forEach(item => {
-                if (item.account === account.name) balance += Number(item.amount || 0);
+                if (item.account === account.name) balance += parseNumber(item.amount || 0);
             });
             state.data.expenses.forEach(item => {
-                if (item.account === account.name) balance -= Number(item.amount || 0);
+                if (item.account === account.name) balance -= parseNumber(item.amount || 0);
             });
             (state.data.transfers || []).forEach(transfer => {
-                if (transfer.fromAccount === account.name) balance -= Number(transfer.amount || 0);
-                if (transfer.toAccount === account.name) balance += Number(transfer.amount || 0);
+                if (transfer.fromAccount === account.name) balance -= parseNumber(transfer.amount || 0);
+                if (transfer.toAccount === account.name) balance += parseNumber(transfer.amount || 0);
             });
             return balance;
         }
@@ -5623,12 +5732,26 @@
                     if (normalized.calculatedOn) normalized.calculatedOn = parseDate(normalized.calculatedOn);
                 }
 
-                // Normalize numeric amounts
+                // Normalize numeric amounts - preserve equations as strings
                 if ('amount' in normalized) {
-                    normalized.amount = parseNumber(normalized.amount);
+                    // If it's already a string that looks like an equation, keep it
+                    if (typeof normalized.amount === 'string' && /[+\-*/%=]/.test(normalized.amount.trim())) {
+                        // Keep the equation string as-is
+                        normalized.amount = normalized.amount.trim();
+                    } else {
+                        // Otherwise, parse as number (for backward compatibility)
+                        normalized.amount = parseNumber(normalized.amount);
+                    }
                 }
                 if ('targetAmount' in normalized) {
-                    normalized.targetAmount = parseNumber(normalized.targetAmount);
+                    // If it's already a string that looks like an equation, keep it
+                    if (typeof normalized.targetAmount === 'string' && /[+\-*/%=]/.test(normalized.targetAmount.trim())) {
+                        // Keep the equation string as-is
+                        normalized.targetAmount = normalized.targetAmount.trim();
+                    } else {
+                        // Otherwise, parse as number (for backward compatibility)
+                        normalized.targetAmount = parseNumber(normalized.targetAmount);
+                    }
                 }
 
                 // Normalize boolean values (recurring)
@@ -5993,7 +6116,9 @@
         }
 
         function formatCurrency(amount) {
-            return CONFIG.currency + Number(amount).toLocaleString('en-BD');
+            // Use parseNumber to handle equations
+            const numAmount = parseNumber(amount);
+            return CONFIG.currency + numAmount.toLocaleString('en-BD');
         }
 
         // Format date according to user's date format setting
@@ -7572,7 +7697,7 @@
                 const tr = document.createElement('tr');
                 let cols = '';
                 const itemKey = `${type}-${originalIndex}`;
-                const amount = Number(item.amount || 0);
+                const amount = parseNumber(item.amount || 0);
                 totalAmount += amount;
 
                 // Checkbox column
@@ -9149,7 +9274,7 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">${t('amount')}</label>
-                            <input type="number" class="form-input" id="inp-amount" placeholder="0" step="0.01" value="${item?.amount || ''}">
+                            <input type="text" class="form-input" id="inp-amount" placeholder="0" value="${item?.amount || ''}">
                         </div>
                         <div class="form-group">
                             <label class="form-label">${t('date')}</label>
@@ -9227,7 +9352,7 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">${t('amount')}</label>
-                            <input type="number" class="form-input" id="inp-amount" placeholder="0" step="0.01" value="${item?.amount || ''}">
+                            <input type="text" class="form-input" id="inp-amount" placeholder="0" value="${item?.amount || ''}">
                         </div>
                         <div class="form-group">
                             <label class="form-label">${t('date')}</label>
@@ -9300,7 +9425,7 @@
                         return `
                                         <div class="form-group" style="margin-bottom: 0.5rem; display: none;" id="contribution-${actualIdx}">
                                             <label class="form-label" style="font-size: 0.875rem;">${member.name}${member.relation ? ` (${member.relation})` : ''}</label>
-                                            <input type="number" class="form-input" id="inp-contribution-${actualIdx}" step="0.01" value="${memberAmount}" placeholder="0.00" onchange="updateContributionTotal()">
+                                            <input type="text" class="form-input" id="inp-contribution-${actualIdx}" value="${memberAmount}" placeholder="0.00" onchange="updateContributionTotal()">
                                         </div>
                                     `;
                     }).join('')}
@@ -9430,7 +9555,7 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">${t('target_amount')}</label>
-                            <input type="number" class="form-input" id="inp-target" placeholder="0" value="${item?.targetAmount || ''}">
+                            <input type="text" class="form-input" id="inp-target" placeholder="0" value="${item?.targetAmount || ''}">
                         </div>
                         <div class="form-group">
                             <label class="form-label">${t('start_date')}</label>
@@ -9539,6 +9664,11 @@
                 content.innerHTML = formHTML;
                 setTimeout(() => {
                     translatePage();
+                    
+                    // Setup equation display for amount fields
+                    setupEquationDisplay('inp-amount');
+                    setupEquationDisplay('inp-target');
+                    
                     // Setup expense contribution UI if it's an expense form
                     if (type === 'expense') {
                         const amountInput = document.getElementById('inp-amount');
@@ -9554,6 +9684,11 @@
 
                         document.querySelectorAll('input[id^="inp-family-member-"]').forEach(checkbox => {
                             checkbox.addEventListener('change', updateContributionUI);
+                        });
+                        
+                        // Setup equation display for contribution inputs
+                        document.querySelectorAll('input[id^="inp-contribution-"]').forEach(input => {
+                            setupEquationDisplay(input.id);
                         });
 
                         // Initial calculation
@@ -9688,7 +9823,26 @@
 
             // Helper to get value
             const val = (id) => document.getElementById(id)?.value || '';
-            const num = (id) => Number(document.getElementById(id)?.value) || 0;
+            const num = (id) => {
+                const input = document.getElementById(id);
+                if (!input) return 0;
+                const value = input.value || '';
+                // Try to evaluate as equation first
+                const equationResult = evaluateEquation(value);
+                if (equationResult !== null) {
+                    return equationResult;
+                }
+                // Fall back to regular number parsing
+                return Number(value) || 0;
+            };
+            // Helper to get raw value (preserves equations for storage in Excel)
+            const getRawAmount = (id) => {
+                const input = document.getElementById(id);
+                if (!input) return '';
+                const value = input.value || '';
+                // Return the raw value (equation or number) as string
+                return value.trim();
+            };
 
             const isEditing = editingIndex !== null;
 
@@ -9735,7 +9889,7 @@
                 newItem = {
                     source: val('inp-source'),
                     category: val('inp-category') || 'Other',
-                    amount: num('inp-amount'),
+                    amount: getRawAmount('inp-amount'),
                     date: val('inp-date'),
                     account: val('inp-account'),
                     familyMember: familyMember || undefined,
@@ -9767,11 +9921,12 @@
                     const checkbox = document.getElementById(`inp-family-member-${idx}`);
                     if (checkbox && checkbox.checked) {
                         selectedFamilyMembers.push(member.name);
-                        // If custom contribution, get the amount
+                        // If custom contribution, get the amount (store raw equation)
                         if (contributionType === 'custom') {
                             const contributionInput = document.getElementById(`inp-contribution-${idx}`);
                             if (contributionInput && contributionInput.value) {
-                                contributions[member.name] = parseFloat(contributionInput.value) || 0;
+                                // Store raw value (equation or number) for Excel
+                                contributions[member.name] = contributionInput.value.trim();
                             }
                         }
                     }
@@ -9780,7 +9935,7 @@
                 newItem = {
                     description: val('inp-desc'),
                     category: val('inp-category') || 'Other',
-                    amount: num('inp-amount'),
+                    amount: getRawAmount('inp-amount'),
                     date: val('inp-date'),
                     account: val('inp-account'),
                     expenseFor: expenseFor, // Person the expense is given to
@@ -9804,7 +9959,7 @@
                 newItem = {
                     from: val('inp-from'),
                     description: val('inp-desc'),
-                    amount: num('inp-amount'),
+                    amount: getRawAmount('inp-amount'),
                     dueDate: val('inp-duedate'),
                     status: val('inp-status') || 'unpaid',
                     priority: val('inp-priority') || 'medium',
@@ -9823,7 +9978,7 @@
                 newItem = {
                     to: val('inp-to'),
                     description: val('inp-desc'),
-                    amount: num('inp-amount'),
+                    amount: getRawAmount('inp-amount'),
                     dueDate: val('inp-duedate'),
                     status: val('inp-status') || 'unpaid',
                     priority: val('inp-priority') || 'medium',
@@ -9841,7 +9996,7 @@
                 if (!validateRequired(val('inp-deadline'), 'Deadline')) return;
                 newItem = {
                     title: val('inp-title'),
-                    targetAmount: num('inp-target'),
+                    targetAmount: getRawAmount('inp-target'),
                     startDate: val('inp-start-date') || val('inp-deadline'),
                     deadline: val('inp-deadline'),
                     status: val('inp-status') || 'in progress',
@@ -9859,7 +10014,7 @@
                 if (!validateAmount(num('inp-amount'), 'Budget Amount')) return;
                 newItem = {
                     category: val('inp-category'),
-                    amount: num('inp-amount'),
+                    amount: getRawAmount('inp-amount'),
                     period: val('inp-period') || 'monthly'
                 };
                 if (isEditing && editingIndex !== null) {
@@ -11059,7 +11214,7 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label">Amount *</label>
-                        <input type="number" class="form-input" id="template-amount" required step="0.01" value="${template?.amount || ''}" placeholder="0.00">
+                        <input type="text" class="form-input" id="template-amount" required value="${template?.amount || ''}" placeholder="0.00">
                     </div>
                     <div class="form-group">
                         <label class="form-label">Category</label>
@@ -11086,6 +11241,11 @@
                     </div>
                 </form>
             `;
+            
+            // Setup equation display for template amount
+            setTimeout(() => {
+                setupEquationDisplay('template-amount');
+            }, 50);
         }
 
         function saveTemplate(event, templateIndex) {
@@ -11175,15 +11335,15 @@
                 // Calculate account balance from transactions
                 let balance = Number(account.initialBalance || 0);
                 state.data.income.forEach(item => {
-                    if (item.account === account.name) balance += Number(item.amount || 0);
+                    if (item.account === account.name) balance += parseNumber(item.amount || 0);
                 });
                 state.data.expenses.forEach(item => {
-                    if (item.account === account.name) balance -= Number(item.amount || 0);
+                    if (item.account === account.name) balance -= parseNumber(item.amount || 0);
                 });
                 // Handle transfers
                 (state.data.transfers || []).forEach(transfer => {
-                    if (transfer.fromAccount === account.name) balance -= Number(transfer.amount || 0);
-                    if (transfer.toAccount === account.name) balance += Number(transfer.amount || 0);
+                    if (transfer.fromAccount === account.name) balance -= parseNumber(transfer.amount || 0);
+                    if (transfer.toAccount === account.name) balance += parseNumber(transfer.amount || 0);
                 });
 
                 const typeColors = {
@@ -11468,7 +11628,7 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label">${t('amount')} *</label>
-                        <input type="number" class="form-input" id="transfer-amount" required step="0.01" value="${transfer?.amount || ''}" placeholder="0.00">
+                        <input type="text" class="form-input" id="transfer-amount" required value="${transfer?.amount || ''}" placeholder="0.00">
                     </div>
                     <div class="form-group">
                         <label class="form-label">${t('date')} *</label>
@@ -11488,6 +11648,11 @@
                     </div>
                 </form>
             `;
+            
+            // Setup equation display for transfer amount
+            setTimeout(() => {
+                setupEquationDisplay('transfer-amount');
+            }, 50);
         }
 
         function saveTransfer(event, transferIndex) {
@@ -11502,10 +11667,21 @@
                 return;
             }
 
+            const transferAmountInput = document.getElementById('transfer-amount');
+            const transferAmountRaw = transferAmountInput ? transferAmountInput.value.trim() : '0';
+            // Validate the amount (but store raw equation)
+            const transferAmountValue = transferAmountRaw || '0';
+            const transferAmountEquation = evaluateEquation(transferAmountValue);
+            const transferAmountForValidation = transferAmountEquation !== null ? transferAmountEquation : (Number(transferAmountValue) || 0);
+            if (!transferAmountForValidation || transferAmountForValidation <= 0) {
+                showToast('Transfer amount must be greater than zero', 'error');
+                return;
+            }
+            
             const transfer = {
                 fromAccount: fromAccount,
                 toAccount: toAccount,
-                amount: Number(document.getElementById('transfer-amount').value) || 0,
+                amount: transferAmountRaw, // Store raw equation
                 date: document.getElementById('transfer-date').value,
                 description: document.getElementById('transfer-description').value || '',
                 notes: document.getElementById('transfer-notes').value || ''
@@ -12166,7 +12342,7 @@
                     <form onsubmit="savePayment(event, ${debtIndex})">
                         <div class="form-group">
                             <label class="form-label">${t('amount_paid')} *</label>
-                            <input type="number" class="form-input" id="payment-amount" required step="0.01" placeholder="0.00">
+                            <input type="text" class="form-input" id="payment-amount" required placeholder="0.00">
                         </div>
                         <div class="form-group">
                             <label class="form-label">${t('payment_date') || 'Payment Date'}</label>
@@ -12193,11 +12369,21 @@
                     </form>
                 </div>
             `;
+            
+            // Setup equation display for payment amount
+            setTimeout(() => {
+                setupEquationDisplay('payment-amount');
+            }, 50);
         }
 
         function savePayment(event, debtIndex) {
             event.preventDefault();
-            const paymentAmount = Number(document.getElementById('payment-amount').value) || 0;
+            const paymentAmountInput = document.getElementById('payment-amount');
+            const paymentAmountRaw = paymentAmountInput ? paymentAmountInput.value.trim() : '0';
+            // Validate the amount (but store raw equation)
+            const paymentAmountValue = paymentAmountRaw || '0';
+            const paymentAmountEquation = evaluateEquation(paymentAmountValue);
+            const paymentAmount = paymentAmountEquation !== null ? paymentAmountEquation : (Number(paymentAmountValue) || 0);
             const paymentDate = document.getElementById('payment-date').value || new Date().toISOString().split('T')[0];
             const paymentNote = document.getElementById('payment-notes').value || '';
             const paymentMethod = document.getElementById('payment-method') ? document.getElementById('payment-method').value : 'Other';
@@ -12210,7 +12396,7 @@
             }
 
             debt.paymentHistory.push({
-                amount: paymentAmount,
+                amount: paymentAmountRaw, // Store raw equation
                 date: paymentDate,
                 note: paymentNote,
                 method: paymentMethod,
@@ -13440,7 +13626,9 @@
 
             if (!amountInput || !contributionTypeSection) return;
 
-            const amount = parseFloat(amountInput.value) || 0;
+            const amountValue = amountInput.value || '0';
+            const amountEquation = evaluateEquation(amountValue);
+            const amount = amountEquation !== null ? amountEquation : (parseFloat(amountValue) || 0);
             const selectedCount = document.querySelectorAll('input[id^="inp-family-member-"]:checked').length;
             const expenseFor = expenseForSelect ? expenseForSelect.value : '';
 
@@ -13480,6 +13668,12 @@
                             }
                         });
                         updateContributionTotal();
+                        // Setup equation display for all visible contribution inputs
+                        setTimeout(() => {
+                            document.querySelectorAll('input[id^="inp-contribution-"]').forEach(input => {
+                                setupEquationDisplay(input.id);
+                            });
+                        }, 10);
                     }
                 }
                 if (expenseTotalAmount) {
@@ -13498,13 +13692,17 @@
 
             let total = 0;
             document.querySelectorAll('input[id^="inp-contribution-"]').forEach(input => {
-                const value = parseFloat(input.value) || 0;
+                const equationResult = evaluateEquation(input.value);
+                const value = equationResult !== null ? equationResult : (parseFloat(input.value) || 0);
                 total += value;
             });
 
             totalSpan.textContent = formatCurrency(total);
 
-            const expenseAmount = parseFloat(document.getElementById('inp-amount')?.value || 0);
+            const expenseAmountInput = document.getElementById('inp-amount');
+            const expenseAmountValue = expenseAmountInput?.value || '0';
+            const expenseAmountEquation = evaluateEquation(expenseAmountValue);
+            const expenseAmount = expenseAmountEquation !== null ? expenseAmountEquation : (parseFloat(expenseAmountValue) || 0);
             if (expenseTotalSpan) {
                 expenseTotalSpan.textContent = formatCurrency(expenseAmount);
             }
